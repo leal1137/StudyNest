@@ -8,3 +8,7 @@ Restart terminal
 nvm install --lts
 npm install express
 npm install socket.io
+
+Skriv node server.js för att starta servern
+Öppna http://localhost:3000 i två private fönster.
+Det man skriver kommer dycka upp i båda fönstrena.
