@@ -1,3 +1,5 @@
+Kör fäljande i wsl:
+
 sudo apt update
 sudo apt install nodejs npm
 Restart terminal
@@ -5,8 +7,4 @@ curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 Restart terminal
 nvm install --lts
 npm install express
-
-
-
-If you decide to build a server using purely raw Node.js without Express, 
-your code becomes much harder to read and manage.
+npm install socket.io

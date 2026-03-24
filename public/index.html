@@ -3,17 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyNest</title>
+    <title>StudyNest Chat</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <div class="container">
-        <h1>Welcome to StudyNest</h1>
-        <p>This is a real website now. Check out the styling!</p>
-        <button id="helloButton">Click Me</button>
+        <h1>StudyNest Live Chat</h1>
+        
+        <ul id="messages" class="chat-box"></ul>
+        
+        <form id="chatForm" class="chat-form">
+            <input id="chatInput" autocomplete="off" placeholder="Type a message..." required />
+            <button type="submit">Send</button>
+        </form>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
+    
     <script src="client.js"></script>
 </body>
 </html>
