@@ -4,7 +4,7 @@ let chatActive = false;
 
 const messages = document.getElementById("messages");
 
-function ConnectChat(){
+export function ConnectChat(){
     if (chatActive) {
         disconnectServer();
     }else {
@@ -49,7 +49,7 @@ function disconnectServer() {
     chatActive = false;
 }
 
-function sendMessage() {
+export function sendMessage() {
     const input = document.getElementById("input");
 
     if (input.value && socket) {
