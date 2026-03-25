@@ -1,4 +1,5 @@
 let socket;
+let username = "";
 let chatActive = false;
 
 const messages = document.getElementById("messages");
@@ -7,6 +8,11 @@ function ConnectChat(){
     if (chatActive) {
         disconnectServer();
     }else {
+        username = prompt("Username:");
+        if (!username){
+            alert("Username cannot be empty!");
+            return;
+        }
         connectServer();
     }
 }
@@ -20,7 +26,7 @@ function connectServer() {
 
     socket.on("chat message", (msg) => {
         const item = document.createElement("li");
-        item.textContent = msg;
+        item.textContent = `${msg.user}: ${msg.msg}`;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
     });
@@ -47,7 +53,8 @@ function sendMessage() {
     const input = document.getElementById("input");
 
     if (input.value && socket) {
-        socket.emit("chat message", input.value);
+        const message = {user: username, msg:input.value};
+        socket.emit("chat message", message);
         input.value = "";
     }
 }
