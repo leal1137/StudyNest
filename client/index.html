@@ -1,36 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Enkel Socket.IO sida</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyNest</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<h1>Enkel chatt</h1>
+    <h1 class="title">StudyNest</h1>
 
-<ul id="messages"></ul>
+    <button class="ButtonOne" id="connectbutton" onclick="ConnectChat()">
+        Connect
+    </button>
 
-<input id="input" autocomplete="off" placeholder="Skriv något..." />
-<button onclick="sendMessage()">Skicka</button>
+    <ul id="messages"></ul>
 
-<script src="/socket.io/socket.io.js"></script>
-<script>
-    const socket = io();
 
-    const input = document.getElementById("input");
-    const messages = document.getElementById("messages");
+    <div id="chat" style="display: none;">
+        <h1 class="underTitle" >Chat</h1>
+        <h1 class="underTitle">Status: Not connected</h1>
+        <div id="inputContainer">
+            <input id="input" autocomplete="off" placeholder="Write something..." />
+            <button id="sendButton" onclick="sendMessage()">
+                Send
+            </button>
+        </div>
+    </div>
 
-    function sendMessage() {
-        const msg = input.value;
-        socket.emit("chat message", msg);
-        input.value = "";
-    }
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
 
-    socket.on("chat message", (msg) => {
-        const li = document.createElement("li");
-        li.textContent = msg;
-        messages.appendChild(li);
-    });
-</script>
-
-</body>
-</html>
+</body> 
+</html> 

@@ -9,22 +9,17 @@ const io = new Server(server);
 app.use(express.static("client"));
 
 io.on("connection", (socket) => {
-    console.log("En klient anslöt:", socket.id);
+    console.log("En användare ansluten:", socket.id);
 
-    // Ta emot meddelande från klient
     socket.on("chat message", (msg) => {
-        console.log("Meddelande:", msg);
-
-        // Skicka tillbaka till alla klienter
-        io.emit("chat message", msg);
+        io.emit("chat message", msg); // skicka till alla
     });
 
     socket.on("disconnect", () => {
-        console.log("Klient lämnade:", socket.id);
+        console.log("Användare frånkopplad:", socket.id);
     });
 });
 
-// Starta server
 server.listen(3000, () => {
-    console.log("Server körs på http://localhost:3000");
+    console.log("Server kör på http://localhost:3000");
 });
