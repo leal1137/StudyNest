@@ -1,7 +1,7 @@
 class User {
-    constructor( username, room) {
+    constructor( username) {
         this.username = username;
-        this.room = room;
+        this.room = null;
     }
     getUsername() {
         return this.username;

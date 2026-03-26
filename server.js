@@ -17,13 +17,12 @@ io.on('connection', (socket) => {
     console.log('User connected:', socket.id);
 
     socket.on('login', (username) => {
-        listUsers[socket.id] = new User(username, null);
+        listUsers[socket.id] = new User(username);
         console.log('User logged in:', username);
     });
 
     socket.on('join_room', (room) => {
         socket.join(room);
-
         if (listUsers[socket.id]) {
             listUsers[socket.id].room = room;
 
