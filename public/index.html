@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StudyNest Simple</title>
+</head>
+<body>
+  <h1>Study Room</h1>
+
+  <input id="username" placeholder="Username" />
+  <input id="room" placeholder="Room" />
+  <button onclick="joinRoom()">Join Room</button>
+
+  <div id="chat" style="margin-top:20px;"></div>
+
+  <input id="message" placeholder="Message" />
+  <button onclick="sendMessage()">Send</button>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    function joinRoom() {
+      const username = document.getElementById('username').value;
+      const room = document.getElementById('room').value;
+      socket.emit('join_room', { username, room });
+    }
+
+    function sendMessage() {
+      const message = document.getElementById('message').value;
+      socket.emit('send_message', message);
+    }
+
+    socket.on('receive_message', (data) => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<p><b>${data.username}:</b> ${data.message}</p>`;
+    });
+
+    socket.on('user_joined', (username) => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<p><i>${username} joined</i></p>`;
+    });
+
+    socket.on('joined_room', (data) => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<p><b>You joined room ${data.room}</b></p>`;
+    });
+
+    socket.on('user_left', (username) => {
+      const chat = document.getElementById('chat');
+      chat.innerHTML += `<p><i>${username} left</i></p>`;
+    });
+  </script>
+</body>
+</html>
