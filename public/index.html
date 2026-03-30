@@ -15,7 +15,26 @@
   <input id="message" placeholder="Message" />
   <button onclick="sendMessage()">Send</button>
 
+  <!--Nytt-->
+  <div id="connection-warning" style="
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      background-color: #ff9800; 
+      color: white; 
+      text-align: center; 
+      padding: 10px; 
+      z-index: 9999; 
+      font-family: sans-serif;
+  ">
+      Anslutningen till servern är bryten
+  </div>
+
   <script src="/socket.io/socket.io.js"></script>
+  <!--Nytt-->
+  <script src="script.js"></script>
   <script>
     const socket = io();
 
