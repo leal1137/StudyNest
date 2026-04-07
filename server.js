@@ -13,9 +13,17 @@ app.use(express.json());
 app.use(express.static('public'));
 
 const users = []; // later → PostgreSQL
-users.push({ id:0, email:"test@test.su.se", password:"abc"});
 
 const bcrypt = require('bcrypt');
+(async () => {
+  const hashed = await bcrypt.hash("abc", 10);
+
+  users.push({
+    id: 0,
+    email: "test@test.su.se",
+    password: hashed
+  });
+})();
 
 const allowedDomains = ['kth.se', 'su.se', 'student.uu.se'];
 
