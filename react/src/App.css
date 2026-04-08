@@ -1,0 +1,76 @@
+/* 1. Reset standard browser margins */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. The Main Container */
+.LoginPage {
+  display: flex;
+  height: 100vh; 
+  font-family: sans-serif;
+}
+
+/* 3. The Sidebar */
+.sidebar {
+  width: 60px;
+  background-color: #5a5f7e; 
+  border-right: 3px solid #1a82e2; 
+  display: flex;
+  justify-content: center;
+  padding-top: 15px;
+}
+
+.hamburger-icon {
+  color: white;
+  font-size: 35px;
+  cursor: pointer;
+  line-height: 1;
+}
+
+/* 4. The Main Content Area */
+.main-content {
+  flex-grow: 1; 
+  background-color: #eeddbb; 
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+}
+
+/* 5. The Login Box Styling */
+.login-box {
+  color: white; 
+  font-size: 28px;
+}
+
+.login-box h2 {
+  text-align: center;
+  font-weight: normal;
+  margin-bottom: 40px;
+  letter-spacing: 1px;
+  color: black; /* Changed to black so you can see it on the beige background! */
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.input-group label {
+  width: 150px; 
+  text-align: right;
+  margin-right: 15px;
+  color: black; 
+}
+
+.input-group input {
+  height: 40px;
+  width: 250px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 20px;
+  padding: 0 10px;
+  outline: none;
+}
