@@ -6,7 +6,9 @@ const { Server } = require('socket.io');
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: { origin: '*' }
+  cors: { origin: '*' },
+  pingTimeout: 5000,
+  pingInterval: 2000
 });
 
 app.use(express.json());
@@ -101,7 +103,15 @@ io.on('connection', (socket) => {
   });
 });
 
+//Nytt
+process.on('SIGINT', () => {
+  io.emit('server_shutdown', 'Servern har stängts ner');
 
+  setTimeout(() => {
+    console.log('Servern stängs ner');
+    process.exit(0);
+  }, 1000);
+});
 
 server.listen(3000, () => {
   console.log('Server running on http://localhost:3000');
