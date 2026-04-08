@@ -2,6 +2,11 @@
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
+require('dotenv').config();
+
+const pool = require('./db/pool');
+const roomRoutes = require('./routes/rooms');
+const userRoutes = require('./routes/users');
 
 const app = express();
 const server = http.createServer(app);
@@ -13,6 +18,9 @@ const io = new Server(server, {
 
 app.use(express.json());
 app.use(express.static('public'));
+app.use(express.json());
+app.use('/api/rooms', roomRoutes);
+app.use('/api/users', userRoutes);
 
 const users = []; // later → PostgreSQL
 
