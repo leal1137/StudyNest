@@ -1,117 +1,43 @@
-let socket;
-
-function login() {
-    socket = io();
-    const username = prompt('Enter your username:');
-    socket.emit('login', username);
-
-    socket.on('receive_message', (data) => {
-        const chat = document.getElementById('chat');
-        chat.innerHTML += `<p><b>${data.username}:</b> ${data.message}</p>`;
-    });
-
-    socket.on('user_joined', (username) => {
-        const chat = document.getElementById('chat');
-        chat.innerHTML += `<p><i>${username} joined</i></p>`;
-    });
-
-    socket.on('joined_room', (data) => {
-        const chat = document.getElementById('chat');
-        chat.innerHTML += `<p><b>You joined room ${data.room}</b></p>`;
-    });
-
-    socket.on('user_left', (username) => {
-        const chat = document.getElementById('chat');
-        chat.innerHTML += `<p><i>${username} left</i></p>`;
-    });
-}
-
-function joinRoom() {
-    const room = document.getElementById('room').value;
-    socket.emit('join_room', room);
-    document.getElementById('room').value = "";
+// --- 1. KONTROLLERA INLOGGNING DIREKT ---
 const token = localStorage.getItem('token');
 
+// Om ingen token finns, skicka användaren till inloggningssidan direkt
 if (!token) {
-    window.location.href = '/login.html';
+    window.location.href = '/login.html'; 
 }
 
+// --- 2. STARTA SOCKET-ANSLUTNING MED TOKEN ---
 const socket = io({
     auth: {
-      token: localStorage.getItem('token')
+      token: token
     }
-  });
+});
 
-const bcrypt = require('bcrypt');
 
-const allowedDomains = ['kth.se', 'su.se', 'student.uu.se'];
+// --- 3. UI-FUNKTIONER ---
+function joinRoom() {
+    const room = document.getElementById('room').value;
+    if (room) {
+        socket.emit('join_room', room);
+        document.getElementById('room').value = ""; // Töm fältet
+    }
+}
 
-function isStudentEmail(email) {
-  const domain = email.split('@')[1];
-  return allowedDomains.includes(domain);
+function sendMessage() {
+    const message = document.getElementById('message').value;
+    if (message) {
+        socket.emit('send_message', message);
+        document.getElementById('message').value = ""; // Töm fältet
+    }
 }
 
 function logout() {
     localStorage.removeItem('token');
     window.location.href = '/login.html';
-  }
-
-app.post('/auth/signup', async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!isStudentEmail(email)) {
-    return res.status(403).json({ error: 'Only students allowed' });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = {
-    id: users.length + 1,
-    email,
-    password: hashedPassword
-  };
-
-  users.push(user);
-
-  res.json({ message: 'User created' });
-});
-
-
-function authMiddleware(req, res, next) {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) return res.sendStatus(401);
-
-  const token = authHeader.split(' ')[1];
-
-  try {
-    const user = jwt.verify(token, SECRET);
-    req.user = user;
-    next();
-  } catch {
-    res.sendStatus(403);
-  }
 }
 
-app.get('/rooms', authMiddleware, (req, res) => {
-  res.json({ rooms: [] });
-});
 
-function joinRoom() {
-    const username = document.getElementById('username').value;
-    const room = document.getElementById('room').value;
-    socket.emit('join_room', { username, room });
-}
-
-function sendMessage() {
-    const message = document.getElementById('message').value;
-    socket.emit('send_message', message);
-    document.getElementById('message').value = "";
-}
-
-    
-}
-
+// --- 4. LYSSNA PÅ HÄNDELSER FRÅN CHATTEN ---
 socket.on('receive_message', (data) => {
     const chat = document.getElementById('chat');
     chat.innerHTML += `<p><b>${data.username}:</b> ${data.message}</p>`;
@@ -124,7 +50,9 @@ socket.on('user_joined', (username) => {
 
 socket.on('joined_room', (data) => {
     const chat = document.getElementById('chat');
-    chat.innerHTML += `<p><b>You joined room ${data.room}</b></p>`;
+    // Hanterar om servern skickar antingen { room: "namn" } eller bara "namn"
+    const roomName = data.room || data; 
+    chat.innerHTML += `<p><b>You joined room ${roomName}</b></p>`;
 });
 
 socket.on('user_left', (username) => {
@@ -132,13 +60,14 @@ socket.on('user_left', (username) => {
     chat.innerHTML += `<p><i>${username} left</i></p>`;
 });
 
-//Nytt
+
+// --- 5. HANTERA FRÅNKOPPLING OCH FEL ---
 const warningBanner = document.getElementById('connection-warning');
 let isPlanned = false; // Håller koll på om det är Ctrl+C eller ett fel
 
+// Om servern stänger ner planerat
 socket.on('server_shutdown', (meddelande) => {
     isPlanned = true;
-    
     document.body.style.margin = '0';
     document.body.innerHTML = `
         <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; text-align: center; font-family: sans-serif; background-color: #f4f4f4;">
@@ -148,13 +77,25 @@ socket.on('server_shutdown', (meddelande) => {
     `;
 });
 
+// Om anslutningen bryts oväntat
 socket.on('disconnect', (reason) => {
-    if (!isPlanned) {
+    if (!isPlanned && warningBanner) {
         warningBanner.style.display = 'block';
     }
 });
 
+// Om vi lyckas ansluta igen
 socket.on('connect', () => {
-    warningBanner.style.display = 'none';
+    if (warningBanner) {
+        warningBanner.style.display = 'none';
+    }
     isPlanned = false;
+});
+
+// Om token är felaktig eller har gått ut
+socket.on('connect_error', (err) => {
+    if (err.message === "Invalid token" || err.message === "No token") {
+        alert("Din inloggning har gått ut eller är ogiltig. Logga in igen.");
+        logout();
+    }
 });
