@@ -1,4 +1,6 @@
 const socket = io();
+
+//Nytt
 const warningBanner = document.getElementById('connection-warning');
 let isPlanned = false; // Håller koll på om det är Ctrl+C eller ett fel
 
