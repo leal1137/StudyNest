@@ -4,6 +4,10 @@
   <title>StudyNest Simple</title>
 </head>
 <body>
+  <h1>Study Room</h1>
+  <div>
+    <button onclick="login()">Login</button>
+  </div>
   <h1>Study Room</h1>s
 
   <input id="username" placeholder="Username" />
@@ -15,6 +19,8 @@
   <input id="message" placeholder="Message" />
   <button onclick="sendMessage()">Send</button>
 
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/script.js"></script>
   <!--Nytt-->
   <div id="connection-warning" style="
       display: none; 
