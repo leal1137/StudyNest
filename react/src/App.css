@@ -6,11 +6,47 @@
 }
 
 /* 2. The Main Container */
+.HomePage,
 .LoginPage {
   display: flex;
   height: 100vh; 
   font-family: sans-serif;
 }
+
+.home-title {
+  position: relative;
+  font-size: 70px;        /* 🔠 size */
+  font-weight: bold;
+
+  color: #000;         /* 🎨 text color (blue) */
+
+  text-align: center;     /* 📍 horizontal position */
+
+  margin-top: -350px;      /* 📍 vertical position */
+
+  font-family: Aclonica, sans-serif; /* 🔤 font family */
+
+  z-index: 2;
+
+}
+
+.vine-img {
+  position: absolute;
+  top: 0px;
+  left: 900px;
+  width: 400px;
+  height: auto;
+  z-index: 1;
+  opacity: 0.6;
+}
+
+
+
+
+
+
+
+/* Components */
 
 /* 3. The Sidebar */
 .sidebar {
@@ -28,6 +64,65 @@
   cursor: pointer;
   line-height: 1;
 }
+
+
+.button-group {
+  position:relative;
+  top: 90px;
+  display: flex;
+  flex-direction: row; 
+  justify-content: center; 
+  gap: 50px; 
+  flex-wrap: wrap;
+  z-index: 2;
+}
+
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* center caption below button */
+  gap: 12px; /* space between button and caption */
+  width: max-content; /* shrink container to fit button */
+}
+
+/* Keep your existing black button styles */
+.black-button {
+  background-color: black;
+  color: white;
+  border: none;
+  padding: 40px 80px;   /* bigger button padding */
+  border-radius: 12px;  /* slightly more rounded corners */
+  cursor: pointer;
+  font-size: 40px;      /* larger text */
+  font-weight: bold;
+  transition: all 0.2s ease;
+  max-width: 400px;     /* allows text to wrap nicely if needed */
+  white-space: normal;  /* allow wrapping */
+  text-align: center;
+}
+
+/* Hover effect stays the same */
+.black-button:hover {
+  background-color: #222;
+  transform: scale(1.05);
+}
+
+/* Caption styling */
+.button-caption {
+  font-size: 26px;      /* slightly bigger caption */
+  color: #555;
+  text-align: center;
+  max-width: 300px;     /* match button width */
+}
+
+
+
+
+
+
+
+
+
 
 /* 4. The Main Content Area */
 .main-content {
