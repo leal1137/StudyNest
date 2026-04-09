@@ -2,6 +2,7 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const { createUser } = require('./users');
 
 const router = express.Router();
 
@@ -38,6 +39,15 @@ router.post('/signup', async (req, res) => {
   };
 
   users.push(user);
+
+  try {
+    await createUser({ username, email });
+  } catch (err) {
+    if (err.code === '23505') {
+      return res.status(409).json({ error: 'Username or email already exists' });
+    }
+    throw err;
+  }
 
   res.json({ message: 'User created' });
 });

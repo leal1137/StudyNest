@@ -1,3 +1,4 @@
+//server.js
 require('dotenv').config();
 
 const express = require('express');
@@ -9,7 +10,7 @@ const SECRET = process.env.SECRET;
 const pool = require('./db/pool');
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
-const userRoutes = require('./routes/users');
+const { router: userRoutes } = require('./routes/users');
 const User = require('./user');
 
 const app = express();
