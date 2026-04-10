@@ -41,7 +41,7 @@ router.post('/signup', async (req, res) => {
   users.push(user);
 
   try {
-    await createUser({ username, email });
+    await createUser({ username, email, hashedPassword });
   } catch (err) {
     if (err.code === '23505') {
       return res.status(409).json({ error: 'Username or email already exists' });
