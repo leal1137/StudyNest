@@ -30,6 +30,7 @@ app.use('/api/users', userRoutes);
 const users = []; // later → PostgreSQL
 const SECRET = 'supersecretkey';
 const allowedDomains = ['kth.se', 'su.se', 'student.uu.se'];
+const room_participants = {}; // { roomId: [userId, ...] }
 
 function isStudentEmail(email) {
   const domain = email.split('@')[1];
@@ -98,18 +99,33 @@ io.on('connection', (socket) => {
 
     socket.on('join_room', (room) => {
         socket.join(room);
-        
+        socket.room = room; // Spara rummet på socketen
+
         // Sätt rummet på User-objektet om det finns
         if (listUsers[socket.id]) {
             listUsers[socket.id].room = room;
+        }
+        if (!room_participants[room]) {
+            room_participants[room] = [];
+        }
+        const userExists = room_participants[room].some(u => u.id === socket.user.userId);
+        if (!userExists) {
+            room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
         }
 
         // 1. Skicka bekräftelse till den som anslöt
         socket.emit('joined_room', { room: room });
 
         // 2. Meddela andra i rummet (Använd namnet från listUsers i första hand, annars e-posten från JWT)
-        const displayName = listUsers[socket.id] ? listUsers[socket.id].getUsername() : socket.user.email;
+        const displayName = listUsers[socket.id] 
+          ? listUsers[socket.id].getUsername() 
+          : socket.user.email;
+
         socket.to(room).emit('user_joined', displayName);
+
+        io.to(room).emit('room_participants', { participants: room_participants[room] || [] });
+         
+
     });
 
     socket.on('send_message', (message) => {
