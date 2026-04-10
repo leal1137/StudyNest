@@ -15,14 +15,10 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* When the URL is "/", show the Home Page */}
-        <Route path="/" element={<HomePage />} />
-        
-        {/* When the URL is "/login", show the Login Page */}
-        <Route path="/login" element={<LoginPage />} />
-        
-        {/* When the URL is "/dashboard", show the Dashboard Page */}
-        <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/" element={<LoginPage />} />
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/createroom" element={<CreateRoomPage />} />
+
       </Routes>
     </BrowserRouter>
   );

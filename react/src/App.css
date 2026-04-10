@@ -1,12 +1,9 @@
-/* 1. Reset standard browser margins */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* 2. The Main Container */
-.HomePage,
 .LoginPage {
   display: flex;
   height: 100vh; 
@@ -48,11 +45,10 @@
 
 /* Components */
 
-/* 3. The Sidebar */
 .sidebar {
   width: 60px;
-  background-color: #5a5f7e; 
-  border-right: 3px solid #1a82e2; 
+  background-color: #5a5f7e;
+  border-right: 3px solid #1a82e2;
   display: flex;
   justify-content: center;
   padding-top: 15px;
@@ -124,7 +120,6 @@
 
 
 
-/* 4. The Main Content Area */
 .main-content {
   flex-grow: 1; 
   background-color: #eeddbb; 
@@ -133,7 +128,6 @@
   align-items: center; 
 }
 
-/* 5. The Login Box Styling */
 .login-box {
   color: white; 
   font-size: 28px;
@@ -144,7 +138,7 @@
   font-weight: normal;
   margin-bottom: 40px;
   letter-spacing: 1px;
-  color: black; /* Changed to black so you can see it on the beige background! */
+  color: black; 
 }
 
 .input-group {
