@@ -30,7 +30,7 @@ router.post('/signup', async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-
+  //
   const user = {
     id: users.length + 1,
     email,
@@ -39,6 +39,7 @@ router.post('/signup', async (req, res) => {
   };
 
   users.push(user);
+  // user in memmory remove
 
   try {
     await createUser({ username, email, hashedPassword });

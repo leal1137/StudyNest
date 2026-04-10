@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const pool = require('../db/pool');
 
+//creates a new user in the database, returns success or error
+// make data base right format
 async function createUser({ username, email, password }) {
     const result = await pool.query(
         'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING *',

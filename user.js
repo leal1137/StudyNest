@@ -1,14 +1,12 @@
 class User {
-    constructor( username) {
+    constructor(username,email,databaseId,socketId) {
         this.username = username;
-        this.room = null;
+        this.email = email;
+        this.databaseId = databaseId;
+        this.socketId = socketId; //finns inte i databasen
     }
     getUsername() {
         return this.username;
     }
-    getRoom() {
-        return this.room;
-    }
-    
 }
 module.exports = User;
