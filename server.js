@@ -112,6 +112,8 @@ io.on('connection', (socket) => {
 // --- 5. GRACEFUL SHUTDOWN ---
 process.on('SIGINT', () => {
   io.emit('server_shutdown', 'Servern har stängts ner');
+  io.disconnectSockets();
+  server.close();
   setTimeout(() => {
     console.log('Servern stängs ner');
     process.exit(0);
@@ -120,6 +122,12 @@ process.on('SIGINT', () => {
 
 
 // --- 6. STARTA SERVER ---
-server.listen(3000, () => {
-  console.log('Server running on http://localhost:3000');
-});
+// Only start listening if we are NOT running tests
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(3000, () => {
+    console.log('Server running on http://localhost:3000');
+  });
+}
+
+// Export the instances so our test files can use them
+module.exports = { app, server, io };
