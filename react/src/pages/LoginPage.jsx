@@ -36,7 +36,7 @@ export default function LogIn() {
                 </div>
                 <button type="submit" style={{padding: '10px 20px', fontSize: '18px',
                                               cursor: 'pointer', margintop: '201px'}}
-                        onClick={() => navigate('/dashboard')}>
+                        onClick={() => navigate('/')}>
                     Login
                 </button>
             </form>

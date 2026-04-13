@@ -1,33 +1,17 @@
 import { useState } from 'react'
-import '../App.css'
-import { Sidebar } from '../components/Sidebar'
+import { Sidebar } from '../components/Sidebar';
+import CreateRoomSettings from '../components/CreateRoomSpecifics';
+import { SelectPlaceOnMap } from '../components/SelectPlaceOnMap';
 
 export default function CreateRoomPage() {
-  const [Roomname, setRoomname] = useState('');
-    
 
 
-    return(
-        <div className="CreateRoomPage">
-          <Sidebar/>
-          <main className="main-content">
-            <form className='NewRoomName'>
-            <div className="input-new-room-name">
-              <h2>Name of room</h2>
-                <label>Name of room</label>
-                <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}/>
-                </div>
-                
-
-
-
-            </form>
-          </main>
-        
-        </div>
-    );
+  return (
+    <div className="CreateRoomPage">
+      <Sidebar />
+      <CreateRoomSettings/>
+      <SelectPlaceOnMap/>
+    </div>
+  )
 
 }

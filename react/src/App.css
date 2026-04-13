@@ -1,10 +1,14 @@
+/* 1. Reset standard browser margins */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-.LoginPage {
+/* 2. The Main Container */
+.HomePage,
+.LoginPage,
+.CreateRoomPage {
   display: flex;
   height: 100vh; 
   font-family: sans-serif;
@@ -12,16 +16,16 @@
 
 .home-title {
   position: relative;
-  font-size: 70px;        /* 🔠 size */
+  font-size: 70px;       
   font-weight: bold;
 
-  color: #000;         /* 🎨 text color (blue) */
+  color: #000;         
 
-  text-align: center;     /* 📍 horizontal position */
+  text-align: center;    
 
-  margin-top: -350px;      /* 📍 vertical position */
+  margin-top: -350px;     
 
-  font-family: Aclonica, sans-serif; /* 🔤 font family */
+  font-family: Aclonica, sans-serif;
 
   z-index: 2;
 
@@ -41,14 +45,13 @@
 
 
 
-
-
 /* Components */
 
+/* 3. The Sidebar */
 .sidebar {
   width: 60px;
-  background-color: #5a5f7e;
-  border-right: 3px solid #1a82e2;
+  background-color: #5a5f7e; 
+  border-right: 3px solid #1a82e2; 
   display: flex;
   justify-content: center;
   padding-top: 15px;
@@ -76,24 +79,23 @@
 .button-container {
   display: flex;
   flex-direction: column;
-  align-items: center; /* center caption below button */
-  gap: 12px; /* space between button and caption */
-  width: max-content; /* shrink container to fit button */
+  align-items: center; 
+  gap: 12px; 
+  width: max-content; 
 }
 
-/* Keep your existing black button styles */
 .black-button {
   background-color: black;
   color: white;
   border: none;
-  padding: 40px 80px;   /* bigger button padding */
-  border-radius: 12px;  /* slightly more rounded corners */
+  padding: 40px 80px;   
+  border-radius: 12px;  
   cursor: pointer;
-  font-size: 40px;      /* larger text */
+  font-size: 40px;      
   font-weight: bold;
   transition: all 0.2s ease;
-  max-width: 400px;     /* allows text to wrap nicely if needed */
-  white-space: normal;  /* allow wrapping */
+  max-width: 400px;   
+  white-space: normal;  
   text-align: center;
 }
 
@@ -105,10 +107,45 @@
 
 /* Caption styling */
 .button-caption {
-  font-size: 26px;      /* slightly bigger caption */
+  font-size: 26px;      
   color: #555;
   text-align: center;
-  max-width: 300px;     /* match button width */
+  max-width: 300px;     
+}
+
+
+.choose-location-button {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%); 
+  background-color: #4a6750; 
+  color: white;
+  padding: 15px 30px;
+  border-radius: 25px;
+  font-size: 20px;
+  border: none;
+  cursor: pointer;
+  z-index: 10; 
+}
+
+
+
+.Create-room-button {
+  background-color: #f3f4f7; 
+  color: black;
+  border: none;
+  padding: 24px 30px;
+  border-radius: 25px; 
+  font-size: 18px;
+  cursor: pointer;
+  width: 250px; 
+  margin-top: 400px; 
+
+}
+
+.Create-room-button:hover {
+  background-color: #d0d3d9;
 }
 
 
@@ -116,18 +153,44 @@
 
 
 
-
-
-
-
+/* 4. The Main Content Area */
 .main-content {
   flex-grow: 1; 
   background-color: #eeddbb; 
   display: flex;
   justify-content: center; 
   align-items: center; 
+}   
+
+
+
+.CreateRoomForm {
+  width: 350px;
+  background-color: #eeddbb;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
 }
 
+
+/* Map specifics for Create room page*/
+.map-component {
+  flex: 1;
+  position: relative;
+}
+
+.map-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+
+
+/* 5. The Login Box Styling */
 .login-box {
   color: white; 
   font-size: 28px;
@@ -138,7 +201,7 @@
   font-weight: normal;
   margin-bottom: 40px;
   letter-spacing: 1px;
-  color: black; 
+  color: black;
 }
 
 .input-group {
@@ -160,6 +223,13 @@
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 20px;
-  padding: 0 10px;
+  padding: 16 10px;
   outline: none;
+}
+
+
+
+.login-box {
+  color: white; 
+  font-size: 28px;
 }
