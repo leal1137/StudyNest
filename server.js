@@ -30,7 +30,16 @@ app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 
 // --- 3. SOCKET.IO MIDDLEWARE (JWT) ---
-// VARNING: Läs kommentaren nedanför koden om denna ställer till det!
+
+/**
+ * Fungerar som en dörrvakt för chatten. Den kollar användarens JWT-token 
+ * för att se till att bara inloggade personer får ansluta. Om allt 
+ * stämmer sparas användarens uppgifter direkt på anslutningen (socketen).
+ * @name authenticateSocket
+ * @function
+ * @param {Object} socket - Klientens anslutningsobjekt.
+ * @param {Function} next - Callback-funktion för att godkänna (next()) eller neka (next(Error)) anslutningen.
+ */
 io.use((socket, next) => {
   const token = socket.handshake.auth.token;
   if (!token) return next(new Error('No token'));
@@ -48,15 +57,41 @@ io.use((socket, next) => {
 // --- 4. SOCKET.IO CHATTLOGIK ---
 let listActiveUsers = {};
 
+
+/**
+ * Hanterar en ny anslutning till realtidsservern. 
+ * Lyssnar efter klientens händelser och sätter upp logiken för inloggning, 
+ * chattrum och meddelanden för just denna specifika användare.
+ *
+ * @name onSocketConnection
+ * @function
+ * @param {Object} socket - Klientens unika anslutningsobjekt.
+ */
 io.on('connection', (socket) => {
     console.log('User connected:', socket.user.email, 'Socket ID:', socket.id);
 
-    // Bevarar gamla login-logiken för User-klassen om ni använder den
+    /**
+     * Registrerar användaren manuellt och skapar ett nytt User-objekt på servern.
+     *
+     * @name socketOnLogin
+     * @function
+     * @param {string} username - Namnet som användaren väljer vid inloggning.
+     */
     socket.on('login', (username) => {
         listActiveUsers[socket.id] = new User(username);
         console.log('User logged in:', username);
     });
 
+
+    /**
+     * Placerar klienten i ett specifikt chattrum. Funktionen uppdaterar serverns 
+     * interna listor över vilka som är i rummet och meddelar sedan både den 
+     * anslutande klienten och de befintliga deltagarna om uppdateringen.
+     *
+     * @name socketOnJoinRoom
+     * @function
+     * @param {string} room - Namnet på rummet som klienten vill ansluta till.
+     */
     socket.on('join_room', (room) => {
         socket.join(room);
         socket.room = room; // Spara rummet på socketen
@@ -88,6 +123,15 @@ io.on('connection', (socket) => {
 
     });
 
+
+    /**
+     * Tar emot ett textmeddelande från klienten och skickar det vidare till 
+     * alla andra användare som befinner sig i samma chattrum.
+     *
+     * @name socketOnSendMessage
+     * @function
+     * @param {string} message - Textmeddelandet som klienten vill skicka.
+     */
     socket.on('send_message', (message) => {
         const user = listUsers[socket.id];
         if (user) {
@@ -98,6 +142,15 @@ io.on('connection', (socket) => {
         }
     });
 
+
+    /**
+     * Hanterar uppstädning när en klient förlorar anslutningen eller stänger webbläsaren. 
+     * Raderar användaren från serverns minne och informerar det aktiva rummet om att 
+     * personen har lämnat.
+     *
+     * @name socketOnDisconnect
+     * @function
+     */
     socket.on('disconnect', () => {
         const user = listUsers[socket.id];
         if (user) {
