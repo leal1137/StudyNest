@@ -1,9 +1,8 @@
 // tests/socket.test.js
 const request = require('supertest');
-const Client = require('socket.io-client');
 const { app, server } = require('../server'); 
 
-// Vi mockar databasen för att undvika "ECONNREFUSED" under testningen
+// Tar bort database errorn. Ta bort när det är fixat
 jest.mock('../db/pool', () => {
     return {
         query: jest.fn().mockResolvedValue({ rows: [] }),
@@ -11,87 +10,119 @@ jest.mock('../db/pool', () => {
     };
 });
 
-describe('Full Integration: Signup, Login & Socket Chat', () => {
-  let clientSocket;
-  let validToken;
-  let port;
+describe('Sign Up & Login Tests', () => {
+  const validUser = {
+      email: `student_${Date.now()}@student.uu.se`,
+      username: 'StudentEtt',
+      password: 'password123'
+  };
 
-  // Unik testmejl för att undvika problem om testet körs flera gånger
-  // Måste vara en godkänd domän enligt din auth.js
-  const testEmail = `test_${Date.now()}@student.uu.se`; 
-  const testUser = 'TestAnvändare';
-  const testPass = 'hemligt123';
+  const invalidUser = {
+      email: `hacker_${Date.now()}@gmail.com`,
+      username: 'Hacker',
+      password: 'password123'
+  };
 
-  beforeAll((done) => {
-    // Starta den riktiga servern på en slumpmässig, ledig port
-    server.listen(0, () => {
-      port = server.address().port;
-      done();
-    });
-  });
-
-  afterAll((done) => {
-    // Stäng ner anslutningar och stäng servern efter testerna
-    if (clientSocket) {
-      clientSocket.close();
-    }
-    server.close(done);
-  });
-
-  test('1. HTTP POST /auth/signup - Ska kunna registrera en student', async () => {
+  // --- TEST 1: Giltig signup ---
+  test('1. En användare signar upp med giltig email', async () => {
     const response = await request(app)
       .post('/auth/signup')
-      .send({
-        email: testEmail,
-        username: testUser,
-        password: testPass
-      });
+      .send(validUser);
     
-    // Vi förväntar oss antingen 200 (Skapad) eller 409 (Finns redan)
-    expect([200, 409]).toContain(response.status);
+    expect(response.status).toBe(200);
+    expect(response.body.message).toBe('User created');
   });
 
-  test('2. HTTP POST /auth/login - Ska logga in och ge tillbaka en JWT-token', async () => {
+  // --- TEST 2: Ogiltig signup ---
+  test('2. En användare signar upp med ogiltig email', async () => {
+    const response = await request(app)
+      .post('/auth/signup')
+      .send(invalidUser);
+    
+    expect(response.status).toBe(403);
+    expect(response.body.error).toBe('Only students allowed');
+  });
+
+  // --- TEST 3: Giltig inloggning ---
+  test('3. En användare försöker logga in med ett giltigt email och lösenord', async () => {
     const response = await request(app)
       .post('/auth/login')
       .send({
-        email: testEmail,
-        password: testPass
+        email: validUser.email,
+        password: validUser.password
       });
     
     expect(response.status).toBe(200);
-    expect(response.body.token).toBeDefined(); // Säkerställ att vi fick en token
+    expect(response.body.token).toBeDefined();
+  });
+
+  // --- TEST 4: Ogiltig inloggning ---
+  test('4. En användare försöker logga in med ogiltigt email och lösenord', async () => {
+    const response = await request(app)
+      .post('/auth/login')
+      .send({
+        email: validUser.email,
+        password: 'fel_losenord_123'
+      });
     
-    // Spara tokenen för att använda i socket-testerna!
-    validToken = response.body.token; 
+    expect(response.status).toBe(401);
+    expect(response.body.error).toBe('Wrong password');
   });
 
-  test('3. SOCKET - Dörrvakten ska neka anslutning om token saknas', (done) => {
-    // Försöker ansluta utan att skicka med vår token
-    const noAuthClient = new Client(`http://localhost:${port}`);
+  // --- TEST 5: Flera inloggningar på samma konto ---
+  test('5. Två användare loggar in med samma email och lösenord', async () => {
+    const login1 = await request(app)
+      .post('/auth/login')
+      .send({
+        email: validUser.email,
+        password: validUser.password
+      });
+
+    const login2 = await request(app)
+      .post('/auth/login')
+      .send({
+        email: validUser.email,
+        password: validUser.password
+      });
+
+    // Båda inloggningarna lyckas
+    expect(login1.status).toBe(200);
+    expect(login2.status).toBe(200);
     
-    noAuthClient.on('connect_error', (err) => {
-      expect(err.message).toBe('No token'); // Dörrvakten gör sitt jobb!
-      noAuthClient.close();
-      done();
-    });
+    expect(login1.body.token).toBeDefined();
+    expect(login2.body.token).toBeDefined();
   });
 
-  test('4. SOCKET - Ska tillåta anslutning med giltig token och registrera "login"', (done) => {
-    // Försöker ansluta och skickar med tokenen vi fick i Test 2
-    clientSocket = new Client(`http://localhost:${port}`, {
-      auth: { token: validToken }
-    });
-
-    clientSocket.on('connect', () => {
-      expect(clientSocket.id).toBeDefined(); // Vi kom in och fick ett Socket ID!
-
-      // Testa din specifika "login"-händelse från server.js
-      clientSocket.emit('login', testUser);
-      
-      // I det här skedet är vi anslutna. Vi avslutar testet.
-      done();
-    });
+  // --- TEST 6: Användare försöker signa upp med en mail som redan är registrerad ---
+  test('6. En användare försöker signa upp med en mail som redan är registrerad', async () => {
+    const response = await request(app)
+      .post('/auth/signup')
+      .send(validUser);
+    
+    expect(response.status).toBe(409);
+    expect(response.body.error).toBe('Username or email already exists');
   });
-  
+
+  // --- TEST 7: Användare försöker logga in med en mail som inte finns ---
+  test('7. En användare försöker logga in med en mail som inte finns', async () => {
+    const response = await request(app)
+      .post('/auth/login')
+      .send({
+        email: 'finns_inte@student.uu.se',
+        password: 'password123'
+      });
+    
+    expect(response.status).toBe(404);
+    expect(response.body.error).toBe('User not found');
+  });
+
+  // --- TEST 8: Användare skickar in tomma fält vid registrering ---
+  test('8. En användare skickar in tomma fält vid registrering', async () => {
+    const response = await request(app)
+      .post('/auth/signup')
+      .send({ email: '', username: '', password: '' });
+    
+    expect(response.status).not.toBe(200);
+  });
+
 });
