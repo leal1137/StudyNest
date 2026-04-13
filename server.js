@@ -65,31 +65,31 @@ io.on('connection', (socket) => {
         if (listActiveUsers[socket.id]) {
             listActiveUsers[socket.id].room = room;
         }
-        if (!room_participants[room]) {
-            room_participants[room] = [];
-        }
-        const userExists = room_participants[room].some(u => u.id === socket.user.userId);
-        if (!userExists) {
-            room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
-        }
+        // if (!room_participants[room]) {
+        //     room_participants[room] = [];
+        // }
+        // const userExists = room_participants[room].some(u => u.id === socket.user.userId);
+        // if (!userExists) {
+        //     room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
+        // }
 
         // 1. Skicka bekräftelse till den som anslöt
         socket.emit('joined_room', { room: room });
 
-        // 2. Meddela andra i rummet (Använd namnet från listUsers i första hand, annars e-posten från JWT)
-        const displayName = listUsers[socket.id] 
-          ? listUsers[socket.id].getUsername() 
+        // 2. Meddela andra i rummet (Använd namnet från listActiveUsers i första hand, annars e-posten från JWT)
+        const displayName = listActiveUsers[socket.id] 
+          ? listActiveUsers[socket.id].getUsername() 
           : socket.user.email;
 
         socket.to(room).emit('user_joined', displayName);
 
-        io.to(room).emit('room_participants', { participants: room_participants[room] || [] });
+        //io.to(room).emit('room_participants', { participants: room_participants[room] || [] });
          
 
     });
 
     socket.on('send_message', (message) => {
-        const user = listUsers[socket.id];
+        const user = listActiveUsers[socket.id];
         if (user) {
             io.to(user.room).emit('receive_message', {
                 username: user.username,
@@ -99,10 +99,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        const user = listUsers[socket.id];
+        const user = listActiveUsers[socket.id];
         if (user) {
             socket.to(user.room).emit('user_left', user.username);
-            delete listUsers[socket.id];
+            delete listActiveUsers[socket.id];
         }
         console.log('User disconnected:', socket.id);
     });
