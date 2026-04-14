@@ -1,8 +1,7 @@
 class User {
-    constructor(username,email,databaseId,socketId) {
+    constructor(username,email,socketId) {
         this.username = username;
         this.email = email;
-        this.databaseId = databaseId;
         this.socketId = socketId; //finns inte i databasen
     }
     getUsername() {

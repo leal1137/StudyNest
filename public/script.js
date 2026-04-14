@@ -1,3 +1,4 @@
+//script.js
 // --- 1. KONTROLLERA INLOGGNING DIREKT ---
 const token = localStorage.getItem('token');
 

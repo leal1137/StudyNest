@@ -47,15 +47,12 @@ io.use((socket, next) => {
 
 // --- 4. SOCKET.IO CHATTLOGIK ---
 let listActiveUsers = {};
+let room_participants = {};
 
 io.on('connection', (socket) => {
     console.log('User connected:', socket.user.email, 'Socket ID:', socket.id);
 
-    // Bevarar gamla login-logiken för User-klassen om ni använder den
-    socket.on('login', (username) => {
-        listActiveUsers[socket.id] = new User(username);
-        console.log('User logged in:', username);
-    });
+    listActiveUsers[socket.id] = new User(socket.user.username, socket.user.email, socket.id);
 
     socket.on('join_room', (room) => {
         socket.join(room);
@@ -76,9 +73,9 @@ io.on('connection', (socket) => {
         // 1. Skicka bekräftelse till den som anslöt
         socket.emit('joined_room', { room: room });
 
-        // 2. Meddela andra i rummet (Använd namnet från listUsers i första hand, annars e-posten från JWT)
-        const displayName = listUsers[socket.id] 
-          ? listUsers[socket.id].getUsername() 
+        // 2. Meddela andra i rummet (Använd namnet från listActiveUsers i första hand, annars e-posten från JWT)
+        const displayName = listActiveUsers[socket.id] 
+          ? listActiveUsers[socket.id].getUsername() 
           : socket.user.email;
 
         socket.to(room).emit('user_joined', displayName);
@@ -89,7 +86,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('send_message', (message) => {
-        const user = listUsers[socket.id];
+        const user = listActiveUsers[socket.id];
         if (user) {
             io.to(user.room).emit('receive_message', {
                 username: user.username,
@@ -99,10 +96,10 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        const user = listUsers[socket.id];
+        const user = listActiveUsers[socket.id];
         if (user) {
             socket.to(user.room).emit('user_left', user.username);
-            delete listUsers[socket.id];
+            delete listActiveUsers[socket.id];
         }
         console.log('User disconnected:', socket.id);
     });
