@@ -1,5 +1,6 @@
+//login.js
 if (localStorage.getItem('token')) {
-    window.location.href = '/index.html';
+    //window.location.href = '/index.html';
   }
 
 async function login() {
@@ -21,6 +22,9 @@ async function login() {
 
       // Save token
       localStorage.setItem('token', data.token);
+
+      const payload = JSON.parse(atob(data.token.split('.')[1]));
+      localStorage.setItem('username', payload.username);
 
       // Redirect to main app
       window.location.href = '/index.html';
