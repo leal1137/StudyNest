@@ -5,7 +5,7 @@ import { CustomButton } from './customButton';
 
 export default function CreateRoomSettings() {
     const [roomName, setRoomName] = useState('');
-    const [roomSize, setRoomSize] = useState(0);
+    const [roomSize, setRoomSize] = useState(15);
     const [jointWorkspace, setJointWorkspace] = useState(false);
 
     const CreateNewRoom = (e) => {
@@ -23,9 +23,9 @@ export default function CreateRoomSettings() {
                     onChange={(e) => setRoomName(e.target.value)} />
             </div>
             
-            <div className="room-size-input">
+            <div className="input-room-size">
                 <h4>Room size</h4>
-                <input 
+                <input className='input'
                     type="Number"
                     value={roomSize}
                     onChange={(e) => setRoomSize(e.target.value)}
@@ -48,7 +48,7 @@ export default function CreateRoomSettings() {
                     Clicking this box enables: <br />
                     Chat box, Voice chat, Whiteboard
                 </p>
-            </div>
+            </div> 
 
             <CustomButton
                 className='Create-room-button'
