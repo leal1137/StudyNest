@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
+import CreateRoomPage from './pages/CreateRoomPage';
 import VirtualRoom from './pages/VirtualRoom';
 
 function DashboardPage() {
