@@ -1,3 +1,4 @@
+//users.js
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
@@ -5,7 +6,7 @@ const pool = require('../db/pool');
 
 // Creates a new user in the database
 // Returns the user (without password) or throws an error
-async function createUser({ username, email, hashedPassword }) {
+async function createUser({ username, email, password }) {
     // Check if email already exists
     const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
@@ -16,7 +17,7 @@ async function createUser({ username, email, hashedPassword }) {
 
     const result = await pool.query(
         'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email, created_at',
-        [username, email, hashedPassword]
+        [username, email, password]
     );
     return result.rows[0];
 }
@@ -71,7 +72,17 @@ router.get('/:email', async (req, res) => {
     }
 });
 
+async function getUserByEmail(email) {
+    const result = await pool.query(
+        'SELECT * FROM users WHERE email = $1',
+        [email]
+    );
+
+    return result.rows[0]; // undefined om ingen finns
+}
+
 module.exports = {
     router,
-    createUser
+    createUser,
+    getUserByEmail
 };

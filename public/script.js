@@ -1,3 +1,4 @@
+//script.js
 // --- 1. KONTROLLERA INLOGGNING DIREKT ---
 const token = localStorage.getItem('token');
 
@@ -15,6 +16,14 @@ const socket = io({
 
 
 // --- 3. UI-FUNKTIONER ---
+
+/**
+ * Hanterar användarens begäran att gå med i ett chattrum. 
+ * Funktionen hämtar rumsnamnet från webbsidans inmatningsfält och 
+ * skickar en förfrågan till servern via WebSockets. Om inmatningsfältet 
+ * är tomt avbryts funktionen. Efter att signalen skickats rensas 
+ * textfältet.
+ */
 function joinRoom() {
     const room = document.getElementById('room').value;
     if (room) {
@@ -23,6 +32,12 @@ function joinRoom() {
     }
 }
 
+
+/**
+ * Hämtar texten från chattens inmatningsfält och skickar det till servern.
+ * Om fältet är tomt skickas inget meddelande. Efter att meddelandet har 
+ * skickats rensas inmatningsfältet automatiskt.
+ */
 function sendMessage() {
     const message = document.getElementById('message').value;
     if (message) {
@@ -38,16 +53,43 @@ function logout() {
 
 
 // --- 4. LYSSNA PÅ HÄNDELSER FRÅN CHATTEN ---
+
+/**
+ * Lyssnar efter inkommande chattmeddelanden från servern och 
+ * lägger till dem i chattfönstret med avsändarens namn i fetstil.
+ *
+ * @name onReceiveMessage
+ * @function
+ * @param {Object} data - Meddelandedata från servern.
+ */
 socket.on('receive_message', (data) => {
     const chat = document.getElementById('chat');
     chat.innerHTML += `<p><b>${data.username}:</b> ${data.message}</p>`;
 });
 
+
+/**
+ * Lyssnar efter information om att en ny användare har anslutit till 
+ * rummet, och skriver ut ett i chatten.
+ *
+ * @name onUserJoined
+ * @function
+ * @param {string} username - Namnet på användaren som anslöt.
+ */
 socket.on('user_joined', (username) => {
     const chat = document.getElementById('chat');
     chat.innerHTML += `<p><i>${username} joined</i></p>`;
 });
 
+
+/**
+ * Tar emot en bekräftelse från servern på att klienten framgångsrikt 
+ * har gått med i ett rum, och meddelar användaren detta i chattfönstret.
+ *
+ * @name onJoinedRoom
+ * @function
+ * @param {Object|string} data - Information om rummet (kan vara ett objekt eller en direkt sträng).
+ */
 socket.on('joined_room', (data) => {
     const chat = document.getElementById('chat');
     // Hanterar om servern skickar antingen { room: "namn" } eller bara "namn"
@@ -55,6 +97,15 @@ socket.on('joined_room', (data) => {
     chat.innerHTML += `<p><b>You joined room ${roomName}</b></p>`;
 });
 
+
+/**
+ * Lyssnar efter information om att en användare har lämnat rummet 
+ * och skriver ut ett kursivt meddelande i chatten.
+ *
+ * @name onUserLeft
+ * @function
+ * @param {string} username - Namnet på användaren som lämnade.
+ */
 socket.on('user_left', (username) => {
     const chat = document.getElementById('chat');
     chat.innerHTML += `<p><i>${username} left</i></p>`;
@@ -65,7 +116,15 @@ socket.on('user_left', (username) => {
 const warningBanner = document.getElementById('connection-warning');
 let isPlanned = false; // Håller koll på om det är Ctrl+C eller ett fel
 
-// Om servern stänger ner planerat
+/**
+ * Hanterar situationen när servern stängs ner planerat av administratör. 
+ * Ersätter hela webbsidans innehåll med en vänlig fel-skärm för att 
+ * tydligt visa att tjänsten är tillfälligt nere.
+ *
+ * @name onServerShutdown
+ * @function
+ * @param {string} meddelande - Anledningen eller meddelandet från servern.
+ */
 socket.on('server_shutdown', (meddelande) => {
     isPlanned = true;
     document.body.style.margin = '0';
@@ -77,14 +136,28 @@ socket.on('server_shutdown', (meddelande) => {
     `;
 });
 
-// Om anslutningen bryts oväntat
+/**
+ * Lyssnar efter oväntade frånkopplingar från servern (t.ex. nätverksproblem). 
+ * Om frånkopplingen inte är planerad (som vid en server-shutdown), 
+ * visas en varningsbanner för användaren.
+ *
+ * @name onDisconnect
+ * @function
+ * @param {string} reason - Systemets anledning till frånkopplingen.
+ */
 socket.on('disconnect', (reason) => {
     if (!isPlanned && warningBanner) {
         warningBanner.style.display = 'block';
     }
 });
 
-// Om vi lyckas ansluta igen
+/**
+ * Lyssnar efter en lyckad anslutning (eller återanslutning) till servern. 
+ * Gömmer varningsbannern om den var synlig och nollställer statusen.
+ *
+ * @name onConnect
+ * @function
+ */
 socket.on('connect', () => {
     if (warningBanner) {
         warningBanner.style.display = 'none';
@@ -92,7 +165,15 @@ socket.on('connect', () => {
     isPlanned = false;
 });
 
-// Om token är felaktig eller har gått ut
+/**
+ * Fångar upp anslutningsfel, specifikt gällande autentisering. 
+ * Om servern nekar anslutningen på grund av en saknad eller ogiltig JWT-token, 
+ * varnas användaren och skickas till inloggningssidan.
+ *
+ * @name onConnectError
+ * @function
+ * @param {Error} err - Felobjektet från servern.
+ */
 socket.on('connect_error', (err) => {
     if (err.message === "Invalid token" || err.message === "No token") {
         alert("Din inloggning har gått ut eller är ogiltig. Logga in igen.");

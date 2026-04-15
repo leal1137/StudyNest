@@ -4,11 +4,10 @@ require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { createUser } = require('./users');
+const { createUser, getUserByEmail } = require('./users');
 
 const router = express.Router();
 
-const users = []; // later → move to DB
 const SECRET = process.env.SECRET;
 const allowedDomains = ['kth.se', 'su.se', 'student.uu.se'];
 
@@ -19,8 +18,25 @@ function isStudentEmail(email) {
 
 // Create test user
 (async () => {
-  const hashed = await bcrypt.hash("abc", 10);
-  users.push({ id: 0, email: "test@test.su.se", username:"TestUser", password: hashed });
+  try {
+    const hashed = await bcrypt.hash("abc", 10);
+
+
+
+    await createUser({
+      username: "TestUser",
+      email: "test@test.su.se",
+      password: hashed
+    });
+
+    console.log("Test user created");
+  } catch (err) {
+    if (err.code === '23505') {
+      console.log("Test user already exists, skipping...");
+    } else {
+      console.error("Startup error:", err);
+    }
+  }
 })();
 
 // Signup
@@ -31,47 +47,55 @@ router.post('/signup', async (req, res) => {
     return res.status(403).json({ error: 'Only students allowed' });
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
-  //
-  const user = {
-    id: users.length + 1,
-    email,
-    username,
-    password: hashedPassword
-  };
-
-  users.push(user);
-  // user in memmory remove
-
   try {
-    await createUser({ username, email, hashedPassword });
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    await createUser({
+      username,
+      email,
+      hashedPassword   // 👈 viktigt namn!
+    });
+
+    res.json({ message: 'User created' });
+
   } catch (err) {
     if (err.code === '23505') {
       return res.status(409).json({ error: 'Username or email already exists' });
     }
-    throw err;
+    console.error(err);
+    res.status(500).json({ error: 'Signup failed' });
   }
-
-  res.json({ message: 'User created' });
 });
 
 // Login
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  const user = users.find(u => u.email === email);
-  if (!user) return res.status(404).json({ error: 'User not found' });
+  try {
+    const user = await getUserByEmail(email);
 
-  const valid = await bcrypt.compare(password, user.password);
-  if (!valid) return res.status(401).json({ error: 'Wrong password' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
 
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    SECRET,
-    { expiresIn: '2h' }
-  );
+    const valid = await bcrypt.compare(password, user.password);
 
-  res.json({ token });
+    if (!valid) {
+      return res.status(401).json({ error: 'Wrong password' });
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, username: user.username }, // 👈 add username
+      SECRET,
+      { expiresIn: '2h' }
+    );
+
+    res.json({ token });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Login failed' });
+  }
 });
 
 module.exports = router;
