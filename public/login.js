@@ -3,6 +3,17 @@ if (localStorage.getItem('token')) {
     //window.location.href = '/index.html';
   }
 
+
+/**
+ * Hanterar inloggningsprocessen på klientsidan. Funktionen hämtar 
+ * användarens e-post och lösenord direkt från webbsidans inmatningsfält 
+ * och skickar en autentiseringsförfrågan till servern. Vid framgång 
+ * sparas en behörighetstoken lokalt i webbläsaren och användaren 
+ * skickas vidare till huvudsidan. Vid fel visas ett felmeddelande på sidan.
+ *
+ * @name login
+ * @function.
+ */
 async function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
