@@ -21,8 +21,6 @@ function isStudentEmail(email) {
   try {
     const hashed = await bcrypt.hash("abc", 10);
 
-
-
     await createUser({
       username: "TestUser",
       email: "test@test.su.se",
@@ -51,9 +49,9 @@ router.post('/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     await createUser({
-      username,
-      email,
-      hashedPassword   // 👈 viktigt namn!
+      username: username,
+      email: email,
+      password: hashedPassword   // 👈 viktigt namn!
     });
 
     res.json({ message: 'User created' });
