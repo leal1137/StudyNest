@@ -3,24 +3,26 @@ import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 
-export default function LogIn() {
+export default function SignUp() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleSignUp = (e) => {
     e.preventDefault();
-    alert(`Logging in as ${username}`);
-    navigate('/');
+
+    alert(`Account created for ${username}`);
+
+    navigate('/login');
   };
 
   return (
-    <div className="LoginPage">
+    <div className="SignUpPage">
       <Sidebar />
 
       <main className="main-content">
-        <form className="Login-box" onSubmit={handleLogin}>
-          <h2>Sign in</h2>
+        <form className="Login-box" onSubmit={handleSignUp}>
+          <h2>Create Account</h2>
 
           <div className="input-group">
             <label>Username:</label>
@@ -40,30 +42,17 @@ export default function LogIn() {
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <button
-              type="submit"
-              style={{
-                padding: '10px 20px',
-                fontSize: '18px',
-                cursor: 'pointer',
-              }}
-            >
-              Login
-            </button>
-
-            <button
-              type="button"
-              style={{
-                padding: '10px 20px',
-                fontSize: '18px',
-                cursor: 'pointer',
-              }}
-              onClick={() => navigate('/sign-up')}
-            >
-              Sign Up
-            </button>
-          </div>
+          <button
+            type="submit"
+            style={{
+              padding: '10px 20px',
+              fontSize: '18px',
+              cursor: 'pointer',
+              marginTop: '20px',
+            }}
+          >
+            Create Account
+          </button>
 
         </form>
       </main>
