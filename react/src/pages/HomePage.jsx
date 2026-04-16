@@ -1,13 +1,15 @@
 import '../App.css'
 import { Sidebar } from '../components/Sidebar'
-import { CustomButton } from '../components/customButton'
+import { CustomButton } from '../components/CustomButton'
 import heroImg from '../assets/vine.png'
+import { useNavigate } from 'react-router-dom'
 
 export default function HomePage() {
+  const navigate = useNavigate()
 
   const handleClick1 = () => alert("Button 1 clicked!");
   const handleClick2 = () => alert("Button 2 clicked!");
-  const handleClick3 = () => alert("Button 3 clicked!");
+  const handleClick3 = () => navigate('/virtual-room');
 
   return (
     <div className="HomePage">
@@ -22,7 +24,7 @@ export default function HomePage() {
               <CustomButton 
                 text="Join a virtual study room" 
                 caption="Silent study rooms" 
-                onClick={handleClick1} 
+                onClick={() => navigate('/createroom')}
               />
               <CustomButton 
                 text="Find a study location" 
