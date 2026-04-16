@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 export default function LogIn() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+
   const navigate = useNavigate();
 
   const handleLogin = (e) => {
@@ -21,6 +23,15 @@ export default function LogIn() {
       <main className="main-content">
         <form className="Login-box" onSubmit={handleLogin}>
           <h2>Sign in</h2>
+
+          <div className="input-group">
+            <label>Email:</label>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
           <div className="input-group">
             <label>Username:</label>

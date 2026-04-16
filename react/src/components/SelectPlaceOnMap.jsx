@@ -22,14 +22,14 @@ function MapClickHandler({ setPinPosition }) {
       });
     },
   });
-  return null; 
+  return null;
 }
 
 export function SelectPlaceOnMap() {
   const [pinPosition, setPinPosition] = useState({ lat: 59.8586, lng: 17.6389 });
 
   return (
-    <div className="map-component"> 
+    <div className="map-component">
       <MapContainer className='map-image'
         center={[59.8586, 17.6389]}
         zoom={13}
@@ -38,7 +38,7 @@ export function SelectPlaceOnMap() {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        
+
         <MapClickHandler setPinPosition={setPinPosition} />
         <Marker position={[pinPosition.lat, pinPosition.lng]} />
       </MapContainer>

@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 export default function SignUp() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+
   const navigate = useNavigate();
 
   const handleSignUp = (e) => {
@@ -23,6 +25,15 @@ export default function SignUp() {
       <main className="main-content">
         <form className="Login-box" onSubmit={handleSignUp}>
           <h2>Create Account</h2>
+
+          <div className="input-group">
+            <label>Email:</label>
+            <input
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
 
           <div className="input-group">
             <label>Username:</label>

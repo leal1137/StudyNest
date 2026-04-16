@@ -22,7 +22,6 @@ export default function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/createroom" element={<CreateRoomPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
-
         <Route path="/virtual-room" element={<VirtualRoom />} />
       </Routes>
     </BrowserRouter>
