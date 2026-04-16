@@ -99,11 +99,11 @@
   padding: 40px 80px;   
   border-radius: 12px;  
   cursor: pointer;
-  font-size: 37px;      
+  font-size: 37px;      /* larger text */
   font-weight: bold;
   transition: all 0.2s ease;
-  max-width: 390px;   
-  white-space: normal;    
+  max-width: 390px;     /* allows text to wrap nicely if needed */
+  white-space: normal;  /* allow wrapping */
   text-align: center;
 }
 
@@ -497,6 +497,35 @@
 }
 
 .participant-mic.muted {
+  color: #b11d1d;
+}
+
+.participant-mic-button {
+  border: 0;
+  background: transparent;
+  color: #111;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.45rem;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 999px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.participant-mic-button:hover {
+  background: rgba(255, 255, 255, 0.18);
+  transform: translateY(-1px);
+}
+
+.participant-mic-button:focus-visible {
+  outline: 2px solid #f8fbff;
+  outline-offset: 2px;
+}
+
+.participant-mic-button.muted {
   color: #b11d1d;
 }
 
