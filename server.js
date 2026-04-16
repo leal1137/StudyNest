@@ -1,18 +1,24 @@
-//server.js
-require('dotenv').config();
+// --- 0. IMPORTS ---
+//loading local secrets from .env
+require('dotenv').config(); 
 
+//server imports
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
-const jwt = require('jsonwebtoken');
 
+//login & user management imports
+const jwt = require('jsonwebtoken');
 const SECRET = process.env.SECRET;
-const pool = require('./db/pool');
+const User = require('./user');
+
+//route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
 const { router: userRoutes } = require('./routes/users');
-const User = require('./user');
 
+// --- 1. EXPRESS MIDDLEWARE & ROUTING ---
+//making server and Sockets.io
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -21,15 +27,14 @@ const io = new Server(server, {
     pingInterval: 2000
 });
 
-// --- 1. EXPRESS MIDDLEWARE & ROUTING ---
+//server setup
 app.use(express.static('public'));
 app.use(express.json());
-
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 
-// --- 3. SOCKET.IO MIDDLEWARE (JWT) ---
+// --- 2. AUTHENTICATION FOR ENTRY ---
 
 /**
  * Fungerar som en dörrvakt för chatten. Den kollar användarens JWT-token 
@@ -54,10 +59,13 @@ io.use((socket, next) => {
 });
 
 
-// --- 4. SOCKET.IO CHATTLOGIK ---
-let listActiveUsers = {};
-let room_participants = {};
+// --- 3. SOCKET.IO CHATTLOGIC ---
+// ei. connection, join_room, send_message, disconnect
 
+//all logged in users, indexed by socket ID
+let listActiveUsers = {};
+//set of all users in rooms
+let room_participants = {};
 
 /**
  * Hanterar en ny anslutning till realtidsservern. 
@@ -164,7 +172,8 @@ io.on('connection', (socket) => {
 });
 
 
-// --- 5. GRACEFUL SHUTDOWN ---
+// --- 4. GRACEFUL SHUTDOWN ---
+//doesnt work right now
 process.on('SIGINT', () => {
   io.emit('server_shutdown', 'Servern har stängts ner');
   io.disconnectSockets();
@@ -176,13 +185,13 @@ process.on('SIGINT', () => {
 });
 
 
-// --- 6. STARTA SERVER ---
+// --- 5. START SERVER ---
 // Only start listening if we are NOT running tests
 if (process.env.NODE_ENV !== 'test') {
   server.listen(3000, () => {
     console.log('Server running on http://localhost:3000');
   });
 }
-
+// --- 6. EXPORTS FOR TESTING ---
 // Export the instances so our test files can use them
 module.exports = { app, server, io };
