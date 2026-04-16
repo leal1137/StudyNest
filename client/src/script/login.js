@@ -1,3 +1,5 @@
+import { Navigate, redirect } from "react-router-dom";
+
 //login.js
 if (localStorage.getItem('token')) {
     //window.location.href = '/index.html';
@@ -14,7 +16,7 @@ if (localStorage.getItem('token')) {
  * @name login
  * @function.
  */
-async function login() {
+export async function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
 
@@ -38,5 +40,5 @@ async function login() {
       localStorage.setItem('username', payload.username);
 
       // Redirect to main app
-      window.location.href = '/index.html';
+      redirect('/');
     }

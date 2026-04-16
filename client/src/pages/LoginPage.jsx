@@ -2,8 +2,9 @@ import { useState } from 'react'
 import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
+import { login } from '../script/login'
 
-export default function LogIn() {
+export default function LogInPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -12,8 +13,9 @@ export default function LogIn() {
 
   const handleLogin = (e) => {
     e.preventDefault();
-    alert(`Logging in as ${username}`);
-    navigate('/');
+    login();
+    //alert(`Logging in as ${username}`);
+    //navigate('/');
   };
 
   return (
@@ -27,6 +29,7 @@ export default function LogIn() {
           <div className="input-group">
             <label>Email:</label>
             <input
+              id='email'
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -36,6 +39,7 @@ export default function LogIn() {
           <div className="input-group">
             <label>Username:</label>
             <input
+              id='username'
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -45,6 +49,7 @@ export default function LogIn() {
           <div className="input-group">
             <label>Password:</label>
             <input
+              id='password'
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

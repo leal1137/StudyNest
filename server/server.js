@@ -28,7 +28,7 @@ const io = new Server(server, {
 });
 
 //server setup
-app.use(express.static('public'));
+//app.use(express.static('public')); //move to react instead
 app.use(express.json());
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
