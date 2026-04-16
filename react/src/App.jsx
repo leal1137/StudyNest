@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import VirtualRoom from './pages/VirtualRoom';
+import SignUpPage from './pages/SignUpPage';
 
 function DashboardPage() {
   return (
@@ -20,6 +21,8 @@ export default function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/createroom" element={<CreateRoomPage />} />
+        <Route path="/sign-up" element={<SignUpPage />} />
+
         <Route path="/virtual-room" element={<VirtualRoom />} />
       </Routes>
     </BrowserRouter>
