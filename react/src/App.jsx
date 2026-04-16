@@ -3,6 +3,7 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import VirtualRoom from './pages/VirtualRoom';
+import SignUpPage from './pages/SignUpPage';
 
 function DashboardPage() {
   return (
@@ -25,6 +26,9 @@ export default function App() {
         
         {/* When the URL is "/dashboard", show the Dashboard Page */}
         <Route path="/dashboard" element={<DashboardPage />} />
+
+        {/* When the URL is "/sign-up", show the SignUp Page */}
+        <Route path="/sign-up" element={<SignUpPage />} />
 
         <Route path="/virtual-room" element={<VirtualRoom />} />
       </Routes>
