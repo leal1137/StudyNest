@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>StudyNest Simple</title>
+</head>
+<body>
+  <div id="menu-container"></div>
+  <h1>Study Room</h1>
+
+  <input id="room" placeholder="Room" />
+  <button onclick="joinRoom()">Join Room</button>
+
+  <div id="chat" style="margin-top:20px;"></div>
+
+  <input id="message" placeholder="Message" />
+  <button onclick="sendMessage()">Send</button>
+
+  <div id="connection-warning" style="
+      display: none; 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      background-color: #ff9800; 
+      color: white; 
+      text-align: center; 
+      padding: 10px; 
+      z-index: 9999; 
+      font-family: sans-serif;
+  ">
+      Anslutningen till servern är bryten
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="script.js"></script>
+  <script src="menu.js"></script>
+</body>
+</html>
