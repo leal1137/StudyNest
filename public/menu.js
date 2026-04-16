@@ -9,7 +9,7 @@ async function loadMenu() {
   const username = localStorage.getItem('username');
 
   if (token && username) {
-    const nav = container.querySelector('nav'); // 🔥 HÄR
+    const nav = container.querySelector('nav'); // HÄR
 
     nav.innerHTML += `
     <span style="color:white; margin-left:20px;">
