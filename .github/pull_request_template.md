@@ -1,9 +1,11 @@
-Related issue # 
-
 ## Changes 
 Description of changes:
 
+Related issue:
+
 ## Checklist
-- [ ] Reviewed the code
+- [ ] Self-reviewed the code
 - [ ] Added/updated tests
 - [ ] Updated documentation
+
+Who made the changes:
