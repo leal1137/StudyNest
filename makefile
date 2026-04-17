@@ -5,6 +5,9 @@ test:
 interact:
 	$(MAKE) -C client start
 
+run:
+	npm run dev
+
 #Skapa dokumentation
 docs:
 	npm run docs
