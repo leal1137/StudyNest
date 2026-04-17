@@ -2,16 +2,8 @@
 test:
 	npm test
 
-backend:
-	node server/server.js
-
 interact:
-	$(MAKE) -C client frontend
-
-run:
-	$(MAKE) backend &
-	$(MAKE) interact
-	
+	$(MAKE) -C client start
 
 #Skapa dokumentation
 docs:

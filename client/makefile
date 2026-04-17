@@ -1,2 +1,2 @@
-frontend:
+start:
 	npm run dev
