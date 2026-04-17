@@ -5,7 +5,7 @@ const pool = require('../db/pool');
 
 describe('Sign Up & Login Tests', () => {
   const validUser = {
-      email: `student_${Date.now()}@student.uu.se`,
+      email: `testUser_${Date.now()}@student.uu.se`,
       username: `StudentEtt_${Date.now()}`,
       password: 'password123'
   };
@@ -19,7 +19,8 @@ describe('Sign Up & Login Tests', () => {
   afterAll(async () => {
     //Clean up the test users from the DB
     try {
-        await pool.query('DELETE FROM users WHERE email = $1', [validUser.email]);
+        await pool.query("DELETE FROM users WHERE email LIKE 'testUser_%@student.uu.se'");
+        
     } catch (error) {
         console.error('Could not clean up test user:', error.message);
     }
@@ -144,7 +145,7 @@ describe('Sign Up & Login Tests', () => {
     testUser = {};
     for (let i = 0; i < 20; i++) {
       testUser = {
-        email: `testuser_${Date.now()}'@student.uu.se`,
+        email: `testUser_${Date.now()}'@student.uu.se`,
         username: `TestUser_${Date.now()}`,
         password: 'password123'
       };
