@@ -1,29 +1,34 @@
 // tests/socket.test.js
 const request = require('supertest');
 const { app, server } = require('../server'); 
-
-// Tar bort database errorn. Ta bort när det är fixat
-jest.mock('../db/pool', () => {
-    return {
-        query: jest.fn().mockResolvedValue({ rows: [] }),
-        end: jest.fn().mockResolvedValue(true)
-    };
-});
+const pool = require('../db/pool');
 
 describe('Sign Up & Login Tests', () => {
   const validUser = {
       email: `student_${Date.now()}@student.uu.se`,
-      username: 'StudentEtt',
+      username: `StudentEtt_${Date.now()}`,
       password: 'password123'
   };
 
   const invalidUser = {
       email: `hacker_${Date.now()}@gmail.com`,
-      username: 'Hacker',
+      username: `Hacker_${Date.now()}`,
       password: 'password123'
   };
 
-  // --- TEST 1: Giltig signup ---
+  afterAll(async () => {
+    //Clean up the test users from the DB
+    try {
+        await pool.query('DELETE FROM users WHERE email = $1', [validUser.email]);
+    } catch (error) {
+        console.error('Could not clean up test user:', error.message);
+    }
+
+    // Close the database connection and the server
+    await pool.end();
+    server.close();
+  });
+
   test('1. En användare signar upp med giltig email', async () => {
     const response = await request(app)
       .post('/auth/signup')
@@ -31,9 +36,13 @@ describe('Sign Up & Login Tests', () => {
     
     expect(response.status).toBe(200);
     expect(response.body.message).toBe('User created');
+
+    const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [validUser.email]);
+    expect(dbResult.rows.length).toBe(1);
+    expect(dbResult.rows[0].email).toBe(validUser.email);
+    expect(dbResult.rows[0].username).toBe(validUser.username);
   });
 
-  // --- TEST 2: Ogiltig signup ---
   test('2. En användare signar upp med ogiltig email', async () => {
     const response = await request(app)
       .post('/auth/signup')
@@ -41,9 +50,10 @@ describe('Sign Up & Login Tests', () => {
     
     expect(response.status).toBe(403);
     expect(response.body.error).toBe('Only students allowed');
+    const dbResult = await pool.query('SELECT * FROM users WHERE email = $1', [invalidUser.email]);
+    expect(dbResult.rows.length).toBe(0);
   });
 
-  // --- TEST 3: Giltig inloggning ---
   test('3. En användare försöker logga in med ett giltigt email och lösenord', async () => {
     const response = await request(app)
       .post('/auth/login')
@@ -56,8 +66,7 @@ describe('Sign Up & Login Tests', () => {
     expect(response.body.token).toBeDefined();
   });
 
-  // --- TEST 4: Ogiltig inloggning ---
-  test('4. En användare försöker logga in med ogiltigt email och lösenord', async () => {
+  test('4. En användare försöker logga in med fel lösenord', async () => {
     const response = await request(app)
       .post('/auth/login')
       .send({
@@ -69,7 +78,6 @@ describe('Sign Up & Login Tests', () => {
     expect(response.body.error).toBe('Wrong password');
   });
 
-  // --- TEST 5: Flera inloggningar på samma konto ---
   test('5. Två användare loggar in med samma email och lösenord', async () => {
     const login1 = await request(app)
       .post('/auth/login')
@@ -93,7 +101,6 @@ describe('Sign Up & Login Tests', () => {
     expect(login2.body.token).toBeDefined();
   });
 
-  // --- TEST 6: Användare försöker signa upp med en mail som redan är registrerad ---
   test('6. En användare försöker signa upp med en mail som redan är registrerad', async () => {
     const response = await request(app)
       .post('/auth/signup')
@@ -103,7 +110,6 @@ describe('Sign Up & Login Tests', () => {
     expect(response.body.error).toBe('Username or email already exists');
   });
 
-  // --- TEST 7: Användare försöker logga in med en mail som inte finns ---
   test('7. En användare försöker logga in med en mail som inte finns', async () => {
     const response = await request(app)
       .post('/auth/login')
@@ -116,7 +122,6 @@ describe('Sign Up & Login Tests', () => {
     expect(response.body.error).toBe('User not found');
   });
 
-  // --- TEST 8: Användare skickar in tomma fält vid registrering ---
   test('8. En användare skickar in tomma fält vid registrering', async () => {
     const response = await request(app)
       .post('/auth/signup')
@@ -125,4 +130,36 @@ describe('Sign Up & Login Tests', () => {
     expect(response.status).not.toBe(200);
   });
 
+  test('9. En användare skickar in tomma fält vid inloggning', async () => {
+    const response = await request(app)
+      .post('/auth/login')
+      .send({ email: '', password: '' });
+
+    expect(response.status).not.toBe(200);
+  });
+
+  test('10. Väldigt många användare signar up på en gång', async () => {
+    const dbResultPrior = await pool.query('SELECT count(*) FROM users');
+    const totalUsersPrior = parseInt(dbResultPrior.rows[0].count);
+    testUser = {};
+    for (let i = 0; i < 20; i++) {
+      testUser = {
+        email: `testuser_${Date.now()}'@student.uu.se`,
+        username: `TestUser_${Date.now()}`,
+        password: 'password123'
+      };
+
+      const response = await request(app)
+      .post('/auth/signup')
+      .send(testUser);
+
+      expect(response.status).toBe(200);
+      expect(response.body.message).toBe('User created');
+    }
+
+    const dbResult = await pool.query('SELECT count(*) FROM users');
+    const totalUsers = parseInt(dbResult.rows[0].count);
+    expect(totalUsers - totalUsersPrior).toBe(20);
+
+  });
 });
