@@ -1,6 +1,6 @@
 #Kör tester
 test:
-	npm test
+	npm test --prefix ./server
 
 interact:
 	$(MAKE) -C client start
