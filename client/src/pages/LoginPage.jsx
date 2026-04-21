@@ -21,7 +21,6 @@ export default function LogInPage() {
   const resultConstanst = await login({ email, password });
 
   if (resultConstanst.success) { 
-    connect();
     alert(`Logging in as ${localStorage.getItem('username')}!`);
     navigate('/home');
   }

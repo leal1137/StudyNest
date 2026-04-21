@@ -150,10 +150,13 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         const user = listActiveUsers[socket.id];
         if (user) {
-            socket.to(user.room).emit('user_left', user.username);
+            if (user.room) {
+                socket.to(user.room).emit('user_left', user.username);
+                // uppdate when rooms are active
+            }
             delete listActiveUsers[socket.id];
         }
-        console.log('User disconnected:', socket.id);
+        console.log('User disconnected:', user.getUsername());
     });
 });
 
