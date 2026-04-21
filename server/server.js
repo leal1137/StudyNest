@@ -28,7 +28,7 @@ const io = new Server(server, {
 });
 
 //server setup
-app.use(express.static('public'));
+//app.use(express.static('public')); //move to react instead
 app.use(express.json());
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
@@ -77,22 +77,8 @@ let room_participants = {};
  * @param {Object} socket - Klientens unika anslutningsobjekt.
  */
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.user.email, 'Socket ID:', socket.id);
-
     listActiveUsers[socket.id] = new User(socket.user.username, socket.user.email, socket.id);
-    /**
-     * Registrerar användaren manuellt och skapar ett nytt User-objekt på servern.
-     *
-     * @name socketOnLogin
-     * @function
-     * @param {string} username - Namnet som användaren väljer vid inloggning.
-     */
-    socket.on('login', (username) => {
-        listActiveUsers[socket.id] = new User(username);
-        console.log('User logged in:', username);
-    });
-
-
+    console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
     /**
      * Placerar klienten i ett specifikt chattrum. Funktionen uppdaterar serverns 
      * interna listor över vilka som är i rummet och meddelar sedan både den 

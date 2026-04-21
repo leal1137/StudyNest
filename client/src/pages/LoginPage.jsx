@@ -1,0 +1,91 @@
+import { useState } from 'react'
+import '../App.css'
+import { Sidebar } from '../components/Sidebar'
+import { useNavigate } from 'react-router-dom';
+import { login } from '../script/login'
+import { connect } from '../script/socketConection';
+
+export default function LogInPage() {
+  const [username, setUsername] = useState('test');
+  const [password, setPassword] = useState('abc');
+  const [email, setEmail] = useState('test@test.su.se');
+
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  console.log("login clicked");
+  console.log("Email:", email);
+  console.log("Password:", password);
+
+  const resultConstanst = await login({ email, password });
+
+  if (resultConstanst.success) { 
+    connect();
+    alert(`Logging in as ${localStorage.getItem('username')}!`);
+    navigate('/home');
+  }
+  
+  else {
+    alert(resultConstanst.message);
+    //alert('Login failed. Please check your credentials and try again.');
+  }
+};
+
+  return (
+    <div className="LoginPage">
+      <Sidebar />
+      <main className="main-content">
+        <form className="Login-box" onSubmit={handleLogin}>
+          <h2>Sign in</h2>
+
+          <div className="input-group">
+            <label>Email:</label>
+            <input
+              id='email'
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Password:</label>
+            <input
+              id='password'
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
+            <button
+              type="submit"
+              style={{
+                padding: '10px 20px',
+                fontSize: '18px',
+                cursor: 'pointer',
+              }}
+            >
+              Login
+            </button>
+
+            <button
+              type="button"
+              style={{
+                padding: '10px 20px',
+                fontSize: '18px',
+                cursor: 'pointer',
+              }}
+              onClick={() => navigate('/sign-up')}
+            >
+              Sign Up
+            </button>
+          </div>
+
+        </form>
+      </main>
+    </div>
+  );
+}

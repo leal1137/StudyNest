@@ -2,9 +2,11 @@
 test:
 	npm test
 
-#Starta servern
+interact:
+	$(MAKE) -C client start
+
 run:
-	node server.js
+	npm run dev
 
 #Skapa dokumentation
 docs:
