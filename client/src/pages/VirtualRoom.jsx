@@ -5,6 +5,7 @@ import { RoomChatPanel } from '../components/RoomChatPanel'
 import { RoomSidebar } from '../components/RoomSidebar'
 import { RoomTools } from '../components/RoomTools'
 import { VirtualRoomHeader } from '../components/VirtualRoomHeader'
+import { } from '../script/socketConection';
 
 const initialParticipants = [
   { id: 1, name: 'Olle', status: 'studying', micMuted: false, speaking: true },

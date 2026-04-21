@@ -3,6 +3,7 @@ import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 import { signup } from '../script/signup';
+import { } from '../script/socketConection';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');

@@ -4,6 +4,7 @@ import { CustomButton } from '../components/CustomButton'
 import heroImg from '../assets/vine.png'
 import { useNavigate } from 'react-router-dom'
 import UserDisplay from '../components/UserDisplay'
+import { } from '../script/socketConection';
 
 export default function HomePage() {
   const navigate = useNavigate()
