@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import '../App.css'
 import { SubjectSelector } from './SubjectSelector';
-import { CustomButton } from './customButton';
+import { CustomButton } from './CustomButton';
 
 export default function CreateRoomSettings() {
     const [roomName, setRoomName] = useState('');
