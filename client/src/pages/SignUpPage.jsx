@@ -2,6 +2,7 @@ import { useState } from 'react'
 import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
+import { signup } from '../script/signup';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
@@ -10,12 +11,24 @@ export default function SignUp() {
 
   const navigate = useNavigate();
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
+
     e.preventDefault();
-
-    alert(`Account created for ${username}`);
-
-    navigate('/login');
+      console.log("sign up clicked");
+      console.log("Email:", email);
+      console.log("Username:", username);
+      console.log("Password:", password);
+    
+      const resultConstanst = await signup({ email, username, password });
+    
+      if (resultConstanst.success) { 
+        alert(`Sign up success!`);
+        navigate('/');
+      }
+      
+      else {
+        alert(resultConstanst.message);
+      }
   };
 
   return (
