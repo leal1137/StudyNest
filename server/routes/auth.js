@@ -55,6 +55,7 @@ router.post('/signup', async (req, res) => {
     });
 
     res.json({ message: 'User created' });
+    console.log(`User signed up: ${email}  (${username})`);
 
   } catch (err) {
     if (err.code === '23505') {
