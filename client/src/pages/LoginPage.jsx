@@ -11,17 +11,28 @@ export default function LogInPage() {
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    login();
-    //alert(`Logging in as ${username}`);
-    //navigate('/');
-  };
+  const handleLogin = async (e) => {
+  e.preventDefault();
+  console.log("login clicked");
+  console.log("Email:", email);
+  console.log("Password:", password);
+
+  const resultConstanst = await login({ email, password });
+
+  if (resultConstanst.success && localStorage.getItem('token')) { 
+    alert(`Logging in as ${localStorage.getItem('username')}!`);
+    navigate('/home');
+  }
+  
+  else {
+    alert(resultConstanst.message);
+    //alert('Login failed. Please check your credentials and try again.');
+  }
+};
 
   return (
     <div className="LoginPage">
       <Sidebar />
-
       <main className="main-content">
         <form className="Login-box" onSubmit={handleLogin}>
           <h2>Sign in</h2>
