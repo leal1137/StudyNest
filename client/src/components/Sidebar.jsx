@@ -7,8 +7,8 @@ export function Sidebar() {
       <div className="menu-icon">≡</div>
 
       <ul className="menu">
-        <li><Link to="/">Home</Link></li>
-        <li><Link to="/login">Login</Link></li>
+        <li><Link to="/">Login</Link></li>
+        <li><Link to="/home">HomePage</Link></li>
       </ul>
     </nav>  
   );
