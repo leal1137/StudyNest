@@ -50,16 +50,6 @@ export default function LogInPage() {
           </div>
 
           <div className="input-group">
-            <label>Username:</label>
-            <input
-              id='username'
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
             <label>Password:</label>
             <input
               id='password'
