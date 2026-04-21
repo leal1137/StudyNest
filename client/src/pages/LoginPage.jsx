@@ -6,9 +6,9 @@ import { login } from '../script/login'
 import { connect } from '../script/socketConection';
 
 export default function LogInPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('test');
+  const [password, setPassword] = useState('abc');
+  const [email, setEmail] = useState('test@test.su.se');
 
   const navigate = useNavigate();
 
