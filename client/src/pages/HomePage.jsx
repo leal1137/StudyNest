@@ -3,9 +3,11 @@ import { Sidebar } from '../components/Sidebar'
 import { CustomButton } from '../components/CustomButton'
 import heroImg from '../assets/vine.png'
 import { useNavigate } from 'react-router-dom'
+import UserDisplay from '../components/UserDisplay'
 
 export default function HomePage() {
   const navigate = useNavigate()
+
 
   const handleClick1 = () => alert("Button 1 clicked!");
   const handleClick2 = () => alert("Button 2 clicked!");
@@ -15,6 +17,7 @@ export default function HomePage() {
     <div className="HomePage">
       <Sidebar />
       <main className="main-content">
+        <UserDisplay />
         <div style={{ padding: '50px', textAlign: 'center' }}>
           <h1 className="home-title">StudyNest</h1>
           <p>What would you like to do?</p>

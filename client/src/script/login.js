@@ -1,44 +1,44 @@
-import { Navigate, redirect } from "react-router-dom";
+export async function login({ email, password }) {
+  const apiUrl = import.meta.env.VITE_API_URL || '';
 
-//login.js
-if (localStorage.getItem('token')) {
-    //window.location.href = '/index.html';
-  }
+  console.log("Sending login request to:", `${apiUrl}/auth/login`);
+  console.log("Data:", { email, password });
 
+  try {
+    const res = await fetch(`/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    localStorage.setItem('string-result', JSON.stringify(res));
+    const data = await res.json();
 
-/**
- * Hanterar inloggningsprocessen på klientsidan. Funktionen hämtar 
- * användarens e-post och lösenord direkt från webbsidans inmatningsfält 
- * och skickar en autentiseringsförfrågan till servern. Vid framgång 
- * sparas en behörighetstoken lokalt i webbläsaren och användaren 
- * skickas vidare till huvudsidan. Vid fel visas ett felmeddelande på sidan.
- *
- * @name login
- * @function.
- */
-export async function login() {
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
+    console.log("Response ok:", res.ok);
+    console.log("Response data:", data);
 
-      const res = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        document.getElementById('error').innerText = data.error;
-        return;
-      }
-
-      // Save token
-      localStorage.setItem('token', data.token);
-
-      const payload = JSON.parse(atob(data.token.split('.')[1]));
-      localStorage.setItem('username', payload.username);
-
-      // Redirect to main app
-      redirect('/');
+    if (!res.ok) {
+      return {
+        success: false,
+        message: data.error || 'Invalid email or password'
+      };
     }
+
+    localStorage.setItem('token', data.token);
+
+    const payload = JSON.parse(atob(data.token.split('.')[1]));
+    localStorage.setItem('username', payload.username);
+
+    // Dispatch custom event to notify components of login
+    window.dispatchEvent(new Event('userLoggedIn'));
+
+    return {
+      success: true
+    };
+
+  } catch (err) {
+    return {
+      success: false,
+      message: 'Network error. Please try again.'
+    };
+  }
+}
