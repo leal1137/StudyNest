@@ -8,9 +8,36 @@ export default function CreateRoomSettings() {
     const [roomSize, setRoomSize] = useState(15);
     const [jointWorkspace, setJointWorkspace] = useState(false);
 
-    const CreateNewRoom = (e) => {
+    const CreateNewRoom = async (e) => {
         e.preventDefault();
-        alert("Creating a new room");
+
+        const newRoomData = {
+            name: roomName,
+            max_capacity: parseInt(roomSize),
+            is_silent: !jointWorkspace
+            //created_by: localStorage.getItem('token')
+        };
+
+        try {
+            const response = await fetch('http://localhost:3000/api/rooms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newRoomData)
+            });
+
+            if (response.ok) {
+                const savedRoom = await response.json();
+                alert(`Succé! Rummet "${savedRoom.name}" har skapats.`);
+            } else {
+                const errorData = await response.json();
+                alert(`Kunde inte skapa rummet: ${errorData.error}`);
+            }
+        } catch (error) {
+            console.error("Nätverksfel:", error);
+            alert("Kunde inte nå servern");
+        }
     };
 
     return (
