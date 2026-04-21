@@ -4,6 +4,7 @@ import HomePage from './pages/HomePage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import VirtualRoom from './pages/VirtualRoom';
 import SignUpPage from './pages/SignUpPage';
+import FindLocationPage from './pages/FindLocationPage';
 
 function DashboardPage() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
         <Route path="/createroom" element={<CreateRoomPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/virtual-room" element={<VirtualRoom />} />
+        <Route path="/find-location" element={<FindLocationPage />} />
       </Routes>
     </BrowserRouter>
   );
