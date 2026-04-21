@@ -3,6 +3,7 @@ import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 import { login } from '../script/login'
+import { connect } from '../script/socketConection';
 
 export default function LogInPage() {
   const [username, setUsername] = useState('');
@@ -19,7 +20,8 @@ export default function LogInPage() {
 
   const resultConstanst = await login({ email, password });
 
-  if (resultConstanst.success && localStorage.getItem('token')) { 
+  if (resultConstanst.success) { 
+    connect();
     alert(`Logging in as ${localStorage.getItem('username')}!`);
     navigate('/home');
   }
