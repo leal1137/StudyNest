@@ -4,6 +4,9 @@ import HomePage from './pages/HomePage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import VirtualRoom from './pages/VirtualRoom';
 import SignUpPage from './pages/SignUpPage';
+import { useEffect } from "react";
+import { connect } from './script/socketConection';
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function DashboardPage() {
   return (
@@ -15,14 +18,42 @@ function DashboardPage() {
 }
 
 export default function App() {
+
+  useEffect(() => {
+    connect(); }, []);
+
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/home" element={<HomePage />} />
-        <Route path="/createroom" element={<CreateRoomPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
-        <Route path="/virtual-room" element={<VirtualRoom />} />
+
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/createroom"
+          element={
+            <ProtectedRoute>
+              <CreateRoomPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/virtual-room"
+          element={
+            <ProtectedRoute>
+              <VirtualRoom />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
