@@ -22,7 +22,6 @@ export default function CreateRoomSettings() {
                     value={roomName}
                     onChange={(e) => setRoomName(e.target.value)} />
             </div>
-            
             <div className="input-room-size">
                 <h4>Room size</h4>
                 <input className='input'
@@ -32,9 +31,7 @@ export default function CreateRoomSettings() {
                 />
                 <span>max 50</span>
             </div>
-
             <SubjectSelector />
-
             <div className="workspace-checkbox">
                 <label>
                     <input
@@ -49,7 +46,6 @@ export default function CreateRoomSettings() {
                     Chat box, Voice chat, Whiteboard
                 </p>
             </div> 
-
             <CustomButton
                 className='Create-room-button'
                 text="CreateRoom"
