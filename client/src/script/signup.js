@@ -1,22 +1,39 @@
-async function signup() {
-      const email = document.getElementById('email').value;
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
+export async function signup({ email, username, password }) {
+  const apiUrl = import.meta.env.VITE_API_URL || '';
 
-      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-      const res = await fetch(`${apiUrl}/auth/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, username, password })
-      });
+  console.log("Sending sign up request to:", `${apiUrl}/auth/signup`);
+  console.log("Data:", { email, username, password });
 
-      const data = await res.json();
+  try {
+    const res = await fetch(`/auth/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, username, password })
+    });
 
-      if (!res.ok) {
-        document.getElementById('error').innerText = data.error;
-        return;
-      }
+    const data = await res.json();
 
-      document.getElementById('error').style.color = 'green';
-      document.getElementById('error').innerText = "Account created! You can now log in.";
+    console.log("Response ok:", res.ok);
+    console.log("Response data:", data);
+
+    if (!res.ok) {
+      return {
+        success: false,
+        message: data.error || 'Signup failed'
+      };
     }
+
+    // Dispatch custom event to notify components of signup success (e.g. to show a success message or redirect)
+    window.dispatchEvent(new Event('signupSuccess'));
+
+    return {
+      success: true
+    };
+
+  } catch (err) {
+    return {
+      success: false,
+      message: 'Network error. Please try again.'
+    };
+  }
+}

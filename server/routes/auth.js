@@ -55,6 +55,7 @@ router.post('/signup', async (req, res) => {
     });
 
     res.json({ message: 'User created' });
+    console.log(`User signed up: ${email}  (${username})`);
 
   } catch (err) {
     if (err.code === '23505') {
@@ -83,7 +84,7 @@ router.post('/login', async (req, res) => {
     }
 
     const token = jwt.sign(
-      { userId: user.id, email: user.email, username: user.username }, // 👈 add username
+      { userId: user.id, email: user.email, username: user.username }, // add username
       SECRET,
       { expiresIn: '2h' }
     );

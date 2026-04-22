@@ -4,6 +4,9 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    allowedHosts: [
+      'thespian-speed-bottling.ngrok-free.dev'
+    ],
     proxy: {
       // REST API routes
       '/api': {
@@ -11,13 +14,13 @@ export default defineConfig({
         changeOrigin: true,
       },
 
-      // Auth routes (IMPORTANT)
+      // Auth routes
       '/auth': {
         target: 'http://localhost:3000',
         changeOrigin: true,
       },
 
-      // Socket.IO (VERY IMPORTANT)
+      // Socket.IO
       '/socket.io': {
         target: 'http://localhost:3000',
         ws: true, // REQUIRED for WebSockets
