@@ -3,11 +3,12 @@ import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 import { login } from '../script/login'
+import { connect } from '../script/socketConection';
 
 export default function LogInPage() {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('test');
+  const [password, setPassword] = useState('abc');
+  const [email, setEmail] = useState('test@test.su.se');
 
   const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ export default function LogInPage() {
 
   const resultConstanst = await login({ email, password });
 
-  if (resultConstanst.success && localStorage.getItem('token')) { 
+  if (resultConstanst.success) { 
     alert(`Logging in as ${localStorage.getItem('username')}!`);
     navigate('/home');
   }
@@ -44,16 +45,6 @@ export default function LogInPage() {
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
-            <label>Username:</label>
-            <input
-              id='username'
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 

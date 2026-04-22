@@ -79,22 +79,8 @@ let room_participants = {};
  * @param {Object} socket - Klientens unika anslutningsobjekt.
  */
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.user.email, 'Socket ID:', socket.id);
-
     listActiveUsers[socket.id] = new User(socket.user.username, socket.user.email, socket.id);
-    /**
-     * Registrerar användaren manuellt och skapar ett nytt User-objekt på servern.
-     *
-     * @name socketOnLogin
-     * @function
-     * @param {string} username - Namnet som användaren väljer vid inloggning.
-     */
-    socket.on('login', (username) => {
-        listActiveUsers[socket.id] = new User(username);
-        console.log('User logged in:', username);
-    });
-
-
+    console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
     /**
      * Placerar klienten i ett specifikt chattrum. Funktionen uppdaterar serverns 
      * interna listor över vilka som är i rummet och meddelar sedan både den 
@@ -166,10 +152,13 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         const user = listActiveUsers[socket.id];
         if (user) {
-            socket.to(user.room).emit('user_left', user.username);
+            if (user.room) {
+                socket.to(user.room).emit('user_left', user.username);
+                // uppdate when rooms are active
+            }
             delete listActiveUsers[socket.id];
         }
-        console.log('User disconnected:', socket.id);
+        console.log('User disconnected:', user.getUsername());
     });
 });
 

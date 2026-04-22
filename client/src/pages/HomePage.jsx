@@ -4,10 +4,11 @@ import { CustomButton } from '../components/CustomButton'
 import heroImg from '../assets/vine.png'
 import { useNavigate } from 'react-router-dom'
 import UserDisplay from '../components/UserDisplay'
+import {socket, logoutDisconnect, connect } from '../script/socketConection';
+import { useEffect } from 'react'
 
 export default function HomePage() {
   const navigate = useNavigate()
-
 
   const handleClick1 = () => alert("Button 1 clicked!");
   const handleClick2 = () => alert("Button 2 clicked!");
