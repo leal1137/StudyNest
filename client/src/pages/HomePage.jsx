@@ -27,7 +27,7 @@ export default function HomePage() {
               <CustomButton 
                 text="Join a virtual study room" 
                 caption="Silent study rooms" 
-                onClick={() => navigate('/createroom')}
+                onClick={() => navigate('/joinvirtualroom')}
               />
               <CustomButton 
                 text="Find a study location" 

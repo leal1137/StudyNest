@@ -1,7 +1,7 @@
 import '../App.css'
 import { Link } from 'react-router-dom'
 
-export function Sidebar() {
+export function Sidebar( {Contents}) {
   return (
     <nav className="sidebar">
       <div className="menu-icon">≡</div>
@@ -10,6 +10,10 @@ export function Sidebar() {
         <li><Link to="/">Login</Link></li>
         <li><Link to="/home">HomePage</Link></li>
       </ul>
+
+      <div className="sidebar-content">
+        {Contents}
+      </div>
     </nav>  
   );
 }
