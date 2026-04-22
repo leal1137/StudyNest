@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import '../CSSfiles/JoinRoomPage.css'
-export default function RoomButton(name, subject, size, lat, lng, inRoom) {
+export default function RoomButton({key, name, subject, size, lat, lng, inRoom}) {
     
     const handlejoin = (e) => {
         e.preventDefault();

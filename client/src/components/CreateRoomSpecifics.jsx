@@ -2,8 +2,9 @@ import { useState } from 'react'
 import '../App.css'
 import { SubjectSelector } from './SubjectSelector';
 import { CustomButton } from './customButton';
-
+import { useNavigate } from 'react-router-dom';
 export default function CreateRoomSettings() {
+    const navigate = useNavigate()
     const [roomName, setRoomName] = useState('');
     const [roomSize, setRoomSize] = useState(15);
     const [jointWorkspace, setJointWorkspace] = useState(false);
@@ -49,6 +50,7 @@ export default function CreateRoomSettings() {
             <CustomButton
                 className='Create-room-button'
                 text="CreateRoom"
+                onClick={() => navigate('/joinvirtualroom')}
             />
         </form>
     )
