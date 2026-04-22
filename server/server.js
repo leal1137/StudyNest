@@ -112,13 +112,13 @@ io.on('connection', (socket) => {
         if (listActiveUsers[socket.id]) {
             listActiveUsers[socket.id].room = room;
         }
-        // if (!room_participants[room]) {
-        //     room_participants[room] = [];
-        // }
-        // const userExists = room_participants[room].some(u => u.id === socket.user.userId);
-        // if (!userExists) {
-        //     room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
-        // }
+        if (!room_participants[room]) {
+            room_participants[room] = [];
+        }
+        const userExists = room_participants[room].some(u => u.id === socket.user.userId);
+        if (!userExists) {
+            room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
+        }
 
         // 1. Skicka bekräftelse till den som anslöt
         socket.emit('joined_room', { room: room });
