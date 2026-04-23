@@ -35,25 +35,19 @@ export default function VirtualRoom({ socket }) {
   }
 
   useEffect(() => {
+    // For testing purposes, to see if socket is properly passed down to virtual room
     console.log("SOCKET IN ROOM:", socket ? socket.id : 'null');
-    socket.onAny((event, ...args) => {
-      console.log('Received socket event:', event, args);
-    });
-    socket.on('user_joined_room', (displayName) => {console.log(`User ${displayName} joined the room!`)});
-    joinVirtualRoom('test-room', socket); // test Anropa funktionen för att gå med i rummet
-    // if (!socket) return;
-    // console.log("SOCKET IN ROOM:", socket.id);
 
-    // socket.onAny((event, ...args) => {
-    //   console.log('Received socket event:', event, args);
-    // });
-    // socket.on('user_joined_room', (displayName) => {console.log(`User ${displayName} joined the room!`)});
-    // socket.on('list_room_participants', ({ participants }) => {console.log('Room participants:', participants)});
-  
-    // return () => {
-    //   socket.off('user_joined_room');
-    //   socket.off('list_room_participants');
-    // }
+    //for testing once joined room.
+    socket.on('user_already_in_room', (room) => {
+      console.log(`User is already in the room: ${room}`);
+    });
+    socket.on('user_joined_room', (displayName) => {
+      console.log(`User ${displayName} joined the room!`);
+    });
+
+    //acctually join the room
+    joinVirtualRoom('test-room', socket);
   }, [socket]);
 
 

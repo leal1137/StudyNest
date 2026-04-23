@@ -2,8 +2,8 @@
 /**
  * Anropar servern för att gå med i ett rum.
  * @function joinVirtualRoom
- * @param {*} room 
- * @param {*} socket 
+ * @param {string} room 
+ * @param {Socket} socket 
  * @returns {void}
  * @description Anropar servern för att gå med i ett rum. 
  * Rummet skapas om det inte redan finns.

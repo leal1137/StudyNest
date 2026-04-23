@@ -16,6 +16,7 @@ export default function HomePage({ socket }) {
     navigate('/virtual-room');
   };
   
+  //for testing purposes, to see if socket is properly passed down to homepage
   useEffect(() => {
     console.log("SOCKET IN HOMEPAGE:", socket ? socket.id : 'null');
   }, [socket]);

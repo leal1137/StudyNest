@@ -2,7 +2,22 @@ require('socket.io');
 //set of all users in rooms
 let room_participants = {};
 
+
+/**
+ * Hanterar logiken när en användare går med i ett rum.
+ * @param {string} room 
+ * @param {Socket} socket 
+ * @param {list<User>} listActiveUsers 
+ * @param {Server} io 
+ * @returns {void}
+ * @description Denna funktion hanterar logiken när en användare går med i ett rum. 
+ */
 function joinRoom(room, socket, listActiveUsers, io) {
+    if (socket.rooms.has(room)) {
+        console.log(`User ${listActiveUsers[socket.id]?.getUsername()} is already in room: ${room}`);
+        socket.emit('user_already_in_room', room);
+        return;
+    }
     socket.join(room);
     socket.room = room;
 
