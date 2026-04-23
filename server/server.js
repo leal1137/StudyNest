@@ -15,6 +15,7 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
+const {joinRoom } = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 
 // --- 1. EXPRESS MIDDLEWARE & ROUTING ---
@@ -35,7 +36,7 @@ app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 
 // --- 2. AUTHENTICATION FOR ENTRY ---
-
+//behövs denna function
 /**
  * Fungerar som en dörrvakt för chatten. Den kollar användarens JWT-token 
  * för att se till att bara inloggade personer får ansluta. Om allt 
@@ -64,8 +65,7 @@ io.use((socket, next) => {
 
 //all logged in users, indexed by socket ID
 let listActiveUsers = {};
-//set of all users in rooms
-let room_participants = {};
+
 
 /**
  * Hanterar en ny anslutning till realtidsservern. 
@@ -89,34 +89,7 @@ io.on('connection', (socket) => {
      * @param {string} room - Namnet på rummet som klienten vill ansluta till.
      */
     socket.on('join_room', (room) => {
-        socket.join(room);
-        socket.room = room; // Spara rummet på socketen
-
-        // Sätt rummet på User-objektet om det finns
-        if (listActiveUsers[socket.id]) {
-            listActiveUsers[socket.id].room = room;
-        }
-        // if (!room_participants[room]) {
-        //     room_participants[room] = [];
-        // }
-        // const userExists = room_participants[room].some(u => u.id === socket.user.userId);
-        // if (!userExists) {
-        //     room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
-        // }
-
-        // 1. Skicka bekräftelse till den som anslöt
-        socket.emit('joined_room', { room: room });
-
-        // 2. Meddela andra i rummet (Använd namnet från listActiveUsers i första hand, annars e-posten från JWT)
-        const displayName = listActiveUsers[socket.id] 
-          ? listActiveUsers[socket.id].getUsername() 
-          : socket.user.email;
-
-        socket.to(room).emit('user_joined', displayName);
-
-        //io.to(room).emit('room_participants', { participants: room_participants[room] || [] });
-         
-
+      joinRoom(room, socket, listActiveUsers, io);
     });
 
 
@@ -150,13 +123,15 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         const user = listActiveUsers[socket.id];
         if (user) {
-            if (user.room) {
-                socket.to(user.room).emit('user_left', user.username);
-                // uppdate when rooms are active
-            }
+            // if (user.room) {
+            //     socket.to(user.room).emit('user_left', user.username);
+            //     console.log(`User ${user.getUsername()} left room: ${user.room}`);
+            //     // uppdate when rooms are active
+            // }
             delete listActiveUsers[socket.id];
+            console.log('User disconnected:', user.getUsername());
+          console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
         }
-        console.log('User disconnected:', user.getUsername());
     });
 });
 

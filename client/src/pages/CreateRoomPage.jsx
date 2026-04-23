@@ -4,7 +4,7 @@ import CreateRoomSettings from '../components/CreateRoomSpecifics';
 import { SelectPlaceOnMap } from '../components/SelectPlaceOnMap';
 import { } from '../script/socketConection';
 
-export default function CreateRoomPage() {
+export default function CreateRoomPage({ socket }) {
 
 
   return (

@@ -4,9 +4,10 @@ import HomePage from './pages/HomePage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import VirtualRoom from './pages/VirtualRoom';
 import SignUpPage from './pages/SignUpPage';
-import { useEffect } from "react";
+import { useEffect,useState } from "react";
 import { connect } from './script/socketConection';
 import ProtectedRoute from "./components/ProtectedRoute";
+import { } from './script/socketConection';
 
 function DashboardPage() {
   return (
@@ -18,21 +19,33 @@ function DashboardPage() {
 }
 
 export default function App() {
-
+  const [socket, setSocket] = useState(null);
   useEffect(() => {
-    connect(); }, []);
+    const soc = connect();
+    
+    if (!soc) return;
+
+    const handleConnect = () => {
+      console.log("SOCKET IN APP:", soc ? soc.id : 'null');
+      setSocket(soc);
+    }
+    soc.on('connect', handleConnect);
+    return () => {
+      soc.off('connect', handleConnect);
+    };
+  }, []);
 
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage/>} />
         <Route path="/sign-up" element={<SignUpPage />} />
 
         <Route
           path="/home"
           element={
             <ProtectedRoute>
-              <HomePage />
+              <HomePage socket={socket} />
             </ProtectedRoute>
           }
         />
@@ -41,7 +54,7 @@ export default function App() {
           path="/createroom"
           element={
             <ProtectedRoute>
-              <CreateRoomPage />
+              <CreateRoomPage socket={socket}/>
             </ProtectedRoute>
           }
         />
@@ -50,7 +63,7 @@ export default function App() {
           path="/virtual-room"
           element={
             <ProtectedRoute>
-              <VirtualRoom />
+              <VirtualRoom socket={socket}/>
             </ProtectedRoute>
           }
         />

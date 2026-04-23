@@ -1,23 +1,42 @@
 import { io } from "socket.io-client";
 
-let token = undefined;
-export let socket = undefined;
+let socket = null;
 
-
-
+/**
+ * Skapar en anslutning till Socket.IO-servern med hjälp av en JWT-token som autentisering.
+ * @function connect
+ * @returns {socket}
+ * @description Denna funktion hämtar JWT-token från localStorage och, 
+ * om den finns och ingen befintlig socket-anslutning finns, skapar en ny Socket.IO-anslutning till servern. 
+ * Token skickas som autentisering i anslutningsförfrågan.
+ */
 export function connect(){
-    token = localStorage.getItem('token');
-    if (token && !socket) {
-        socket = io("/", {path: "/socket.io", auth: {token: token}});
+    const token = localStorage.getItem('token');
+    if (!token) return null;
+    if (!socket) {
+        //socket = io("/", {path: "/socket.io", auth: {token: token}});
+        socket = io("http://localhost:3000", {auth: { token }});
     }
+    if (!socket.connected) {
+        socket.connect();
+    }
+
+    return socket;
 }
 
+/**
+ * Loggar ut användaren genom att ta bort JWT-token från localStorage och koppla bort Socket.IO-anslutningen.
+ * @function logoutDisconnect
+ * @returns {void}
+ * @description Denna funktion tar bort JWT-token från localStorage, 
+ * kopplar bort Socket.IO-anslutningen och sätter både token och socket till undefined. 
+ * Detta säkerställer att användaren är helt utloggad och att ingen anslutning till servern kvarstår.
+ */
 export function logoutDisconnect() {
     if (socket) {
         socket.disconnect();
-        socket = undefined;
+        socket = null;
         localStorage.removeItem('token');
-        token = undefined;
         console.log("User Logged out, socket disconnected");
     }
 }

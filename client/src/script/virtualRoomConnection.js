@@ -1,0 +1,16 @@
+
+/**
+ * Anropar servern för att gå med i ett rum.
+ * @function joinVirtualRoom
+ * @param {*} room 
+ * @param {*} socket 
+ * @returns {void}
+ * @description Anropar servern för att gå med i ett rum. 
+ * Rummet skapas om det inte redan finns.
+ */
+export function joinVirtualRoom(room, socket) {
+    if (room && socket) {
+        socket.emit('join_room', room);
+    }
+}
+

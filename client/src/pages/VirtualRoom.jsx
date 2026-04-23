@@ -5,7 +5,8 @@ import { RoomChatPanel } from '../components/RoomChatPanel'
 import { RoomSidebar } from '../components/RoomSidebar'
 import { RoomTools } from '../components/RoomTools'
 import { VirtualRoomHeader } from '../components/VirtualRoomHeader'
-import { } from '../script/socketConection';
+import { useEffect } from 'react';
+import { joinVirtualRoom } from '../script/virtualRoomConnection';
 
 const initialParticipants = [
   { id: 1, name: 'Olle', status: 'studying', micMuted: false, speaking: true },
@@ -20,7 +21,7 @@ const initialParticipants = [
 
 const roomTools = ['Chatroom', 'Whiteboard']
 
-export default function VirtualRoom() {
+export default function VirtualRoom({ socket }) {
   const [participants, setParticipants] = useState(initialParticipants)
 
   function handleToggleMute(participantId) {
@@ -32,6 +33,29 @@ export default function VirtualRoom() {
       )
     )
   }
+
+  useEffect(() => {
+    console.log("SOCKET IN ROOM:", socket ? socket.id : 'null');
+    socket.onAny((event, ...args) => {
+      console.log('Received socket event:', event, args);
+    });
+    socket.on('user_joined_room', (displayName) => {console.log(`User ${displayName} joined the room!`)});
+    joinVirtualRoom('test-room', socket); // test Anropa funktionen för att gå med i rummet
+    // if (!socket) return;
+    // console.log("SOCKET IN ROOM:", socket.id);
+
+    // socket.onAny((event, ...args) => {
+    //   console.log('Received socket event:', event, args);
+    // });
+    // socket.on('user_joined_room', (displayName) => {console.log(`User ${displayName} joined the room!`)});
+    // socket.on('list_room_participants', ({ participants }) => {console.log('Room participants:', participants)});
+  
+    // return () => {
+    //   socket.off('user_joined_room');
+    //   socket.off('list_room_participants');
+    // }
+  }, [socket]);
+
 
   return (
     <div className="virtual-room-page">
