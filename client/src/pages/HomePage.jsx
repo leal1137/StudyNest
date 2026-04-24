@@ -11,7 +11,7 @@ export default function HomePage() {
   const navigate = useNavigate()
 
   const handleClick1 = () => navigate('/createroom');
-  const handleClick2 = () => navigate('/find-location');
+  const handleClick2 = () => navigate('/find-location-map');
   const handleClick3 = () => navigate('/virtual-room');
   const logout = () => {
     alert("logout button clicked!!!!!!");

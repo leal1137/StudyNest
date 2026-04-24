@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
+import { useMapEvents } from 'react-leaflet';
+import { useNavigate } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -11,7 +13,14 @@ let DefaultIcon = L.icon({
   iconAnchor: [12, 41]
 });
 
+const locations = [
+  { id: 1, name: "Ekonomikum", lat: 59.8594, lng: 17.6200 },
+  { id: 2, name: "Ångström", lat: 59.8397, lng: 17.6468 },
+  { id: 3, name: "Carolina Rediviva", lat: 59.8550, lng: 17.6310 }
+];
+
 L.Marker.prototype.options.icon = DefaultIcon;
+
 
 function MapClickHandler({ setPinPosition }) {
   useMapEvents({
@@ -26,22 +35,46 @@ function MapClickHandler({ setPinPosition }) {
 }
 
 export function SelectPlaceOnMap() {
-  const [pinPosition, setPinPosition] = useState({ lat: 59.8586, lng: 17.6389 });
+  const [hoveredId, setHoveredId] = useState(null);
+  const navigate = useNavigate();
+
+  const handleMarkerClick = (loc) => {
+    navigate('/find-location', { state: { locationName: loc.name } });
+  };
 
   return (
     <div className="map-component">
       <MapContainer className='map-image'
-        center={[59.8586, 17.6389]}
-        zoom={13}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      center={[59.8586, 17.6389]}
+      zoom={13}
+    >
+      <TileLayer
+        attribution='&copy; OpenStreetMap contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
 
-        <MapClickHandler setPinPosition={setPinPosition} />
-        <Marker position={[pinPosition.lat, pinPosition.lng]} />
+      {locations.map((loc) => (
+        <CircleMarker
+          key={loc.id}
+          center={[loc.lat, loc.lng]}
+          radius={10}
+          pathOptions={{
+            color: 'blue',
+            fillColor: hoveredId === loc.id ? 'white' : 'blue',
+            fillOpacity: 1
+          }}
+          eventHandlers={{
+            click: () => handleMarkerClick(loc),
+            mouseover: () => setHoveredId(loc.id),
+            mouseout: () => setHoveredId(null)
+          }}
+        />
+      ))}
+
       </MapContainer>
     </div>
   );
 }
+
+// <Marker position={[pinPosition.lat, pinPosition.lng]} />
+//<MapClickHandler setPinPosition={setPinPosition} />

@@ -10,6 +10,7 @@
 .LoginPage,
 .SignUpPage,
 .FindLocationPage,
+.FindLocationMapPage,
 .CreateRoomPage {
   display: flex;
   height: 100vh; 
@@ -87,31 +88,27 @@
 }
 
 .Location-search-box {
-  max-width: 500px;
+  position: fixed;
+  top: 20px;
+  max-width: 400px;
   margin: 60px auto;
   padding: 20px;
 }
 
-.Location-input-group {
-  display: flex;
-  flex-direction: column;
+/* Title */
+.Location-search-box h2 {
+  font-size: 40px;
+  font-weight: 700;
   margin-bottom: 15px;
 }
 
-/* 👇 BIGGER TEXT ABOVE INPUT */
-.Location-input-group label {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-
-/* 👇 SHORTER INPUT FIELD */
-.Location-input-group input {
-  width: 100%;
-  padding: 8px 10px;   /* smaller padding = less height */
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+/* The location text */
+.Location-display {
+  position: relative;
+  font-size: 30px;
+  font-weight: 500;
+  padding: 10px 0;
+  text-align: center;
 }
 
 
