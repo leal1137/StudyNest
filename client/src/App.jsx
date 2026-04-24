@@ -7,6 +7,8 @@ import SignUpPage from './pages/SignUpPage';
 import { useEffect } from "react";
 import { connect } from './script/socketConection';
 import ProtectedRoute from "./components/ProtectedRoute";
+import FindLocationPage from './pages/FindLocationPage';
+import FindLocationPageMap from './pages/FindLocationMapPage';
 
 function DashboardPage() {
   return (
@@ -27,6 +29,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
+        <Route path="/find-location" element={<FindLocationPage />} />
+        <Route path="/virtual-room" element={<VirtualRoom />} />
+        <Route path="/find-location-map" element={<FindLocationPageMap />} />
+
 
         <Route
           path="/home"

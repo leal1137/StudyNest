@@ -10,9 +10,12 @@ import { useEffect } from 'react'
 export default function HomePage() {
   const navigate = useNavigate()
 
-  const handleClick1 = () => alert("Button 1 clicked!");
-  const handleClick2 = () => alert("Button 2 clicked!");
+  const handleClick1 = () => navigate('/createroom');
+  const handleClick2 = () => navigate('/find-location-map');
   const handleClick3 = () => navigate('/virtual-room');
+  const logout = () => {
+    alert("logout button clicked!!!!!!");
+  };
 
   return (
     <div className="HomePage">
@@ -28,18 +31,25 @@ export default function HomePage() {
               <CustomButton 
                 text="Join a virtual study room" 
                 caption="Silent study rooms" 
-                onClick={() => navigate('/createroom')}
+                onClick={handleClick1}
               />
               <CustomButton 
                 text="Find a study location" 
                 caption="Find real world locations" 
-                onClick={handleClick2} 
+                onClick={handleClick2}
               />
               <CustomButton 
                 text="Join a joint workspace" 
                 caption="Work together with others in a virtual study room"
                 onClick={handleClick3} 
               />
+              <button
+                className="Sign-out-button"
+                type="button"
+                onClick={logout}
+              >
+                Sign Out
+              </button>
             </div>
         </div>
       </main>

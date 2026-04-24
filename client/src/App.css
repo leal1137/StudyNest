@@ -9,6 +9,8 @@
 .HomePage,
 .LoginPage,
 .SignUpPage,
+.FindLocationPage,
+.FindLocationMapPage,
 .CreateRoomPage {
   display: flex;
   height: 100vh; 
@@ -63,11 +65,53 @@
 
     padding: 8px 12px;
     background-color: white;
-    border: 1px solid #ccc;
+    border: 1px solid #000000;
     border-radius: 8px;
 
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
+
+.Sign-out-button {
+  position: fixed;
+  top: 100px;
+  right: 110px;
+  font-size: 20px;
+
+  padding: 8px 12px;
+  background-color: white;
+  border: 1px solid #000000;
+  border-radius: 8px;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+
+
+}
+
+.Location-search-box {
+  position: fixed;
+  top: 20px;
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 20px;
+}
+
+/* Title */
+.Location-search-box h2 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+/* The location text */
+.Location-display {
+  position: relative;
+  font-size: 30px;
+  font-weight: 500;
+  padding: 10px 0;
+  text-align: center;
+}
+
+
 
 
 

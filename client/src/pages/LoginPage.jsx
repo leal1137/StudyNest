@@ -4,6 +4,7 @@ import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 import { login } from '../script/login'
 import { connect } from '../script/socketConection';
+import UserDisplay from '../components/UserDisplay';
 
 export default function LogInPage() {
   const [username, setUsername] = useState('test');
@@ -22,7 +23,7 @@ export default function LogInPage() {
 
   if (resultConstanst.success) { 
     alert(`Logging in as ${localStorage.getItem('username')}!`);
-    navigate('/home');
+    navigate('/');
   }
   
   else {
