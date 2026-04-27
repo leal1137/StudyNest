@@ -5,7 +5,7 @@ const statusOptions = [
   { label: 'Taking a break', modifier: 'break' },
 ]
 
-export function RoomSidebar() {
+export function RoomSidebar({ onLeaveRoom }) {
   return (
     <aside className="room-sidebar">
       <div className="room-brand">
@@ -49,7 +49,7 @@ export function RoomSidebar() {
       <button className="room-break-button" type="button">
         Suggest a break
       </button>
-      <button className="room-switch-button" type="button">
+      <button className="room-switch-button" type="button" onClick={onLeaveRoom}>
         Choose another room
       </button>
     </aside>

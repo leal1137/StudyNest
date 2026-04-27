@@ -2,20 +2,28 @@ import { useState } from 'react'
 import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
-import { login } from '../script/login'
+import { login } from '../script/login';
 
 export default function LogInPage() {
-  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    login();
-    //alert(`Logging in as ${username}`);
-    //navigate('/');
+
+    setError('');
+
+    const result = await login(email, password);
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    navigate('/');
   };
 
   return (
@@ -33,16 +41,6 @@ export default function LogInPage() {
               type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
-            <label>Username:</label>
-            <input
-              id='username'
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
             />
           </div>
 
@@ -80,6 +78,7 @@ export default function LogInPage() {
               Sign Up
             </button>
           </div>
+          {error ? <p style={{ color: '#9f3d31', marginTop: '16px' }}>{error}</p> : null}
 
         </form>
       </main>
