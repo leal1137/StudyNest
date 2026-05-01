@@ -9,14 +9,14 @@ import { useEffect } from 'react';
 import { joinVirtualRoom } from '../script/virtualRoomConnection';
 
 const initialParticipants = [
-  { id: 1, name: 'Olle', status: 'studying', micMuted: false, speaking: true },
-  { id: 2, name: 'Andreas', status: 'studying', micMuted: true, speaking: true },
-  { id: 3, name: 'Måns', status: 'studying', micMuted: false, speaking: true },
-  { id: 4, name: 'Mille', status: 'studying', micMuted: false, speaking: true },
-  { id: 5, name: 'Ebba', status: 'studying', micMuted: false, speaking: true },
-  { id: 6, name: 'Leo', status: 'studying', micMuted: false, speaking: false },
-  { id: 7, name: 'Edward', status: 'studying', micMuted: false, speaking: true },
-  { id: 8, name: 'Samir', status: 'break', micMuted: false, speaking: false },
+  { userId: 1, username: 'Olle', status: 'studying', micMuted: false, speaking: true },
+  { userId: 2, username: 'Andreas', status: 'studying', micMuted: true, speaking: true },
+  { userId: 3, username: 'Måns', status: 'studying', micMuted: false, speaking: true },
+  { userId: 4, username: 'Mille', status: 'studying', micMuted: false, speaking: true },
+  { userId: 5, username: 'Ebba', status: 'studying', micMuted: false, speaking: true },
+  { userId: 6, username: 'Leo', status: 'studying', micMuted: false, speaking: false },
+  { userId: 7, username: 'Edvard', status: 'studying', micMuted: false, speaking: true },
+  { userId: 8, username: 'Samir', status: 'break', micMuted: false, speaking: false },
 ]
 
 const roomTools = ['Chatroom', 'Whiteboard']
@@ -27,7 +27,7 @@ export default function VirtualRoom({ socket }) {
   function handleToggleMute(participantId) {
     setParticipants((currentParticipants) =>
       currentParticipants.map((participant) =>
-        participant.id === participantId
+        participant.userId === participantId
           ? { ...participant, micMuted: !participant.micMuted }
           : participant
       )
@@ -43,7 +43,18 @@ export default function VirtualRoom({ socket }) {
       console.log(`User is already in the room: ${room}`);
     });
     socket.on('user_joined_room', (displayName) => {
-      console.log(`User ${displayName} joined the room!`);
+      console.log(`User ${displayName} joined the room!`);//uppdata chat
+    });
+
+    socket.on('list_participants_in_room', (list) => {
+      const currentParticipants = list.participants_List;
+      setParticipants(currentParticipants);
+    });
+    socket.on('user_left_room', (data) => {
+      const currentParticipants = data.participants_List;
+      const displayName = data.name;
+      setParticipants(currentParticipants);
+      console.log(`User ${displayName} left the room!`);//uppdata chat
     });
 
     //acctually join the room
@@ -61,9 +72,9 @@ export default function VirtualRoom({ socket }) {
         <section className="participant-grid">
           {participants.map((participant) => (
             <ParticipantCard
-              key={participant.id}
+              key={participant.userId}
               {...participant}
-              onToggleMute={() => handleToggleMute(participant.id)}
+              onToggleMute={() => handleToggleMute(participant.userId)}
             />
           ))}
         </section>

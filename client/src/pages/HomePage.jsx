@@ -4,7 +4,7 @@ import { CustomButton } from '../components/CustomButton'
 import heroImg from '../assets/vine.png'
 import { useNavigate } from 'react-router-dom'
 import UserDisplay from '../components/UserDisplay'
-import { logoutDisconnect } from '../script/socketConection';
+import { connect, logoutDisconnect } from '../script/socketConection';
 import { useEffect } from 'react'
 
 export default function HomePage({ socket }) {
@@ -18,6 +18,7 @@ export default function HomePage({ socket }) {
   
   //for testing purposes, to see if socket is properly passed down to homepage
   useEffect(() => {
+    connect(); // Test for first time connection
     console.log("SOCKET IN HOMEPAGE:", socket ? socket.id : 'null');
   }, [socket]);
 

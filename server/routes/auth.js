@@ -51,7 +51,7 @@ router.post('/signup', async (req, res) => {
     await createUser({
       username: username,
       email: email,
-      password: hashedPassword   // 👈 viktigt namn!
+      password: hashedPassword   // viktigt namn!
     });
 
     res.json({ message: 'User created' });

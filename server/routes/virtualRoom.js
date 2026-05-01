@@ -1,6 +1,6 @@
 require('socket.io');
 //set of all users in rooms
-let room_participants = {};
+let List_of_rooms = {};
 
 
 /**
@@ -25,18 +25,30 @@ function joinRoom(room, socket, listActiveUsers, io) {
     if (!user) return;
     const displayName = user.getUsername();
     
-    if (!room_participants[room]) {
-        room_participants[room] = [];
+    if (!List_of_rooms[room]) {
+        List_of_rooms[room] = [];
     }
-    const userExists = room_participants[room].some(user => user.socketId === socket.id);
+    const userExists = List_of_rooms[room].some(user => user.socketId === socket.id);
     if (!userExists) {
-        room_participants[room].push(listActiveUsers[socket.id]);
+        List_of_rooms[room].push(listActiveUsers[socket.id]);
     }
     // bekräfta att att användaren har joinat rummet
     console.log(`User ${displayName} joined room: ${room}`);
 
-    socket.emit('user_joined_room', displayName);
-    //io.to(room).emit('user_joined_room', displayName);
-    //io.to(room).emit('list_room_participants', { participants: room_participants[room] });
+    io.to(room).emit('user_joined_room', displayName);
+    io.to(room).emit('list_participants_in_room', { participants_List: List_of_rooms[room] });
 } 
-module.exports = { joinRoom };
+
+function leaveRoom(room, socket, listActiveUsers, io) {
+    socket.leave(room);
+    const user = listActiveUsers[socket.id];
+    List_of_rooms[room] = List_of_rooms[room].filter(u => u.socketId !== socket.id);
+    if (user) {
+        const displayName = user.getUsername();
+        console.log(`User ${displayName} left room: ${room}`);
+        io.to(room).emit('user_left_room', { participants_List: List_of_rooms[room], name: displayName });
+    }
+}
+
+module.exports = { joinRoom, leaveRoom };
+

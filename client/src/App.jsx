@@ -30,9 +30,9 @@ export default function App() {
       setSocket(soc);
     }
     soc.on('connect', handleConnect);
-    return () => {
-      soc.off('connect', handleConnect);
-    };
+    // return () => { //test for connect first time
+    //   soc.off('connect', handleConnect);
+    // };
   }, []);
 
   return (

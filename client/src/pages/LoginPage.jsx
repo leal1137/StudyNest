@@ -22,6 +22,7 @@ export default function LogInPage() {
 
   if (resultConstanst.success) { 
     alert(`Logging in as ${localStorage.getItem('username')}!`);
+    connect(); // Connect to the socket server after successful login
     navigate('/home');
   }
   

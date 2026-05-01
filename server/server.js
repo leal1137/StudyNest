@@ -15,7 +15,7 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
-const {joinRoom } = require('./routes/virtualRoom');
+const {joinRoom,leaveRoom } = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 
 // --- 1. EXPRESS MIDDLEWARE & ROUTING ---
@@ -77,7 +77,7 @@ let listActiveUsers = {};
  * @param {Object} socket - Klientens unika anslutningsobjekt.
  */
 io.on('connection', (socket) => {
-    listActiveUsers[socket.id] = new User(socket.user.username, socket.user.email, socket.id);
+    listActiveUsers[socket.id] = new User(socket.user.userId, socket.user.username, socket.user.email, socket.id);
     console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
     /**
      * Placerar klienten i ett specifikt chattrum. Funktionen uppdaterar serverns 
@@ -123,11 +123,9 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         const user = listActiveUsers[socket.id];
         if (user) {
-            // if (user.room) {
-            //     socket.to(user.room).emit('user_left', user.username);
-            //     console.log(`User ${user.getUsername()} left room: ${user.room}`);
-            //     // uppdate when rooms are active
-            // }
+            if (user.room) {
+                leaveRoom(user.room, socket, listActiveUsers, io);
+            }
             delete listActiveUsers[socket.id];
             console.log('User disconnected:', user.getUsername());
           console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
