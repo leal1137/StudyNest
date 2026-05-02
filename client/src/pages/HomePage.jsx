@@ -15,12 +15,18 @@ export default function HomePage({ socket }) {
   const handleClick3 = () => {
     navigate('/virtual-room');
   };
+  const logout = () => {
+    alert("logout button clicked!!!!!!");
+    logoutDisconnect();
+  };
   
   //for testing purposes, to see if socket is properly passed down to homepage
   useEffect(() => {
     connect(); // Test for first time connection
     console.log("SOCKET IN HOMEPAGE:", socket ? socket.id : 'null');
   }, [socket]);
+
+
 
   
   return (
@@ -37,18 +43,25 @@ export default function HomePage({ socket }) {
               <CustomButton 
                 text="Join a virtual study room" 
                 caption="Silent study rooms" 
-                onClick={() => navigate('/createroom')}
+                onClick={handleClick1}
               />
               <CustomButton 
                 text="Find a study location" 
                 caption="Find real world locations" 
-                onClick={handleClick2} 
+                onClick={handleClick2}
               />
               <CustomButton 
                 text="Join a joint workspace" 
                 caption="Work together with others in a virtual study room"
                 onClick={handleClick3} 
               />
+              <button
+                className="Sign-out-button"
+                type="button"
+                onClick={logout}
+              >
+                Sign Out
+              </button>
             </div>
         </div>
       </main>
