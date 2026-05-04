@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useBlocker, useNavigate } from 'react-router-dom'
 import '../App.css'
 import { io } from 'socket.io-client'
 import { ParticipantCard } from '../components/ParticipantCard'
@@ -55,7 +55,9 @@ export default function VirtualRoom({ socket }) {
     setMessages((currentMessages) => [...currentMessages, createMessage(author, text, type)])
   }
 
+  const isMountedRef = useRef(true);
   useEffect(() => {
+    isMountedRef.current = true;
     // For testing purposes, to see if socket is properly passed down to virtual room
     console.log("SOCKET IN ROOM:", socket ? socket.id : 'null');
 
@@ -89,11 +91,15 @@ export default function VirtualRoom({ socket }) {
     socket_room = 'test-room';
     joinVirtualRoom(socket_room, socket);
 
-    return () => {      socket?.off('user_already_in_room');
+    return () => { 
+      leaveVirtualRoom(socket_room, socket);
+      console.log("EXIT ROOM PAGE");
+      socket?.off('user_already_in_room');
       socket?.off('user_joined_room');
       socket?.off('list_participants_in_room');
       socket?.off('user_left_room');
       socket?.off('receive_message');
+    
     }
   }, [socket]);
 
