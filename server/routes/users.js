@@ -74,9 +74,7 @@ router.get('/:email', async (req, res) => {
 
 async function getUserByEmail(email) {
     const result = await pool.query(
-        'SELECT * FROM users WHERE email = $1',
-        [email]
-    );
+        'SELECT * FROM users WHERE email = $1', [email]);
 
     return result.rows[0]; // undefined om ingen finns
 }
