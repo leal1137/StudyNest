@@ -10,9 +10,8 @@ import { useEffect } from 'react'
 export default function HomePage() {
   const navigate = useNavigate()
 
-  const handleClick1 = () => navigate('/createroom');
   const handleClick2 = () => navigate('/find-location-map');
-  const handleClick3 = () => navigate('/virtual-room');
+  const handleClick1 = () => navigate('/virtual-room');
   const logout = () => {
     alert("logout button clicked!!!!!!");
   };
@@ -37,11 +36,6 @@ export default function HomePage() {
                 text="Find a study location" 
                 caption="Find real world locations" 
                 onClick={handleClick2}
-              />
-              <CustomButton 
-                text="Join a joint workspace" 
-                caption="Work together with others in a virtual study room"
-                onClick={handleClick3} 
               />
               <button
                 className="Sign-out-button"
