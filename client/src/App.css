@@ -117,19 +117,70 @@
 
 /* 3. The Sidebar */
 .sidebar {
-  width: 60px;
-  background-color: #5a5f7e; 
-  border-right: 3px solid #1a82e2; 
-  display: flex;
-  justify-content: center;
-  padding-top: 15px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 70px;
+  background-color: #66678e;
+  color: white;
+  transition: width 0.3s ease;
+  overflow: hidden;
 }
 
-.hamburger-icon {
+.sidebar:hover {
+  width: 200px;
+}
+
+.menu-icon {
+  font-size: 24px;
+  padding: 20px;
+  text-align: center;
+}
+
+.menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu li {
+  margin: 10px 0;
+}
+
+.menu a {
+  display: flex;
+  align-items: center;
   color: white;
-  font-size: 35px;
-  cursor: pointer;
-  line-height: 1;
+  text-decoration: none;
+  padding: 12px 20px;
+  transition: background 0.2s;
+}
+
+.menu a:hover {
+  background-color: #33334d;
+}
+
+.icon {
+  font-size: 20px;
+  min-width: 30px;
+  text-align: center;
+}
+
+.text {
+  opacity: 0;
+  margin-left: 10px;
+  transition: opacity 0.2s ease;
+}
+
+/* Show text when sidebar expands */
+.sidebar:hover .text {
+  opacity: 1;
+}
+
+.sidebar:hover .menu-icon {
+  opacity: 0;
+
 }
 
 .button-group {
