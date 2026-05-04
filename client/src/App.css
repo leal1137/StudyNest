@@ -132,7 +132,6 @@
   line-height: 1;
 }
 
-
 .button-group {
   position:relative;
   top: 90px;
@@ -258,7 +257,6 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-
 }
 
 
