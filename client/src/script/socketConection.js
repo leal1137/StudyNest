@@ -14,8 +14,7 @@ export function connect(){
     const token = localStorage.getItem('token');
     if (!token) return null;
     if (!socket) {
-        //socket = io("/", {path: "/socket.io", auth: {token: token}});
-        socket = io("http://localhost:3000", {auth: { token }});
+        socket = io("/", {path: "/socket.io", auth: {token: token}});
     }
     if (!socket.connected) {
         socket.connect();
