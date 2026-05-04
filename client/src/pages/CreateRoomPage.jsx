@@ -11,7 +11,7 @@ export default function CreateRoomPage() {
     <div className="CreateRoomPage">
       <Sidebar />
       <CreateRoomSettings/>
-      <SelectPlaceOnMap/>
+      <FakeMapCreateRoom/>
     </div>
   )
 

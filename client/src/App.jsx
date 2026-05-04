@@ -4,20 +4,13 @@ import HomePage from './pages/HomePage';
 import CreateRoomPage from './pages/CreateRoomPage';
 import VirtualRoom from './pages/VirtualRoom';
 import SignUpPage from './pages/SignUpPage';
+import JoinVirtualRoomPage from './pages/JoinVirtualRoomPage';
 import { useEffect } from "react";
 import { connect } from './script/socketConection';
 import ProtectedRoute from "./components/ProtectedRoute";
 import FindLocationPage from './pages/FindLocationPage';
 import FindLocationPageMap from './pages/FindLocationMapPage';
 
-function DashboardPage() {
-  return (
-    <div style={{ padding: '50px', textAlign: 'center' }}>
-      <h1>Welcome to the Secret Dashboard!</h1>
-      <p>You have successfully logged in.</p>
-    </div>
-  );
-}
 
 export default function App() {
 

@@ -1,16 +1,44 @@
 import { useState } from 'react'
 import '../App.css'
 import { SubjectSelector } from './SubjectSelector';
-import { CustomButton } from './CustomButton';
-
+import { CustomButton } from './customButton';
+import { useNavigate } from 'react-router-dom';
 export default function CreateRoomSettings() {
+    const navigate = useNavigate()
     const [roomName, setRoomName] = useState('');
     const [roomSize, setRoomSize] = useState(15);
     const [jointWorkspace, setJointWorkspace] = useState(false);
 
-    const CreateNewRoom = (e) => {
+    const CreateNewRoom = async (e) => {
         e.preventDefault();
-        alert("Creating a new room");
+
+        const newRoomData = {
+            name: roomName,
+            max_capacity: parseInt(roomSize),
+            is_silent: !jointWorkspace
+            //created_by: localStorage.getItem('token')
+        };
+
+        try {
+            const response = await fetch('http://localhost:3000/api/rooms', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newRoomData)
+            });
+
+            if (response.ok) {
+                const savedRoom = await response.json();
+                alert(`Succé! Rummet "${savedRoom.name}" har skapats.`);
+            } else {
+                const errorData = await response.json();
+                alert(`Kunde inte skapa rummet: ${errorData.error}`);
+            }
+        } catch (error) {
+            console.error("Nätverksfel:", error);
+            alert("Kunde inte nå servern");
+        }
     };
 
     return (
@@ -22,7 +50,6 @@ export default function CreateRoomSettings() {
                     value={roomName}
                     onChange={(e) => setRoomName(e.target.value)} />
             </div>
-            
             <div className="input-room-size">
                 <h4>Room size</h4>
                 <input className='input'
@@ -32,9 +59,7 @@ export default function CreateRoomSettings() {
                 />
                 <span>max 50</span>
             </div>
-
             <SubjectSelector />
-
             <div className="workspace-checkbox">
                 <label>
                     <input
@@ -49,10 +74,10 @@ export default function CreateRoomSettings() {
                     Chat box, Voice chat, Whiteboard
                 </p>
             </div> 
-
             <CustomButton
                 className='Create-room-button'
                 text="CreateRoom"
+                onClick={() => navigate('/joinvirtualroom')}
             />
         </form>
     )

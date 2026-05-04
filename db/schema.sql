@@ -1,8 +1,3 @@
--- Drop old tables
-DROP TABLE IF EXISTS room_participants;
-DROP TABLE IF EXISTS rooms;
-DROP TABLE IF EXISTS users;
-
 -- Users table with password
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,

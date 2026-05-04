@@ -16,6 +16,7 @@ export function Sidebar() {
     };
   }, []);
 
+export function Sidebar( {Contents}) {
   return (
     <nav className="sidebar">
       <div className="menu-icon">≡</div>
@@ -38,5 +39,10 @@ export function Sidebar() {
         )}
       </ul>
     </nav>
+
+      <div className="sidebar-content">
+        {Contents}
+      </div>
+    </nav>  
   );
 }

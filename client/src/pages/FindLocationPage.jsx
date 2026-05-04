@@ -6,6 +6,9 @@ import { useEffect } from 'react';
 
 export default function FindLocationPage() {
   const [location, setLocation] = useState('');
+  const [rooms, setRooms]       = useState([]);
+  const [loading, setLoading]   = useState(true);
+  const [error, setError]       = useState(null);
   const routerLocation = useLocation();
 
   useEffect(() => {
@@ -14,22 +17,47 @@ export default function FindLocationPage() {
     }
   }, [routerLocation.state]);
 
-  const searchLocation = (e) => {
-  e.preventDefault();
-  alert("Searching for: " + location);
-};
+//fetch rooms from backend
+  useEffect(() =>  {
+    async function fetchRooms() {
+      try {
+        const res = await fetch('/api/rooms');
+        if (!res.ok) throw new Error('Failed to fetch rooms');
+        const data = await res.json();
+        setRooms(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchRooms();
+  }, []);
 
   return (
     <div className="FindLocationPage">
       <Sidebar />
       <UserDisplay />
       <main className="main-content">
-        <form className="Location-search-box" onSubmit={searchLocation}>
+        <div className="Location-search-box">
           <h2>Locations near</h2>
-            <div className="Location-display">
-            {location || "No location selected"}
-            </div>
-        </form>
+          <div className="Location-display">
+            {location || 'No location selected'}
+          </div>
+
+          {loading && <p>Loading rooms…</p>}
+          {error   && <p style={{ color: 'red' }}>Error: {error}</p>}
+          {!loading && !error && (
+            <ul>
+              {rooms.map((room) => (
+                <li key={room.id}>
+                  <strong>{room.name}</strong>
+                  {room.is_silent ? ' (silent)' : ''} — capacity {room.max_capacity}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </main>
     </div>
   );

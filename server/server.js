@@ -3,6 +3,7 @@
 require('dotenv').config(); 
 
 //server imports
+const cors = require('cors');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -30,9 +31,13 @@ const io = new Server(server, {
 //server setup
 //app.use(express.static('public')); //move to react instead
 app.use(express.json());
+app.use(cors());
 app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
+
+const seedRooms = require('./db/seedRooms');
+seedRooms();
 
 // --- 2. AUTHENTICATION FOR ENTRY ---
 
@@ -96,13 +101,13 @@ io.on('connection', (socket) => {
         if (listActiveUsers[socket.id]) {
             listActiveUsers[socket.id].room = room;
         }
-        // if (!room_participants[room]) {
-        //     room_participants[room] = [];
-        // }
-        // const userExists = room_participants[room].some(u => u.id === socket.user.userId);
-        // if (!userExists) {
-        //     room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
-        // }
+        if (!room_participants[room]) {
+            room_participants[room] = [];
+        }
+        const userExists = room_participants[room].some(u => u.id === socket.user.userId);
+        if (!userExists) {
+            room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
+        }
 
         // 1. Skicka bekräftelse till den som anslöt
         socket.emit('joined_room', { room: room });
