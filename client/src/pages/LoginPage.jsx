@@ -23,7 +23,7 @@ export default function LogInPage() {
       return;
     }
 
-    navigate('/');
+    navigate('/home');
   };
 
   return (
