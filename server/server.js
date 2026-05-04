@@ -34,6 +34,9 @@ app.use('/api/rooms', roomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 
+const seedRooms = require('./db/seedRooms');
+seedRooms();
+
 // --- 2. AUTHENTICATION FOR ENTRY ---
 
 /**
