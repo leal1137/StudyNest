@@ -5,7 +5,8 @@ export default defineConfig({
   plugins: [react()],
   server: {
     allowedHosts: [
-      'thespian-speed-bottling.ngrok-free.dev'
+      'thespian-speed-bottling.ngrok-free.dev',
+      'ipad-useable-lather.ngrok-free.dev'
     ],
     proxy: {
       // REST API routes
