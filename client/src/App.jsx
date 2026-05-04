@@ -8,6 +8,8 @@ import JoinVirtualRoomPage from './pages/JoinVirtualRoomPage';
 import { useEffect } from "react";
 import { connect } from './script/socketConection';
 import ProtectedRoute from "./components/ProtectedRoute";
+import FindLocationPage from './pages/FindLocationPage';
+import FindLocationPageMap from './pages/FindLocationMapPage';
 
 
 export default function App() {
@@ -20,8 +22,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
-        <Route path="/joinvirtualroom" element={<JoinVirtualRoomPage/>} />
+        <Route path="/find-location" element={<FindLocationPage />} />
         <Route path="/virtual-room" element={<VirtualRoom />} />
+        <Route path="/find-location-map" element={<FindLocationPageMap />} />
+
 
         <Route
           path="/home"

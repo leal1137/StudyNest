@@ -2,34 +2,29 @@ import { useState } from 'react'
 import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
-import { login } from '../script/login'
-import { connect } from '../script/socketConection';
+import { login } from '../script/login';
 
 export default function LogInPage() {
-  const [username, setUsername] = useState('test');
-  const [password, setPassword] = useState('abc');
-  const [email, setEmail] = useState('test@test.su.se');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  console.log("login clicked");
-  console.log("Email:", email);
-  console.log("Password:", password);
+    e.preventDefault();
 
-  const resultConstanst = await login({ email, password });
+    setError('');
 
-  if (resultConstanst.success) { 
-    alert(`Logging in as ${localStorage.getItem('username')}!`);
-    navigate('/home');
-  }
-  
-  else {
-    alert(resultConstanst.message);
-    //alert('Login failed. Please check your credentials and try again.');
-  }
-};
+    const result = await login(email, password);
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    navigate('/');
+  };
 
   return (
     <div className="LoginPage">
@@ -82,6 +77,7 @@ export default function LogInPage() {
               Sign Up
             </button>
           </div>
+          {error ? <p style={{ color: '#9f3d31', marginTop: '16px' }}>{error}</p> : null}
 
         </form>
       </main>
