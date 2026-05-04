@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useBlocker, useNavigate } from 'react-router-dom'
+import { useBlocker, useNavigate, useParams } from 'react-router-dom'
 import '../App.css'
 import { io } from 'socket.io-client'
 import { ParticipantCard } from '../components/ParticipantCard'
@@ -32,6 +32,8 @@ function createMessage(author, text, type = 'chat') {
 }
 
 export default function VirtualRoom({ socket }) {
+  const { roomName } = useParams();
+  socket_room = roomName;
   const navigate = useNavigate()
   const [participants, setParticipants] = useState(initialParticipants)
   const [messages, setMessages] = useState([
@@ -88,7 +90,6 @@ export default function VirtualRoom({ socket }) {
     })
 
     //acctually join the room
-    socket_room = 'test-room';
     joinVirtualRoom(socket_room, socket);
 
     return () => { 
