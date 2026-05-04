@@ -7,7 +7,7 @@ import UserDisplay from '../components/UserDisplay'
 import { connect, logoutDisconnect } from '../script/socketConection';
 import { useEffect } from 'react'
 
-export default function HomePage({ socket }) {
+export default function HomePage({ socket, setSocket }) {
   const navigate = useNavigate()
 
   const handleClick1 = () => alert("Button 1 clicked!");
@@ -16,8 +16,10 @@ export default function HomePage({ socket }) {
     navigate('/virtual-room');
   };
   const logout = () => {
-    alert("logout button clicked!!!!!!");
-    logoutDisconnect();
+    logoutDisconnect(socket);
+    setSocket(null);
+    console.log("SOCKET IN HOMEPAGE:", socket ? socket.id : 'null');
+    navigate('/');
   };
   
   //for testing purposes, to see if socket is properly passed down to homepage

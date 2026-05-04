@@ -15,8 +15,9 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
-const {joinRoom,leaveRoom } = require('./routes/virtualRoom');
+const {joinRoom,leaveRoom, sendMessageToRoom } = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
+const { send } = require('process');
 
 // --- 1. EXPRESS MIDDLEWARE & ROUTING ---
 //making server and Sockets.io
@@ -92,6 +93,9 @@ io.on('connection', (socket) => {
       joinRoom(room, socket, listActiveUsers, io);
     });
 
+    socket.on('leave_room', (room) => {
+      leaveRoom(room, socket, listActiveUsers, io);
+    });
 
     /**
      * Tar emot ett textmeddelande från klienten och skickar det vidare till 
@@ -100,15 +104,10 @@ io.on('connection', (socket) => {
      * @name socketOnSendMessage
      * @function
      * @param {string} message - Textmeddelandet som klienten vill skicka.
+     * @param {string} room - Namnet på rummet som klienten vill skicka meddelandet till.
      */
-    socket.on('send_message', (message) => {
-        const user = listActiveUsers[socket.id];
-        if (user) {
-            io.to(user.room).emit('receive_message', {
-                username: user.username,
-                message
-            });
-        }
+    socket.on('send_message', (message, room) => {
+        sendMessageToRoom(room, socket, message, listActiveUsers, io);
     });
 
 

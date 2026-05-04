@@ -14,3 +14,9 @@ export function joinVirtualRoom(room, socket) {
     }
 }
 
+
+export function leaveVirtualRoom(room, socket) {
+    if (room && socket) {
+        socket.emit('leave_room', room);
+    }
+}

@@ -7,7 +7,7 @@ import { RoomChatPanel } from '../components/RoomChatPanel'
 import { RoomSidebar } from '../components/RoomSidebar'
 import { RoomTools } from '../components/RoomTools'
 import { VirtualRoomHeader } from '../components/VirtualRoomHeader'
-import { joinVirtualRoom } from '../script/virtualRoomConnection';
+import { joinVirtualRoom, leaveVirtualRoom } from '../script/virtualRoomConnection';
 
 const initialParticipants = [
   { userId: 1, username: 'Olle', status: 'studying', micMuted: false, speaking: true },
@@ -17,11 +17,10 @@ const initialParticipants = [
   { userId: 5, username: 'Ebba', status: 'studying', micMuted: false, speaking: true },
   { userId: 6, username: 'Leo', status: 'studying', micMuted: false, speaking: false },
   { userId: 7, username: 'Edvard', status: 'studying', micMuted: false, speaking: true },
-  { userId: 8, username: 'Samir', status: 'break', micMuted: false, speaking: false },
 ]
 
 const roomTools = ['Chatroom', 'Whiteboard']
-const roomName = 'study-room-1'
+let socket_room;
 
 function createMessage(author, text, type = 'chat') {
   return {
@@ -52,118 +51,78 @@ export default function VirtualRoom({ socket }) {
     )
   }
 
-  useEffect(() => {
-    // For testing purposes, to see if socket is properly passed down to virtual room
-    console.log("SOCKET IN ROOM:", socket ? socket.id : 'null');
-
-    //for testing once joined room.
-    socket.on('user_already_in_room', (room) => {
-      console.log(`User is already in the room: ${room}`);
-    });
-    socket.on('user_joined_room', (displayName) => {
-      console.log(`User ${displayName} joined the room!`);//uppdata chat
-    });
-
-    socket.on('list_participants_in_room', (list) => {
-      const currentParticipants = list.participants_List;
-      setParticipants(currentParticipants);
-    });
-    socket.on('user_left_room', (data) => {
-      const currentParticipants = data.participants_List;
-      const displayName = data.name;
-      setParticipants(currentParticipants);
-      console.log(`User ${displayName} left the room!`);//uppdata chat
-    });
-
-    //acctually join the room
-    joinVirtualRoom('test-room', socket);
-  }, [socket]);
-  /*
   function appendMessage(author, text, type = 'chat') {
     setMessages((currentMessages) => [...currentMessages, createMessage(author, text, type)])
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    const username = localStorage.getItem('username') || 'Unknown user'
+    // For testing purposes, to see if socket is properly passed down to virtual room
+    console.log("SOCKET IN ROOM:", socket ? socket.id : 'null');
 
-    if (!token) {
-      setConnectionStatus('Log in first to use the live chat.')
-      setMessages([createMessage('System', 'You need to sign in before joining the live room.', 'system')])
-      return undefined
-    }
+    //for testing once joined room.
+    socket?.on('user_already_in_room', (room) => {
+      console.log(`User is already in the room: ${room}`);
+    });
 
-    const socket = io({
-      auth: { token },
-      transports: ['websocket'],
-    })
+    socket?.on('user_joined_room', (displayName) => {
+      appendMessage('System', `${displayName} joined the room.`, 'system')
+      console.log(`User ${displayName} joined the room!`);//uppdata chat
+    });
 
-    socketRef.current = socket
-    setConnectionStatus(`Connecting as ${username}...`)
+    socket?.on('list_participants_in_room', (list) => {
+      const currentParticipants = list.participants_List;
+      setParticipants(currentParticipants);
+    });
 
-    socket.on('connect', () => {
-      setConnectionStatus(`Connected as ${username}`)
-      socket.emit('join_room', roomName)
-    })
+    socket?.on('user_left_room', (data) => {
+      const currentParticipants = data.participants_List;
+      const displayName = data.name;
+      setParticipants(currentParticipants);
+      appendMessage('System', `${displayName} left the room.`, 'system');
+    });
 
-    socket.on('joined_room', ({ room }) => {
-      appendMessage('System', `You joined ${room}.`, 'system')
-    })
-
-    socket.on('user_joined', (joinedUsername) => {
-      appendMessage('System', `${joinedUsername} joined the room.`, 'system')
-    })
-
-    socket.on('user_left', (leftUsername) => {
-      appendMessage('System', `${leftUsername} left the room.`, 'system')
-    })
-
-    socket.on('receive_message', ({ username: messageAuthor, message }) => {
+    socket?.on('receive_message', ({ username: messageAuthor, message }) => {
       appendMessage(messageAuthor, message)
     })
 
-    socket.on('connect_error', (error) => {
-      setConnectionStatus(error.message || 'Could not connect to chat.')
-    })
+    //acctually join the room
+    socket_room = 'test-room';
+    joinVirtualRoom(socket_room, socket);
 
-    socket.on('disconnect', () => {
-      setConnectionStatus('Disconnected from chat.')
-    })
-
-    return () => {
-      socket.disconnect()
-      socketRef.current = null
+    return () => {      socket?.off('user_already_in_room');
+      socket?.off('user_joined_room');
+      socket?.off('list_participants_in_room');
+      socket?.off('user_left_room');
+      socket?.off('receive_message');
     }
-  }, [])
+  }, [socket]);
+
 
   function handleSendMessage(event) {
     event.preventDefault()
+  
+    const trimmedMessage = messageInput.trim();
 
-    const trimmedMessage = messageInput.trim()
-
-    if (!trimmedMessage || !socketRef.current?.connected) {
+    if (!trimmedMessage || !socket?.connected) {
       return
     }
-
-    socketRef.current.emit('send_message', trimmedMessage)
+   
+    socket.emit('send_message', trimmedMessage, socket_room);
     setMessageInput('')
   }
 
-  function handleLeaveRoom() {
-    if (socketRef.current) {
-      socketRef.current.disconnect()
-      socketRef.current = null
-    }
+ function handleleaveRoom() {
+    leaveVirtualRoom(socket_room, socket);
+    navigate('/home');
+ }
 
-    navigate('/')
-  }
-*/
+
   return (
     <div className="virtual-room-page">
-      <RoomSidebar onLeaveRoom={handleLeaveRoom} />
+      <RoomSidebar onLeaveRoom={() => handleleaveRoom()} />
 
       <main className="virtual-room-main">
-        <VirtualRoomHeader roomName="Study room 1" studyingCount={548} />
+        <VirtualRoomHeader roomName={socket_room} studyingCount={548} />
 
         <section className="participant-grid">
           {participants.map((participant) => (
@@ -182,7 +141,7 @@ export default function VirtualRoom({ socket }) {
             connectionStatus={connectionStatus}
             onMessageInputChange={setMessageInput}
             onSendMessage={handleSendMessage}
-            isConnected={Boolean(socketRef.current?.connected)}
+            isConnected={Boolean(socket?.connected)}
           />
           <RoomTools tools={roomTools} />
         </section>

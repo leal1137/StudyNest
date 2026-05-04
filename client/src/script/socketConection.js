@@ -32,11 +32,11 @@ export function connect(){
  * kopplar bort Socket.IO-anslutningen och sätter både token och socket till undefined. 
  * Detta säkerställer att användaren är helt utloggad och att ingen anslutning till servern kvarstår.
  */
-export function logoutDisconnect() {
+export function logoutDisconnect(socket) {
     if (socket) {
         socket.disconnect();
-        socket = null;
         localStorage.removeItem('token');
         console.log("User Logged out, socket disconnected");
     }
+    
 }

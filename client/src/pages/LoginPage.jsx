@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { login } from '../script/login';
 import { connect } from '../script/socketConection';
 
-export default function LogInPage() {
+export default function LogInPage({ socket, setSocket }) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -23,8 +23,9 @@ export default function LogInPage() {
       setError(result.error);
       return;
     }
-    connect(); // Test for first time connection
-    navigate('/');
+    const soc = connect(); // Test for first time connection
+    setSocket(soc);
+    navigate('/home');
   };
 
   return (

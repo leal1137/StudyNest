@@ -39,18 +39,48 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<LoginPage/>} />
-        <Route path="/sign-up" element={<SignUpPage />} />
-        <Route path="/find-location" element={<FindLocationPage />} />
-        <Route path="/virtual-room" element={<VirtualRoom />} />
-        <Route path="/find-location-map" element={<FindLocationPageMap />} />
-
+        <Route 
+          path="/" 
+          element={
+            <LoginPage 
+              socket={socket} 
+              setSocket={setSocket} 
+            />
+          } 
+        />
+        <Route 
+          path="/sign-up" 
+          element={
+          <SignUpPage 
+          />
+          }
+        />
+        <Route 
+          path="/find-location" 
+          element={
+            <ProtectedRoute>
+              <FindLocationPage 
+              />
+            </ProtectedRoute>
+          }
+        />
+        <Route 
+          path="/find-location-map" 
+          element={
+            <ProtectedRoute>
+              <FindLocationPageMap />
+            </ProtectedRoute>
+          }
+        />
 
         <Route
           path="/home"
           element={
             <ProtectedRoute>
-              <HomePage socket={socket} />
+              <HomePage 
+                socket={socket} 
+                setSocket={setSocket} 
+              />
             </ProtectedRoute>
           }
         />
