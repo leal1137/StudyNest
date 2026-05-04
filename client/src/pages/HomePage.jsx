@@ -2,7 +2,7 @@ import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { CustomButton } from '../components/CustomButton'
 import heroImg from '../assets/vine.png'
-importhttps://github.com/leal1137/StudyNest/pulls { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import UserDisplay from '../components/UserDisplay'
 import {socket, logoutDisconnect, connect } from '../script/socketConection';
 import { useEffect } from 'react'

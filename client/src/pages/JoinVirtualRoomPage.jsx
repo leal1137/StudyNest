@@ -9,7 +9,7 @@ export default function JoinVirtualRoom() {
     return (
 
         <div className="JoinVirtualRoom">
-            <SidebarListofRooms />
+            <FakeMapJoinRoom />
             <MapWithRoomsOn/>
             </div>
     )

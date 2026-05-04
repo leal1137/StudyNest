@@ -18,7 +18,7 @@ export default function FindLocationPage() {
   }, [routerLocation.state]);
 
 //fetch rooms from backend
-  userEffect(() =>  {
+  useEffect(() =>  {
     async function fetchRooms() {
       try {
         const res = await fetch('/api/rooms');
