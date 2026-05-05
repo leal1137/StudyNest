@@ -16,7 +16,7 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
-const {joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction } = require('./routes/virtualRoom');
+const {joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus } = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 const { send } = require('process');
 
@@ -117,6 +117,10 @@ io.on('connection', (socket) => {
 
     socket.on('timer_action', (data) => {
         handleTimerAction(data.room, data.action, io);
+    });
+
+    socket.on('change_status', (data) => {
+        changeUserStatus(data.room, socket, data.status, listActiveUsers, io);
     });
 
     /**

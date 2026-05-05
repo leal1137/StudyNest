@@ -109,5 +109,16 @@ function handleTimerAction(room, action, io) {
     }
 }
 
-module.exports = { joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction };
+function changeUserStatus(room, socket, newStatus, listActiveUsers, io) {
+    const user = listActiveUsers[socket.id];
+    if (user) {
+        user.status = newStatus;
+        
+        if (List_of_rooms[room]) {
+            io.to(room).emit('list_participants_in_room', { participants_List: List_of_rooms[room] });
+        }
+    }
+}
+
+module.exports = { joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus };
 

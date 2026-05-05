@@ -4,7 +4,7 @@ class User {
         this.username = username;
         this.email = email;
         this.socketId = socketId; //finns inte i databasen
-        this.status = 'online';
+        this.status = 'studying';
     }
     getUsername() {
         return this.username;

@@ -11,6 +11,8 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
   const [timeLeft, setTimeLeft] = useState(10 * 60);
   const [isActive, setIsActive] = useState(false);
 
+  const [myStatus, setMyStatus] = useState('studying');
+
   useEffect(() => {
     // Om ingen socket finns laddad än, gör ingenting
     if (!socket) return;
@@ -49,6 +51,15 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  const handleStatusChange = (modifier) => {
+    const newStatus = modifier === 'study' ? 'studying' : 'break';
+    setMyStatus(newStatus);
+    
+    if (socket && roomName) {
+      socket.emit('change_status', { room: roomName, status: newStatus });
+    }
+  };
+
   return (
     <aside className="room-sidebar">
       <div className="room-brand">
@@ -59,15 +70,20 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
       <section className="room-sidebar-section">
         <p className="room-sidebar-label">Status</p>
         <div className="room-timer-display">
-          <span className="room-status-pill room-status-pill-study" />
-          <span>50:23</span>
+          <span className={`room-status-pill room-status-pill-${myStatus === 'studying' ? 'study' : 'break'}`} />
+          <span>{myStatus === 'studying' ? 'Studying' : 'Taking a break'}</span>
         </div>
       </section>
 
       <section className="room-sidebar-section">
         <p className="room-sidebar-label">Choose a status</p>
         {statusOptions.map((option) => (
-          <div className="room-status-option" key={option.label}>
+          <div 
+            className="room-status-option" 
+            key={option.label}
+            onClick={() => handleStatusChange(option.modifier)}
+            style={{ cursor: 'pointer' }}
+          >
             <span>{option.label}</span>
             <span className={`room-status-pill room-status-pill-${option.modifier}`} />
           </div>
