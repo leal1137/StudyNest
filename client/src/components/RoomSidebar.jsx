@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import '../App.css'
 
 const statusOptions = [
@@ -5,13 +6,53 @@ const statusOptions = [
   { label: 'Taking a break', modifier: 'break' },
 ]
 
-export function RoomSidebar({ onLeaveRoom }) {
+// Ta emot socket och roomName som props från VirtualRoom.jsx
+export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
+  const [timeLeft, setTimeLeft] = useState(10 * 60);
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    // Om ingen socket finns laddad än, gör ingenting
+    if (!socket) return;
+    
+    // Lyssna på tidsuppdateringar från servern
+    socket.on('timer_update', (data) => {
+      setTimeLeft(data.timeLeft);
+      setIsActive(data.isActive);
+    });
+
+    // Städa upp lyssnaren när komponenten tas bort
+    return () => socket.off('timer_update');
+  }, [socket]);
+
+  // Skicka till servern att vi vill starta eller pausa
+  const toggleTimer = () => {
+    if (!socket || !roomName) return;
+    socket.emit('timer_action', { 
+      room: roomName, 
+      action: isActive ? 'pause' : 'start' 
+    });
+  };
+
+  // Skicka till servern att vi vill lägga till tid
+  const addTime = () => {
+    if (!socket || !roomName) return;
+    socket.emit('timer_action', { 
+      room: roomName, 
+      action: 'add' 
+    });
+  };
+
+  const formatTime = (seconds) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? '0' : ''}${s}`;
+  };
+
   return (
     <aside className="room-sidebar">
       <div className="room-brand">
-        <button className="room-menu-button" type="button" aria-label="Open menu">
-          ☰
-        </button>
+        <button className="room-menu-button" type="button" aria-label="Open menu"></button>
         <span>StudyNest</span>
       </div>
 
@@ -36,11 +77,18 @@ export function RoomSidebar({ onLeaveRoom }) {
       <section className="room-sidebar-section">
         <p className="room-sidebar-label">Timer</p>
         <div className="room-timer-controls">
-          <div className="room-time-input">
-            <span>10 min</span>
-            <span className="room-status-pill room-status-pill-break" />
+          
+          <div 
+            className="room-time-input" 
+            onClick={toggleTimer}
+            style={{ cursor: 'pointer' }}
+            title={isActive ? "Pausa timer" : "Starta timer"}
+          >
+            <span>{formatTime(timeLeft)}</span>
+            <span className={`room-status-pill ${isActive ? 'room-status-pill-study' : 'room-status-pill-break'}`} />
           </div>
-          <button className="room-add-button" type="button">
+          
+          <button className="room-add-button" type="button" onClick={addTime}>
             +
           </button>
         </div>
@@ -53,5 +101,5 @@ export function RoomSidebar({ onLeaveRoom }) {
         Choose another room
       </button>
     </aside>
-  )
+  );
 }

@@ -1,6 +1,7 @@
 require('socket.io');
 //set of all users in rooms
 let List_of_rooms = {};
+let RoomTimers = {};
 
 
 /**
@@ -39,6 +40,12 @@ function joinRoom(room, socket, listActiveUsers, io) {
     io.to(room).emit('user_joined_room', displayName);
     io.to(room).emit('list_participants_in_room', { participants_List: List_of_rooms[room] });
 
+    if (RoomTimers[room]) {
+        socket.emit('timer_update', { 
+            timeLeft: RoomTimers[room].timeLeft, 
+            isActive: RoomTimers[room].isActive 
+        });
+    }
 } 
 
 function leaveRoom(room, socket, listActiveUsers, io) {
@@ -50,6 +57,11 @@ function leaveRoom(room, socket, listActiveUsers, io) {
         io.to(room).emit('user_left_room', { participants_List: List_of_rooms[room], name: displayName });
     }
     socket.leave(room);
+
+    if (List_of_rooms[room] && List_of_rooms[room].length === 0 && RoomTimers[room]) {
+        clearInterval(RoomTimers[room].intervalId);
+        delete RoomTimers[room];
+    }
 }
 
 function sendMessageToRoom(room, socket, message, listActiveUsers, io) {
@@ -62,5 +74,40 @@ function sendMessageToRoom(room, socket, message, listActiveUsers, io) {
     }
 }
 
-module.exports = { joinRoom, leaveRoom, sendMessageToRoom };
+function handleTimerAction(room, action, io) {
+    // Skapa en timer för rummet om den inte finns
+    if (!RoomTimers[room]) {
+        RoomTimers[room] = { timeLeft: 10 * 60, isActive: false, intervalId: null };
+    }
+    
+    let timer = RoomTimers[room];
+
+    if (action === 'start' && !timer.isActive) {
+        timer.isActive = true;
+        // Skicka uppdatering direkt
+        io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: true });
+        
+        timer.intervalId = setInterval(() => {
+            if (timer.timeLeft > 0) {
+                timer.timeLeft -= 1;
+                io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: true });
+            } else {
+                timer.isActive = false;
+                clearInterval(timer.intervalId);
+                io.to(room).emit('timer_update', { timeLeft: 0, isActive: false });
+
+                io.to(room).emit('timer_ended');
+            }
+        }, 1000);
+    } else if (action === 'pause' && timer.isActive) {
+        timer.isActive = false;
+        clearInterval(timer.intervalId);
+        io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: false });
+    } else if (action === 'add') {
+        timer.timeLeft += 60;
+        io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: timer.isActive });
+    }
+}
+
+module.exports = { joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction };
 

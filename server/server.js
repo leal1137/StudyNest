@@ -16,7 +16,7 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
-const {joinRoom,leaveRoom, sendMessageToRoom } = require('./routes/virtualRoom');
+const {joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction } = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 const { send } = require('process');
 
@@ -115,6 +115,9 @@ io.on('connection', (socket) => {
         sendMessageToRoom(room, socket, message, listActiveUsers, io);
     });
 
+    socket.on('timer_action', (data) => {
+        handleTimerAction(data.room, data.action, io);
+    });
 
     /**
      * Hanterar uppstädning när en klient förlorar anslutningen eller stänger webbläsaren. 

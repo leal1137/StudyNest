@@ -85,6 +85,10 @@ export default function VirtualRoom({ socket }) {
       appendMessage(messageAuthor, message)
     })
 
+    socket?.on('timer_ended', () => {
+      appendMessage('System', 'Timern har nått noll! Dags för en paus!', 'system');
+    });
+
     //acctually join the room
     socket_room = 'test-room';
     joinVirtualRoom(socket_room, socket);
@@ -94,6 +98,7 @@ export default function VirtualRoom({ socket }) {
       socket?.off('list_participants_in_room');
       socket?.off('user_left_room');
       socket?.off('receive_message');
+      socket?.off('timer_ended');
     }
   }, [socket]);
 
@@ -119,7 +124,7 @@ export default function VirtualRoom({ socket }) {
 
   return (
     <div className="virtual-room-page">
-      <RoomSidebar onLeaveRoom={() => handleleaveRoom()} />
+      <RoomSidebar onLeaveRoom={() => handleleaveRoom()} socket={socket} roomName={socket_room} />
 
       <main className="virtual-room-main">
         <VirtualRoomHeader roomName={socket_room} studyingCount={548} />
