@@ -10,7 +10,7 @@ import { useEffect } from 'react'
 export default function HomePage() {
   const navigate = useNavigate()
 
-  const handleClick1 = () => navigate('/createroom');
+  const handleClick1 = () => navigate('/join-virtual-room');
   const handleClick2 = () => navigate('/find-location-map');
   const handleClick3 = () => navigate('/virtual-room');
   const logout = () => {

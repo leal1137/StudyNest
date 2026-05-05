@@ -12,7 +12,7 @@ export default function CreateRoomSettings() {
     const CreateNewRoom = async (e) => {
         e.preventDefault();
 
-        const newRoomData = {
+        const newRoomData = {   
             name: roomName,
             max_capacity: parseInt(roomSize),
             is_silent: !jointWorkspace
@@ -50,6 +50,7 @@ export default function CreateRoomSettings() {
                     value={roomName}
                     onChange={(e) => setRoomName(e.target.value)} />
             </div>
+
             <div className="input-room-size">
                 <h4>Room size</h4>
                 <input className='input'
@@ -77,7 +78,7 @@ export default function CreateRoomSettings() {
             <CustomButton
                 className='Create-room-button'
                 text="CreateRoom"
-                onClick={() => navigate('/joinvirtualroom')}
+                onClick={() => navigate('/join-virtual-room')}
             />
         </form>
     )

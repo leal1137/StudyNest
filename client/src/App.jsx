@@ -23,8 +23,8 @@ export default function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path="/sign-up" element={<SignUpPage />} />
         <Route path="/find-location" element={<FindLocationPage />} />
-        <Route path="/virtual-room" element={<VirtualRoom />} />
         <Route path="/find-location-map" element={<FindLocationPageMap />} />
+
 
 
         <Route
@@ -37,7 +37,7 @@ export default function App() {
         />
 
         <Route
-          path="/createroom"
+          path="/create-virtual-room"
           element={
             <ProtectedRoute>
               <CreateRoomPage />
@@ -50,6 +50,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <VirtualRoom />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/join-virtual-room"
+          element={
+            <ProtectedRoute>
+              <JoinVirtualRoomPage />
             </ProtectedRoute>
           }
         />

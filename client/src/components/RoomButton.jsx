@@ -7,7 +7,7 @@ import { joinVirtualRoom } from '../script/joinRoom';
 export default function RoomButton({key, name, subject, size, lat, lng, inRoom}) {
     
     const handlejoin = (e) => {
-        e.preventDefault();
+        
         alert(`Joining ${name}`);
 
         const navigate = useNavigate();

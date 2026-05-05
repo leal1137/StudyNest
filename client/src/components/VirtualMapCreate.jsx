@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
 import icon from 'leaflet/dist/images/marker-icon.png';
+import map from '../assets/ai_map.png';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -34,7 +35,7 @@ function MapClickHandler({ setPinPosition }) {
   return null;
 }
 
-export function SelectPlaceOnMap() {
+export default function VirtualMapCreate() {
   const [hoveredId, setHoveredId] = useState(null);
   const navigate = useNavigate();
 
@@ -45,13 +46,9 @@ export function SelectPlaceOnMap() {
   return (
     <div className="map-component">
       <MapContainer className='map-image'
-      center={[59.8586, 17.6389]}
-      zoom={13}
     >
-      <TileLayer
-        attribution='&copy; OpenStreetMap contributors'
-        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      />
+       
+      <img src={map} alt="map" className="virtualmap-img" />
 
       {locations.map((loc) => (
         <CircleMarker

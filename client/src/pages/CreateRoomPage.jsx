@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Sidebar } from '../components/Sidebar';
 import CreateRoomSettings from '../components/CreateRoomSpecifics';
-import { SelectPlaceOnMap } from '../components/SelectPlaceOnMap';
+import VirtualMapCreate from '../components/VirtualMapCreate';
 import { } from '../script/socketConection';
 
 export default function CreateRoomPage() {
@@ -11,8 +11,7 @@ export default function CreateRoomPage() {
     <div className="CreateRoomPage">
       <Sidebar />
       <CreateRoomSettings/>
-      <FakeMapCreateRoom/>
+      <VirtualMapCreate/>
     </div>
   )
-
 }
