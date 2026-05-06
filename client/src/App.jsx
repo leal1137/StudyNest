@@ -16,7 +16,6 @@ export default function App() {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
     const soc = connect();
-    
     if (!soc) return;
 
     const handleConnect = () => {
@@ -32,6 +31,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+
         <Route 
           path="/" 
           element={
@@ -66,6 +66,7 @@ export default function App() {
           }
         />
 
+
         <Route
           path="/home"
           element={
@@ -79,7 +80,7 @@ export default function App() {
         />
 
         <Route
-          path="/createroom"
+          path="/create-virtual-room"
           element={
             <ProtectedRoute>
               <CreateRoomPage socket={socket}/>
@@ -88,13 +89,23 @@ export default function App() {
         />
 
         <Route
-          path="/virtual-room"
+          path="/virtual-room/:roomName"
           element={
             <ProtectedRoute>
-              <VirtualRoom socket={socket}/>
+              <VirtualRoom socket={socket} />
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/join-virtual-room"
+          element={
+            <ProtectedRoute>
+              <JoinVirtualRoomPage/>
+            </ProtectedRoute>
+          }
+        />
+      
       </Routes>
     </BrowserRouter>
   );
