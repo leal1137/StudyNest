@@ -50,17 +50,37 @@ function joinRoom(room, socket, listActiveUsers, io) {
 
 function leaveRoom(room, socket, listActiveUsers, io) {
     const user = listActiveUsers[socket.id];
-    if (user && List_of_rooms[room]) {
-        List_of_rooms[room] = List_of_rooms[room].filter(u => u.getUsername() !== user.getUsername());
-        const displayName = user.getUsername();
-        console.log(`User ${displayName} left room: ${room}`);
-        io.to(room).emit('user_left_room', { participants_List: List_of_rooms[room], name: displayName });
-    }
-    socket.leave(room);
 
-    if (List_of_rooms[room] && List_of_rooms[room].length === 0 && RoomTimers[room]) {
-        clearInterval(RoomTimers[room].intervalId);
-        delete RoomTimers[room];
+    if (!user || !List_of_rooms[room]) {
+        socket.leave(room);
+        socket.room = null;
+        return;
+    }
+
+    const displayName = user.getUsername();
+
+    List_of_rooms[room] = List_of_rooms[room].filter(
+        u => u.getUsername() !== displayName
+    );
+
+    console.log(`User ${displayName} left room: ${room}`);
+
+    io.to(room).emit('user_left_room', {
+        participants_List: List_of_rooms[room],
+        name: displayName
+    });
+
+    socket.leave(room);
+    socket.room = null;
+    user.room = null;
+
+    if (List_of_rooms[room].length === 0) {
+        delete List_of_rooms[room];
+
+        if (RoomTimers[room]) {
+            clearInterval(RoomTimers[room].intervalId);
+            delete RoomTimers[room];
+        }
     }
 }
 
