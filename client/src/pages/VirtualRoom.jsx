@@ -1,7 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
-import { useBlocker, useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useRef, useState, useMemo } from 'react'
+import { useBlocker, useNavigate, useParams, useLocation } from 'react-router-dom'
 import '../App.css'
-import { io } from 'socket.io-client'
 import { ParticipantCard } from '../components/ParticipantCard'
 import { RoomChatPanel } from '../components/RoomChatPanel'
 import { RoomSidebar } from '../components/RoomSidebar'
@@ -20,7 +19,6 @@ const initialParticipants = [
 ]
 
 const roomTools = ['Chatroom', 'Whiteboard']
-let socket_room;
 
 function createMessage(author, text, type = 'chat') {
   return {
@@ -34,14 +32,20 @@ function createMessage(author, text, type = 'chat') {
 export default function VirtualRoom({ socket }) {
   const { roomName } = useParams();
   socket_room = roomName;
+  const location = useLocation()
   const navigate = useNavigate()
+  const currentUsername = localStorage.getItem('username') || ''
+  const socketRoom = useMemo(
+    () => location.state?.roomName || `room-${location.state?.roomId || 'general'}`,
+    [location.state]
+  )
   const [participants, setParticipants] = useState(initialParticipants)
   const [messages, setMessages] = useState([
     createMessage('System', 'Log in and join the room to start chatting.', 'system'),
   ])
   const [messageInput, setMessageInput] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('Checking login...')
-  const socketRef = useRef(null)
+  const [isChatVisible, setIsChatVisible] = useState(true)
 
   function handleToggleMute(participantId) {
     setParticipants((currentParticipants) =>
@@ -57,52 +61,82 @@ export default function VirtualRoom({ socket }) {
     setMessages((currentMessages) => [...currentMessages, createMessage(author, text, type)])
   }
 
+    
+  function handleLocalStatusChange(newStatus) {
+    setParticipants((currentParticipants) =>
+      currentParticipants.map((participant) =>
+        participant.username === currentUsername
+          ? { ...participant, status: newStatus }
+          : participant
+      )
+    )
+  }
+
   const isMountedRef = useRef(true);
   useEffect(() => {
+    if (!socket) {
+      setConnectionStatus('Socket not connected.')
+      return undefined
+    }
+    
     isMountedRef.current = true;
     // For testing purposes, to see if socket is properly passed down to virtual room
     console.log("SOCKET IN ROOM:", socket ? socket.id : 'null');
 
-    //for testing once joined room.
-    socket?.on('user_already_in_room', (room) => {
-      console.log(`User is already in the room: ${room}`);
-    });
+    setConnectionStatus(`Joining ${socketRoom}...`)
 
-    socket?.on('user_joined_room', (displayName) => {
-      appendMessage('System', `${displayName} joined the room.`, 'system')
-      console.log(`User ${displayName} joined the room!`);//uppdata chat
-    });
-
-    socket?.on('list_participants_in_room', (list) => {
-      const currentParticipants = list.participants_List;
-      setParticipants(currentParticipants);
-    });
-
-    socket?.on('user_left_room', (data) => {
-      const currentParticipants = data.participants_List;
-      const displayName = data.name;
-      setParticipants(currentParticipants);
-      appendMessage('System', `${displayName} left the room.`, 'system');
-    });
-
-    socket?.on('receive_message', ({ username: messageAuthor, message }) => {
-      appendMessage(messageAuthor, message)
-    })
-
-    //acctually join the room
-    joinVirtualRoom(socket_room, socket);
-
-    return () => { 
-      leaveVirtualRoom(socket_room, socket);
-      console.log("EXIT ROOM PAGE");
-      socket?.off('user_already_in_room');
-      socket?.off('user_joined_room');
-      socket?.off('list_participants_in_room');
-      socket?.off('user_left_room');
-      socket?.off('receive_message');
-    
+    const handleAlreadyInRoom = (room) => {
+      setConnectionStatus(`Already connected to ${room}`)
     }
-  }, [socket]);
+
+    const handleUserJoinedRoom = (displayName) => {
+      setConnectionStatus(`Connected to ${socketRoom}`)
+      appendMessage('System', `${displayName} joined the room.`, 'system')
+    }
+
+    const handleParticipantList = (list) => {
+      setParticipants(list.participants_List)
+    }
+
+    const handleUserLeftRoom = (data) => {
+      setParticipants(data.participants_List)
+      appendMessage('System', `${data.name} left the room.`, 'system')
+    }
+
+    const handleReceiveMessage = ({ username: messageAuthor, message }) => {
+      appendMessage(messageAuthor, message)
+    }
+
+    const handleTimerEnded = () => {
+      appendMessage('System', 'Timern har nått noll! Dags för en paus!', 'system')
+    }
+
+    const handleDisconnect = () => {
+      setConnectionStatus('Disconnected from room.')
+    }
+
+    socket.on('user_already_in_room', handleAlreadyInRoom)
+    socket.on('user_joined_room', handleUserJoinedRoom)
+    socket.on('list_participants_in_room', handleParticipantList)
+    socket.on('user_left_room', handleUserLeftRoom)
+    socket.on('receive_message', handleReceiveMessage)
+    socket.on('timer_ended', handleTimerEnded)
+    socket.on('disconnect', handleDisconnect)
+
+    joinVirtualRoom(socketRoom, socket)
+
+    return () => {
+      leaveVirtualRoom(socketRoom, socket)
+      console.log("EXIT ROOM PAGE");
+      socket.off('user_already_in_room', handleAlreadyInRoom)
+      socket.off('user_joined_room', handleUserJoinedRoom)
+      socket.off('list_participants_in_room', handleParticipantList)
+      socket.off('user_left_room', handleUserLeftRoom)
+      socket.off('receive_message', handleReceiveMessage)
+      socket.off('timer_ended', handleTimerEnded)
+      socket.off('disconnect', handleDisconnect)
+    }
+  }, [socket, socketRoom]);
 
 
   function handleSendMessage(event) {
@@ -114,22 +148,32 @@ export default function VirtualRoom({ socket }) {
       return
     }
    
-    socket.emit('send_message', trimmedMessage, socket_room);
+    socket.emit('send_message', trimmedMessage, socketRoom);
     setMessageInput('')
   }
 
- function handleleaveRoom() {
-    leaveVirtualRoom(socket_room, socket);
-    navigate('/home');
- }
+  function handleLeaveRoom() {
+    leaveVirtualRoom(socketRoom, socket);
+    navigate('/join-virtual-room');
+  }
 
+  function handleToolToggle(tool) {
+    if (tool === 'Chatroom') {
+      setIsChatVisible((currentValue) => !currentValue)
+    }
+  }
 
   return (
     <div className="virtual-room-page">
-      <RoomSidebar onLeaveRoom={() => handleleaveRoom()} />
+      <RoomSidebar
+        onLeaveRoom={handleLeaveRoom}
+        socket={socket}
+        roomName={socketRoom}
+        onStatusChange={handleLocalStatusChange}
+      />
 
       <main className="virtual-room-main">
-        <VirtualRoomHeader roomName={socket_room} studyingCount={548} />
+        <VirtualRoomHeader roomName={socketRoom} studyingCount={participants.length} />
 
         <section className="participant-grid">
           {participants.map((participant) => (
@@ -142,15 +186,21 @@ export default function VirtualRoom({ socket }) {
         </section>
 
         <section className="virtual-room-lower">
-          <RoomChatPanel
-            messages={messages}
-            messageInput={messageInput}
-            connectionStatus={connectionStatus}
-            onMessageInputChange={setMessageInput}
-            onSendMessage={handleSendMessage}
-            isConnected={Boolean(socket?.connected)}
+          {isChatVisible ? (
+            <RoomChatPanel
+              messages={messages}
+              messageInput={messageInput}
+              connectionStatus={connectionStatus}
+              onMessageInputChange={setMessageInput}
+              onSendMessage={handleSendMessage}
+              isConnected={Boolean(socket?.connected)}
+            />
+          ) : null}
+          <RoomTools
+            tools={roomTools}
+            activeTool={isChatVisible ? 'Chatroom' : ''}
+            onToolToggle={handleToolToggle}
           />
-          <RoomTools tools={roomTools} />
         </section>
       </main>
     </div>
