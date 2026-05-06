@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState, useMemo } from 'react'
+import { useBlocker, useNavigate, useParams, useLocation } from 'react-router-dom'
 import '../App.css'
 import { ParticipantCard } from '../components/ParticipantCard'
 import { RoomChatPanel } from '../components/RoomChatPanel'
@@ -30,6 +30,8 @@ function createMessage(author, text, type = 'chat') {
 }
 
 export default function VirtualRoom({ socket }) {
+  const { roomName } = useParams();
+  socket_room = roomName;
   const location = useLocation()
   const navigate = useNavigate()
   const currentUsername = localStorage.getItem('username') || ''
@@ -59,6 +61,7 @@ export default function VirtualRoom({ socket }) {
     setMessages((currentMessages) => [...currentMessages, createMessage(author, text, type)])
   }
 
+    
   function handleLocalStatusChange(newStatus) {
     setParticipants((currentParticipants) =>
       currentParticipants.map((participant) =>
@@ -69,11 +72,16 @@ export default function VirtualRoom({ socket }) {
     )
   }
 
+  const isMountedRef = useRef(true);
   useEffect(() => {
     if (!socket) {
       setConnectionStatus('Socket not connected.')
       return undefined
     }
+    
+    isMountedRef.current = true;
+    // For testing purposes, to see if socket is properly passed down to virtual room
+    console.log("SOCKET IN ROOM:", socket ? socket.id : 'null');
 
     setConnectionStatus(`Joining ${socketRoom}...`)
 
@@ -119,6 +127,7 @@ export default function VirtualRoom({ socket }) {
 
     return () => {
       leaveVirtualRoom(socketRoom, socket)
+      console.log("EXIT ROOM PAGE");
       socket.off('user_already_in_room', handleAlreadyInRoom)
       socket.off('user_joined_room', handleUserJoinedRoom)
       socket.off('list_participants_in_room', handleParticipantList)

@@ -16,7 +16,6 @@ export default function App() {
   const [socket, setSocket] = useState(null);
   useEffect(() => {
     const soc = connect();
-    
     if (!soc) return;
 
     const handleConnect = () => {
@@ -88,6 +87,7 @@ export default function App() {
         />
 
         <Route
+          //path="/virtual-room/:roomName"
           path="/join-virtual-room"
           element={
             <ProtectedRoute>
