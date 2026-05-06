@@ -1,6 +1,6 @@
 import '../App.css'
 
-export function ParticipantCard({ username, status, micMuted, speaking, onToggleMute }) {
+export function ParticipantCard({ username, status, micMuted, speaking, onToggleMute, isCurrentUser }) {
 
   const dotColorClass = status === 'studying' ? 'study' : 'break';
 
@@ -15,9 +15,10 @@ export function ParticipantCard({ username, status, micMuted, speaking, onToggle
 
         <span className="participant-name">{username}</span>
         <button
-          className={`participant-mic-button ${micMuted ? 'muted' : ''}`}
+          className={`participant-mic-button ${micMuted ? 'muted' : ''} ${isCurrentUser ? '' : 'is-disabled'}`}
           type="button"
           onClick={onToggleMute}
+          disabled={!isCurrentUser}
           aria-label={micMuted ? `Unmute ${username}` : `Mute ${username}`}
         >
           <span className="participant-mic-icon">{micMuted ? '🎙︎̸' : '🎙︎'}</span>

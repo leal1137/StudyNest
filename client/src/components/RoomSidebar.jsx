@@ -114,9 +114,6 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
         </div>
       </section>
 
-      <button className="room-break-button" type="button">
-        Suggest a break
-      </button>
       <button className="room-switch-button" type="button" onClick={onLeaveRoom}>
         Choose another room
       </button>

@@ -520,6 +520,7 @@
 }
 
 .room-switch-button {
+  margin-top: auto;
   background: #9f3d31;
   color: #fff4ee;
   padding: 14px 10px;
@@ -636,6 +637,11 @@
 
 .participant-mic-button.muted {
   color: #b11d1d;
+}
+
+.participant-mic-button.is-disabled {
+  cursor: default;
+  opacity: 0.55;
 }
 
 .participant-status {

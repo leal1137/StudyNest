@@ -171,7 +171,12 @@ export default function VirtualRoom({ socket }) {
             <ParticipantCard
               key={participant.userId}
               {...participant}
-              onToggleMute={() => handleToggleMute(participant.userId)}
+              isCurrentUser={participant.username === currentUsername}
+              onToggleMute={
+                participant.username === currentUsername
+                  ? () => handleToggleMute(participant.userId)
+                  : undefined
+              }
             />
           ))}
         </section>
