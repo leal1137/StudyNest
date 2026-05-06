@@ -6,7 +6,7 @@ export default function RoomButtonOnMap({ id, name, subject, size, x, y, inRoom 
 
     const handleJoinClick = () => {
         // Navigate to the VirtualRoom page and pass the room name in the state
-        navigate('/virtual-room/${Name}', { state: { roomName: name } });
+        navigate(`/virtual-room/${name}`, { state: { roomName: name } });
     };
 
     return (
