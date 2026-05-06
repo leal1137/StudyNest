@@ -97,7 +97,7 @@ export default function App() {
         />
 
         <Route
-          path="/virtual-room"
+          path="/virtual-room/:roomName"
           element={
             <ProtectedRoute>
               <VirtualRoom socket={socket}/>
