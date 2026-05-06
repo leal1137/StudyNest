@@ -12,6 +12,9 @@ export default function FindLocationPage() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const routerLocation = useLocation();
 
+  function selectRoom(room) {
+    setSelectedRoom(room);
+  }
   useEffect(() => {
     if (routerLocation.state?.locationName) {
       setLocation(routerLocation.state.locationName);
@@ -54,10 +57,10 @@ export default function FindLocationPage() {
                 <div
                   key={room.id}
                   className={`room-card ${selectedRoom?.id === room.id ? 'active' : ''}`}
-                  onClick={() => setSelectedRoom(room)}
+                  onClick={() => selectRoom(room)}
                 >
                   <h3>{room.name}</h3>
-                  <h4>People count:</h4>
+                  <h4>People count: {room.user_count}</h4>
                   <p>{room.is_silent ? 'Silent room' : 'Group room'}</p>
                   <p>Capacity: {room.max_capacity}</p>
                 </div>

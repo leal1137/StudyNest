@@ -20,10 +20,10 @@ router.post('/', async (req, res) => {
     const { name, max_capacity, is_silent, created_by } = req.body;
     try {
         const result = await pool.query(
-            `INSERT INTO rooms (name, max_capacity, is_silent, created_by)
-             VALUES ($1, $2, $3, $4)
+            `INSERT INTO rooms (name, max_capacity, is_silent, created_by, user_count)
+             VALUES ($1, $2, $3, $4, $5)
              RETURNING *`,
-            [name, max_capacity || 10, is_silent || false, created_by || null]
+            [name, max_capacity || 10, is_silent || false, created_by || null, 0]
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {

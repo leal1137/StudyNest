@@ -2,19 +2,19 @@
 const pool = require('./pool');
 
 const PERSISTENT_ROOMS = [
-  { name: 'Silent study', max_capacity: 30, is_silent: true  },
-  { name: 'Maths',       max_capacity: 40, is_silent: true  },
-  { name: 'Chatty room',            max_capacity: 15, is_silent: false },
+  { name: 'Silent study', max_capacity: 30, is_silent: true, user_count: 0 },
+  { name: 'Maths',       max_capacity: 40, is_silent: true, user_count: 0 },
+  { name: 'Chatty room',            max_capacity: 15, is_silent: false, user_count: 0 }
 ];
 
 async function seedRooms() {
   for (const room of PERSISTENT_ROOMS) {
     try {
       await pool.query(
-        `INSERT INTO rooms (name, max_capacity, is_silent)
-         VALUES ($1, $2, $3)
+        `INSERT INTO rooms (name, max_capacity, is_silent,user_count)
+         VALUES ($1, $2, $3, $4)
          ON CONFLICT (name) DO NOTHING`,
-        [room.name, room.max_capacity, room.is_silent]
+        [room.name, room.max_capacity, room.is_silent, 0]
       );
     } catch (err) {
       console.error(`Failed to seed "${room.name}":`, err.message);
