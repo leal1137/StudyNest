@@ -1,69 +1,36 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db/pool');
 
-// GET /api/rooms — list all rooms
-router.get('/', async (req, res) => {
-    try {
-        const result = await pool.query(
-            'SELECT * FROM rooms ORDER BY created_at DESC'
-        );
-        res.json(result.rows);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to fetch rooms' });
-    }
+// Din önskade array sparad i serverns minne
+let rooms = [
+    { id: 1, name: "Ekonomikum", subject: "Economics", size: 50, x: 200.8594, y: 700.6200, inRoom: 0 },
+    { id: 2, name: "Ångström", subject: "Math", size: 50, x: 500.8397, y: 200.6468, inRoom: 0 },
+    { id: 3, name: "Carolina Rediviva", subject: "English", size: 50, x: 600.8550, y: 700.6310, inRoom: 0 }
+];
+
+let nextId = 4;
+
+// GET /api/rooms - Skickar arrayen till frontenden
+router.get('/', (req, res) => {
+    res.json(rooms);
 });
 
-// POST /api/rooms — create a new room
-router.post('/', async (req, res) => {
-    const { name, max_capacity, is_silent, created_by } = req.body;
-    try {
-        const result = await pool.query(
-            `INSERT INTO rooms (name, max_capacity, is_silent, created_by)
-             VALUES ($1, $2, $3, $4)
-             RETURNING *`,
-            [name, max_capacity || 10, is_silent || false, created_by || null]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (err) {
-        if (err.code === '23505') {
-            return res.status(409).json({ error: 'A room with that name already exists' });
-        }
-        console.error(err);
-        res.status(500).json({ error: 'Failed to create room' });
-    }
-});
+// POST /api/rooms - Lägger till ett nytt rum i arrayen
+router.post('/', (req, res) => {
+    const { name, max_capacity, x, y } = req.body;
 
-// GET /api/rooms/:id — get a single room
-router.get('/:id', async (req, res) => {
-    try {
-        const result = await pool.query('SELECT * FROM rooms WHERE id = $1', [req.params.id]);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Room not found' });
-        }
-        res.json(result.rows[0]);
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to fetch room' });
-    }
-});
+    const newRoom = {
+        id: nextId++,
+        name: name,
+        subject: "Misc", 
+        size: max_capacity || 15,
+        x: x,
+        y: y,
+        inRoom: 0
+    };
 
-// DELETE /api/rooms/:id — delete a room
-router.delete('/:id', async (req, res) => {
-    try {
-        const result = await pool.query(
-            'DELETE FROM rooms WHERE id = $1 RETURNING *',
-            [req.params.id]
-        );
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Room not found' });
-        }
-        res.json({ message: 'Room deleted' });
-    } catch (err) {
-        console.error(err);
-        res.status(500).json({ error: 'Failed to delete room' });
-    }
+    rooms.push(newRoom);
+    res.status(201).json(newRoom);
 });
 
 module.exports = router;
