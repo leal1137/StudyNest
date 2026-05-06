@@ -9,6 +9,7 @@ export default function FindLocationPage() {
   const [rooms, setRooms]       = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
+  const [selectedRoom, setSelectedRoom] = useState(null);
   const routerLocation = useLocation();
 
   useEffect(() => {
@@ -48,14 +49,26 @@ export default function FindLocationPage() {
           {loading && <p>Loading rooms…</p>}
           {error   && <p style={{ color: 'red' }}>Error: {error}</p>}
           {!loading && !error && (
-            <ul>
+            <div className="rooms-grid">
               {rooms.map((room) => (
-                <li key={room.id}>
-                  <strong>{room.name}</strong>
-                  {room.is_silent ? ' (silent)' : ''} — capacity {room.max_capacity}
-                </li>
+                <div
+                  key={room.id}
+                  className={`room-card ${selectedRoom?.id === room.id ? 'active' : ''}`}
+                  onClick={() => setSelectedRoom(room)}
+                >
+                  <h3>{room.name}</h3>
+                  <h4>People count:</h4>
+                  <p>{room.is_silent ? 'Silent room' : 'Group room'}</p>
+                  <p>Capacity: {room.max_capacity}</p>
+                </div>
+                
               ))}
-            </ul>
+              <div className="selection-text">
+                {selectedRoom
+                  ? `You are sitting in: ${selectedRoom.name}`
+                  : 'Where are you sitting?'}
+              </div>
+            </div>
           )}
         </div>
       </main>
