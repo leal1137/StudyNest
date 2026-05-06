@@ -6,9 +6,9 @@ import { VirtualMapJoin } from '../components/VirtualMapJoin';
 export default function JoinVirtualRoom() {
 
     const [rooms, setRooms] = useState([
-        { id: 1, name: "Ekonomikum", lat: 59.8594, lng: 17.6200 },
-        { id: 2, name: "Ångström", lat: 59.8397, lng: 17.6468 },
-        { id: 3, name: "Carolina Rediviva", lat: 59.8550, lng: 17.6310 }
+        { id: 1, name: "Ekonomikum", subject: "Economics", size: 50, x: 200.8594, y: 700.6200 },
+        { id: 2, name: "Ångström", subject: "Math", size: 50, x: 500.8397, y: 200.6468 },
+        { id: 3, name: "Carolina Rediviva", subject: "English", size: 50, x: 600.8550, y: 700.6310 }
     ]);
 
     return (

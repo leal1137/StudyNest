@@ -12,10 +12,18 @@ export default function CreateRoomSettings() {
     const CreateNewRoom = async (e) => {
         e.preventDefault();
 
-        const newRoomData = {   
+
+        if (!pinPosition) {
+            alert("Please click on the map to choose a location first!");
+            return;
+        }
+        const newRoomData = {
             name: roomName,
             max_capacity: parseInt(roomSize),
-            is_silent: !jointWorkspace
+            is_silent: !jointWorkspace,
+            x: pinPosition.x, 
+            y: pinPosition.y
+
             //created_by: localStorage.getItem('token')
         };
 
@@ -31,6 +39,7 @@ export default function CreateRoomSettings() {
             if (response.ok) {
                 const savedRoom = await response.json();
                 alert(`Succé! Rummet "${savedRoom.name}" har skapats.`);
+                navigate('/join-virtual-room');
             } else {
                 const errorData = await response.json();
                 alert(`Kunde inte skapa rummet: ${errorData.error}`);
@@ -74,11 +83,10 @@ export default function CreateRoomSettings() {
                     Clicking this box enables: <br />
                     Chat box, Voice chat, Whiteboard
                 </p>
-            </div> 
+            </div>
             <CustomButton
                 className='Create-room-button'
                 text="CreateRoom"
-                onClick={() => navigate('/join-virtual-room')}
             />
         </form>
     )

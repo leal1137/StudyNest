@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker } from 'react-leaflet';
-import { useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, useMapEvents, Popup, ImageOverlay, CircleMarker } from 'react-leaflet';
 import { useNavigate } from 'react-router-dom';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+
 import icon from 'leaflet/dist/images/marker-icon.png';
-import map from '../assets/ai_map.png';
+import map from '../assets/fortnite.webp';
 
 let DefaultIcon = L.icon({
   iconUrl: icon,
@@ -15,9 +15,9 @@ let DefaultIcon = L.icon({
 });
 
 const locations = [
-  { id: 1, name: "Ekonomikum", lat: 59.8594, lng: 17.6200 },
-  { id: 2, name: "Ångström", lat: 59.8397, lng: 17.6468 },
-  { id: 3, name: "Carolina Rediviva", lat: 59.8550, lng: 17.6310 }
+  { id: 1, name: "Ekonomikum", x: 59.8594, y: 17.6200 },
+  { id: 2, name: "Ångström", x: 59.8397, y: 17.6468 },
+  { id: 3, name: "Carolina Rediviva", x: 59.8550, y: 17.6310 }
 ];
 
 L.Marker.prototype.options.icon = DefaultIcon;
@@ -27,15 +27,16 @@ function MapClickHandler({ setPinPosition }) {
   useMapEvents({
     click(e) {
       setPinPosition({
-        lat: e.latlng.lat,
-        lng: e.latlng.lng
+        x: e.latlng.lng,
+        y: e.latlng.lat
       });
     },
   });
   return null;
 }
+const bounds = [[0, 0], [825, 1000]];
 
-export default function VirtualMapCreate() {
+export default function VirtualMapCreate({pinPosition, setPinPosition}) {
   const [hoveredId, setHoveredId] = useState(null);
   const navigate = useNavigate();
 
@@ -46,32 +47,29 @@ export default function VirtualMapCreate() {
   return (
     <div className="map-component">
       <MapContainer className='map-image'
-    >
-       
-      <img src={map} alt="map" className="virtualmap-img" />
 
-      {locations.map((loc) => (
-        <CircleMarker
-          key={loc.id}
-          center={[loc.lat, loc.lng]}
-          radius={10}
-          pathOptions={{
-            color: 'blue',
-            fillColor: hoveredId === loc.id ? 'white' : 'blue',
-            fillOpacity: 1
-          }}
-          eventHandlers={{
-            click: () => handleMarkerClick(loc),
-            mouseover: () => setHoveredId(loc.id),
-            mouseout: () => setHoveredId(null)
-          }}
+        crs={L.CRS.Simple}
+        bounds={bounds}
+
+        dragging={false}
+        scrollWheelZoom={false}
+        doubleClickZoom={false}
+        zoomControl={false}
+      >
+        <ImageOverlay
+          url={map}
+          bounds={bounds}
         />
-      ))}
 
+        {pinPosition && (
+          <Marker position={[pinPosition.y, pinPosition.x]} />
+        )}
+        <MapClickHandler setPinPosition={setPinPosition} />
       </MapContainer>
+
+
     </div>
   );
 }
 
-// <Marker position={[pinPosition.lat, pinPosition.lng]} />
-//<MapClickHandler setPinPosition={setPinPosition} />
+

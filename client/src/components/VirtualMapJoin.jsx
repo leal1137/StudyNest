@@ -1,35 +1,51 @@
 import { useState } from 'react';
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Tooltip, ImageOverlay } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import map from '../assets/ai_map.png'
+import RoomButton from './RoomButtonOnMap';
+import map from '../assets/fortnite.webp';
 import L from 'leaflet';
 
-import icon from 'leaflet/dist/images/marker-icon.png';
+const bounds = [[0, 0], [825, 1000]];
 
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    iconAnchor: [12, 41]
+const transparentIcon = new L.DivIcon({
+  className: 'transparent-icon',
+  html: '<div></div>'
 });
 
-function MapClickHandler({ setPinPosition }) {
-  useMapEvents({
-    click(e) {
-      
-    },
-  });
-  return null;
-}
-
-export function VirtualMapJoin() {
-
+export function VirtualMapJoin({ rooms }) {
   return (
     <div className="map-component">
       <MapContainer className='map-image'
-       
+        crs={L.CRS.Simple}
+        bounds={bounds}
+        dragging={false}
+        scrollWheelZoom={false}
+        doubleClickZoom={false}
+        zoomControl={false}
       >
-        <img src={map} alt="map" className="virtualmap-img" />
-       
-        <MapClickHandler/>
+        <ImageOverlay
+          url={map}
+          bounds={bounds}
+        />
+
+        {rooms && rooms.map((room) => (
+          <Marker
+            key={room.id}
+            position={[room.y, room.x]}
+            icon={transparentIcon}
+          >
+            <Tooltip permanent direction="center" className="custom-map-tooltip">
+              <RoomButton
+                id={room.id}
+                name={room.name}
+                subject={room.subject}
+                inRoom={room.inRoom}
+                size={room.size}
+              />
+            </Tooltip>
+          </Marker>
+        ))}
+
       </MapContainer>
     </div>
   );

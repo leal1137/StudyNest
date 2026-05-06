@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { joinVirtualRoom } from '../script/joinRoom';
 
-export default function RoomButton({id, name, subject, size, lat, lng, inRoom}) {
+export default function RoomButton({id, name, subject, size, x, y, inRoom}) {
     
     const handlejoin = (e) => {
         
@@ -33,7 +33,6 @@ export default function RoomButton({id, name, subject, size, lat, lng, inRoom}) 
             // 2. Use your function from joinRoom.js instead of emitting directly here
             joinVirtualRoom(socket, id); 
         }
-
         return (
             <button onClick={() => handleJoinClick("Math Study Group")}>
                 Join Math Group
@@ -44,7 +43,7 @@ export default function RoomButton({id, name, subject, size, lat, lng, inRoom}) 
   
 
     return (
-            <button className='room-button'  onClick={handlejoin}>
+            <button className='room-button-on-map'  onClick={handlejoin}>
             <span className="room-name">{name}</span>
             <span className="room-stats">{inRoom}/{size}</span>
             <span className="room-subject">{subject}</span>
