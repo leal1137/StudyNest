@@ -31,6 +31,11 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+//         <Route path="/" element={<LoginPage />} />
+//         <Route path="/sign-up" element={<SignUpPage />} />
+//         <Route path="/find-location" element={<FindLocationPage />} />
+//         <Route path="/find-location-map" element={<FindLocationPageMap />} />
+
         <Route 
           path="/" 
           element={
@@ -65,6 +70,7 @@ export default function App() {
           }
         />
 
+
         <Route
           path="/home"
           element={
@@ -78,7 +84,7 @@ export default function App() {
         />
 
         <Route
-          path="/createroom"
+          path="/create-virtual-room"
           element={
             <ProtectedRoute>
               <CreateRoomPage socket={socket}/>
@@ -100,6 +106,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <VirtualRoom socket={socket}/>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/join-virtual-room"
+          element={
+            <ProtectedRoute>
+              <JoinVirtualRoomPage />
             </ProtectedRoute>
           }
         />
