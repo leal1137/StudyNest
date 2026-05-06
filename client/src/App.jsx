@@ -31,10 +31,6 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-//         <Route path="/" element={<LoginPage />} />
-//         <Route path="/sign-up" element={<SignUpPage />} />
-//         <Route path="/find-location" element={<FindLocationPage />} />
-//         <Route path="/find-location-map" element={<FindLocationPageMap />} />
 
         <Route 
           path="/" 
@@ -96,27 +92,20 @@ export default function App() {
           path="/virtual-room/:roomName"
           element={
             <ProtectedRoute>
-              <JoinVirtualRoomPage />
+              <VirtualRoom socket={socket} />
             </ProtectedRoute>
           }
         />
 
         <Route
-          path="/virtual-room"
-          element={
-            <ProtectedRoute>
-              <VirtualRoom socket={socket}/>
-            </ProtectedRoute>
-          }
-        />
-        <Route
           path="/join-virtual-room"
           element={
             <ProtectedRoute>
-              <JoinVirtualRoomPage />
+              <JoinVirtualRoomPage/>
             </ProtectedRoute>
           }
         />
+      
       </Routes>
     </BrowserRouter>
   );

@@ -1,6 +1,7 @@
 import '../cssfiles/JoinRoomPage.css'
 import SidebarListofRooms from '../components/SidebarListofRooms';
 import { VirtualMapJoin } from '../components/VirtualMapJoin';
+import { useState } from 'react';
 export default function JoinVirtualRoom() {
 
     const [rooms, setRooms] = useState([
@@ -12,8 +13,6 @@ export default function JoinVirtualRoom() {
     return (
 
         <div className="JoinVirtualRoom">
-
-            
             <SidebarListofRooms rooms={rooms} />
             <VirtualMapJoin rooms={rooms}/>
             </div>

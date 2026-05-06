@@ -31,7 +31,6 @@ function createMessage(author, text, type = 'chat') {
 
 export default function VirtualRoom({ socket }) {
   const { roomName } = useParams();
-  socket_room = roomName;
   const location = useLocation()
   const navigate = useNavigate()
   const currentUsername = localStorage.getItem('username') || ''

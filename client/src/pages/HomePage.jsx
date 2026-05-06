@@ -13,13 +13,9 @@ export default function HomePage({ socket, setSocket}) {
 
   
   const joinVirtualRoom = () => {
-    const roomName = prompt("Enter room name:"); // Prompt user for room name
-    if (roomName) {
-      navigate(`/virtual-room/${roomName}`); // Pass room name as state to VirtualRoom
-    } else {
-      alert("Room name cannot be empty.");
-    }
+    navigate(`/join-virtual-room`); 
   };
+  
   const joinLocation = () => {
     navigate('/find-location-map');
   };
