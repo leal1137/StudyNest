@@ -4,19 +4,41 @@ import { CustomButton } from '../components/CustomButton'
 import heroImg from '../assets/vine.png'
 import { useNavigate } from 'react-router-dom'
 import UserDisplay from '../components/UserDisplay'
-import {socket, logoutDisconnect, connect } from '../script/socketConection';
+import { connect, logoutDisconnect } from '../script/socketConection';
 import { useEffect } from 'react'
 
-export default function HomePage() {
+export default function HomePage({ socket, setSocket}) {
   const navigate = useNavigate()
 
-  const handleClick1 = () => navigate('/join-virtual-room');
-  const handleClick2 = () => navigate('/find-location-map');
-  const handleClick3 = () => navigate('/virtual-room');
-  const logout = () => {
-    alert("logout button clicked!!!!!!");
-  };
 
+  
+  const joinVirtualRoom = () => {
+    const roomName = prompt("Enter room name:"); // Prompt user for room name
+    if (roomName) {
+      navigate(`/virtual-room/${roomName}`); // Pass room name as state to VirtualRoom
+    } else {
+      alert("Room name cannot be empty.");
+    }
+  };
+  const joinLocation = () => {
+    navigate('/find-location-map');
+  };
+  const logout = () => {
+    logoutDisconnect(socket);
+    setSocket(null);
+    console.log("SOCKET IN HOMEPAGE:", socket ? socket.id : 'null');
+    navigate('/');
+  };
+  
+  //for testing purposes, to see if socket is properly passed down to homepage
+  useEffect(() => {
+    connect(); // Test for first time connection
+    console.log("SOCKET IN HOMEPAGE:", socket ? socket.id : 'null');
+  }, [socket]);
+
+
+
+  
   return (
     <div className="HomePage">
       <Sidebar />
@@ -31,17 +53,12 @@ export default function HomePage() {
               <CustomButton 
                 text="Join a virtual study room" 
                 caption="Silent study rooms" 
-                onClick={handleClick1}
+                onClick={joinVirtualRoom}
               />
               <CustomButton 
                 text="Find a study location" 
                 caption="Find real world locations" 
-                onClick={handleClick2}
-              />
-              <CustomButton 
-                text="Join a joint workspace" 
-                caption="Work together with others in a virtual study room"
-                onClick={handleClick3} 
+                onClick={joinLocation}
               />
               <button
                 className="Sign-out-button"

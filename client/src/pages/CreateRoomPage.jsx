@@ -6,7 +6,7 @@ import { } from '../script/socketConection';
 import '../cssfiles/JoinRoomPage.css'
 
 
-export default function CreateRoomPage() {
+export default function CreateRoomPage({ socket }) {
 
   const [pinPosition, setPinPosition] = useState(null);
 

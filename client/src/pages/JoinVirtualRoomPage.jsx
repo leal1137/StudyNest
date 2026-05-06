@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import { Sidebar } from '../components/Sidebar';
 import '../cssfiles/JoinRoomPage.css'
 import SidebarListofRooms from '../components/SidebarListofRooms';
 import { VirtualMapJoin } from '../components/VirtualMapJoin';

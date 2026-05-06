@@ -3,8 +3,9 @@ import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 import { login } from '../script/login';
+import { connect } from '../script/socketConection';
 
-export default function LogInPage() {
+export default function LogInPage({ socket, setSocket }) {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -23,7 +24,9 @@ export default function LogInPage() {
       return;
     }
 
-    navigate('/');
+    const soc = connect(); // Test for first time connection
+    setSocket(soc);
+    navigate('/home');
   };
 
   return (
