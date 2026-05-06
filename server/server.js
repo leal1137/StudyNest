@@ -128,19 +128,25 @@ io.on('connection', (socket) => {
      * Raderar användaren från serverns minne och informerar det aktiva rummet om att 
      * personen har lämnat.
      *
-     * @name socketOnDisconnect
+     * @name socketOnDisconnecting
      * @function
      */
-    socket.on('disconnect', () => {
-        const user = listActiveUsers[socket.id];
-        if (user) {
-            if (user.room) {
-                leaveRoom(user.room, socket, listActiveUsers, io);
-            }
-            delete listActiveUsers[socket.id];
-            console.log('User disconnected:', user.getUsername());
-          console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
-        }
+    socket.on('disconnecting', () => {
+      const user = listActiveUsers[socket.id];
+
+      if (!user) return;
+
+      if (socket.room) {
+        leaveRoom(socket.room, socket, listActiveUsers, io);
+      }
+
+      delete listActiveUsers[socket.id];
+
+      console.log('User disconnecting:', user.getUsername());
+      console.log(
+        'Current active users:',
+        Object.values(listActiveUsers).map(u => u.getUsername())
+      );
     });
 });
 
