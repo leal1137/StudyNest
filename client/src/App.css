@@ -743,6 +743,7 @@
   flex-direction: column;
   gap: 16px;
   align-items: flex-end;
+  margin-left: auto;
 }
 
 .room-tool-button {
@@ -751,6 +752,11 @@
   padding: 12px 18px;
   font-size: 1.15rem;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+.room-tool-button.is-active {
+  background: #232323;
+  color: #f5f0e6;
 }
 
 @media (max-width: 1100px) {

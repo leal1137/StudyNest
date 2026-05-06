@@ -88,6 +88,15 @@ export default function App() {
         />
 
         <Route
+          path="/join-virtual-room"
+          element={
+            <ProtectedRoute>
+              <JoinVirtualRoomPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/virtual-room"
           element={
             <ProtectedRoute>

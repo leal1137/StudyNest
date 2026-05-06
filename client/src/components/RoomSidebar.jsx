@@ -7,7 +7,7 @@ const statusOptions = [
 ]
 
 // Ta emot socket och roomName som props från VirtualRoom.jsx
-export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
+export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
   const [timeLeft, setTimeLeft] = useState(10 * 60);
   const [isActive, setIsActive] = useState(false);
 
@@ -54,6 +54,10 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
   const handleStatusChange = (modifier) => {
     const newStatus = modifier === 'study' ? 'studying' : 'break';
     setMyStatus(newStatus);
+
+    if (onStatusChange) {
+      onStatusChange(newStatus);
+    }
     
     if (socket && roomName) {
       socket.emit('change_status', { room: roomName, status: newStatus });
