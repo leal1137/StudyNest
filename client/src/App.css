@@ -87,31 +87,6 @@
 
 }
 
-.Location-search-box {
-  position: fixed;
-  top: 20px;
-  max-width: 400px;
-  margin: 60px auto;
-  padding: 20px;
-}
-
-/* Title */
-.Location-search-box h2 {
-  font-size: 40px;
-  font-weight: 700;
-  margin-bottom: 15px;
-}
-
-/* The location text */
-.Location-display {
-  position: relative;
-  font-size: 30px;
-  font-weight: 500;
-  padding: 10px 0;
-  text-align: center;
-}
-
-
 
 
 
@@ -324,6 +299,86 @@
   display: block;
 }
 
+/* Styling for FindLocationPage */
+.Location-search-box {
+  position: fixed;
+  top: 20px;
+  max-width: 400px;
+  margin: 60px auto;
+  padding: 20px;
+}
+
+/* Title */
+.Location-search-box h2 {
+  font-size: 40px;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+/* The location text */
+.Location-display {
+  position: relative;
+  font-size: 30px;
+  font-weight: 500;
+  padding: 10px 0;
+  text-align: center;
+}
+
+
+.rooms-grid {
+  display: grid;
+  position: relative;
+  right: 0px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.room-card {
+  position: relative;
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.room-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 9px rgba(0,0,0,0.12);
+}
+
+.room-card h3 {
+  margin-bottom: 8px;
+}
+
+.room-card h4{
+  position: absolute;
+  top: 18px;
+  right: 10px;
+  margin: 0;
+}
+
+.room-card p {
+  margin: 4px 0;
+  color: #555;
+}
+
+.selection-text {
+  margin-top: 100px;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.room-card.active {
+  border: 2px solid #333;
+  background: #7ff871;
+  transform: scale(1.02);
+}
+
+
 
 
 /* 5. The Login Box Styling */
@@ -530,10 +585,10 @@
 .virtual-room-main {
   flex: 1;
   background: #eeddbb;
-  padding: 42px 38px 34px;
+  padding: 42px 38px 0;
   display: flex;
   flex-direction: column;
-  gap: 34px;
+  justify-content: flex-end;
   min-width: 0;
 }
 
@@ -541,7 +596,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .room-chip {
@@ -660,15 +716,25 @@
 
 .virtual-room-lower {
   display: flex;
-  justify-content: space-between;
-  gap: 28px;
-  align-items: flex-end;
+  gap: 24px;
+  align-items: stretch;
   flex: 1;
+  min-height: 0;
+}
+
+.room-panel-area {
+  display: grid;
+  grid-template-columns: 360px minmax(24px, 1fr) 820px;
+  gap: 20px;
+  align-items: end;
+  flex: 1;
+  min-width: 0;
 }
 
 .room-chat-panel {
-  width: min(100%, 510px);
-  height: 294px;
+  grid-column: 1;
+  width: 360px;
+  height: 420px;
   background: #f3ece5;
   display: flex;
   flex-direction: column;
@@ -749,7 +815,125 @@
   flex-direction: column;
   gap: 16px;
   align-items: flex-end;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.whiteboard-layout {
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 820px;
+  min-width: 0;
+}
+
+.whiteboard-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+  background: #f3ece5;
+  padding: 12px;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.whiteboard-toolbar-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.whiteboard-toolbar-actions {
   margin-left: auto;
+}
+
+.whiteboard-toolbar-row-options {
+  min-height: 38px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(63, 52, 38, 0.14);
+}
+
+.whiteboard-toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.whiteboard-toolbar-row .whiteboard-toolbar-group + .whiteboard-toolbar-group {
+  padding-left: 10px;
+  border-left: 1px solid rgba(63, 52, 38, 0.14);
+}
+
+.whiteboard-toolbar button,
+.whiteboard-toolbar input,
+.whiteboard-toolbar select {
+  font: inherit;
+}
+
+.whiteboard-toolbar button.is-active {
+  background: #232323;
+  color: #f5f0e6;
+}
+
+.whiteboard-toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.whiteboard-text-input {
+  width: min(260px, 48vw);
+}
+
+.whiteboard-number-input {
+  width: 72px;
+}
+
+.whiteboard-select-input {
+  min-width: 120px;
+}
+
+.whiteboard-file-input {
+  display: none;
+}
+
+.whiteboard-canvas-wrapper {
+  width: 100%;
+  height: 460px;
+  background: #ffffff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.whiteboard-canvas-draw {
+  cursor: crosshair;
+}
+
+.whiteboard-canvas-text {
+  cursor: text;
+}
+
+.whiteboard-canvas-shape {
+  cursor: crosshair;
+}
+
+.whiteboard-canvas-image {
+  cursor: move;
+}
+
+.whiteboard-canvas-fill {
+  cursor: cell;
+}
+
+.whiteboard-canvas-wrapper canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .room-tool-button {
@@ -800,11 +984,24 @@
     align-items: stretch;
   }
 
+  .room-panel-area {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
   .room-chat-panel {
     width: 100%;
+    min-width: 0;
+    height: 320px;
   }
 
   .room-tools {
     align-items: stretch;
+  }
+
+  .whiteboard-layout {
+    width: 100%;
+    min-width: 0;
   }
 }

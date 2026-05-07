@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import '../CSSfiles/JoinRoomPage.css';
 
-export default function RoomButton({ id, name, subject, size, lat, lng, inRoom }) {
+export default function RoomButtonOnMap({ id, name, subject, size, x, y, inRoom }) {
     const navigate = useNavigate();
 
     const handleJoinClick = () => {
@@ -10,7 +10,7 @@ export default function RoomButton({ id, name, subject, size, lat, lng, inRoom }
     };
 
     return (
-        <button className='room-button' onClick={handleJoinClick}>
+        <button className='room-button-on-map' onClick={handleJoinClick}>
             <span className="room-name">{name}</span>
             <span className="room-stats">{inRoom || 0}/{size}</span>
             <span className="room-subject">{subject}</span>

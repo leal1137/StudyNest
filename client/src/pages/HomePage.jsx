@@ -7,14 +7,15 @@ import UserDisplay from '../components/UserDisplay'
 import { connect, logoutDisconnect } from '../script/socketConection';
 import { useEffect } from 'react'
 
-export default function HomePage({ socket, setSocket }) {
+export default function HomePage({ socket, setSocket}) {
   const navigate = useNavigate()
 
 
   
   const joinVirtualRoom = () => {
-    navigate('/virtual-room');
+    navigate(`/join-virtual-room`); 
   };
+  
   const joinLocation = () => {
     navigate('/find-location-map');
   };

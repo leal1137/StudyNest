@@ -16,7 +16,15 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
-const {joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus } = require('./routes/virtualRoom');
+const {
+  joinRoom,
+  leaveRoom,
+  sendMessageToRoom,
+  handleTimerAction,
+  changeUserStatus,
+  handleWhiteboardRequest,
+  handleWhiteboardUpdate
+} = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 const { send } = require('process');
 
@@ -123,24 +131,41 @@ io.on('connection', (socket) => {
         changeUserStatus(data.room, socket, data.status, listActiveUsers, io);
     });
 
+    socket.on('whiteboard_request', ({ room }, callback) => {
+      const board = handleWhiteboardRequest(room, socket);
+      if (typeof callback === 'function') {
+        callback({ board });
+      }
+    });
+
+    socket.on('whiteboard_update', ({ room, board }) => {
+      handleWhiteboardUpdate(room, socket, board, io);
+    });
+
     /**
      * Hanterar uppstädning när en klient förlorar anslutningen eller stänger webbläsaren. 
      * Raderar användaren från serverns minne och informerar det aktiva rummet om att 
      * personen har lämnat.
      *
-     * @name socketOnDisconnect
+     * @name socketOnDisconnecting
      * @function
      */
-    socket.on('disconnect', () => {
-        const user = listActiveUsers[socket.id];
-        if (user) {
-            if (user.room) {
-                leaveRoom(user.room, socket, listActiveUsers, io);
-            }
-            delete listActiveUsers[socket.id];
-            console.log('User disconnected:', user.getUsername());
-          console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
-        }
+    socket.on('disconnecting', () => {
+      const user = listActiveUsers[socket.id];
+
+      if (!user) return;
+
+      if (socket.room) {
+        leaveRoom(socket.room, socket, listActiveUsers, io);
+      }
+
+      delete listActiveUsers[socket.id];
+
+      console.log('User disconnecting:', user.getUsername());
+      console.log(
+        'Current active users:',
+        Object.values(listActiveUsers).map(u => u.getUsername())
+      );
     });
 });
 

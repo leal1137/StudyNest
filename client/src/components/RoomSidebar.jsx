@@ -6,28 +6,23 @@ const statusOptions = [
   { label: 'Taking a break', modifier: 'break' },
 ]
 
-// Ta emot socket och roomName som props från VirtualRoom.jsx
 export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
-  const [timeLeft, setTimeLeft] = useState(10 * 60);
+  // Sätter initialt state till 25 minuter (1500 sekunder)
+  const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
-
   const [myStatus, setMyStatus] = useState('studying');
 
   useEffect(() => {
-    // Om ingen socket finns laddad än, gör ingenting
     if (!socket) return;
     
-    // Lyssna på tidsuppdateringar från servern
     socket.on('timer_update', (data) => {
       setTimeLeft(data.timeLeft);
       setIsActive(data.isActive);
     });
 
-    // Städa upp lyssnaren när komponenten tas bort
     return () => socket.off('timer_update');
   }, [socket]);
 
-  // Skicka till servern att vi vill starta eller pausa
   const toggleTimer = () => {
     if (!socket || !roomName) return;
     socket.emit('timer_action', { 
@@ -36,13 +31,21 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
     });
   };
 
-  // Skicka till servern att vi vill lägga till tid
-  const addTime = () => {
+  // NYA FUNKTIONER FÖR POMODORO
+  const setStudyTime = () => {
     if (!socket || !roomName) return;
-    socket.emit('timer_action', { 
-      room: roomName, 
-      action: 'add' 
-    });
+    socket.emit('timer_action', { room: roomName, action: 'pomodoro_study' });
+    
+    // Autobyter din status till "studying" när du sätter en studietimer
+    handleStatusChange('study'); 
+  };
+
+  const setBreakTime = () => {
+    if (!socket || !roomName) return;
+    socket.emit('timer_action', { room: roomName, action: 'pomodoro_break' });
+    
+    // Autobyter din status till "break" när du sätter en paustimer
+    handleStatusChange('break');
   };
 
   const formatTime = (seconds) => {
@@ -53,7 +56,7 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
 
   const handleStatusChange = (modifier) => {
     const newStatus = modifier === 'study' ? 'studying' : 'break';
-    setMyStatus(newStatus);
+    setMyStatus(newStatus); 
 
     if (onStatusChange) {
       onStatusChange(newStatus);
@@ -94,27 +97,45 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
         ))}
       </section>
 
+      {/* NY LAYOUT FÖR POMODORO TIMERN */}
       <section className="room-sidebar-section">
-        <p className="room-sidebar-label">Timer</p>
-        <div className="room-timer-controls">
+        <p className="room-sidebar-label">Pomodoro Timer</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
           
           <div 
             className="room-time-input" 
             onClick={toggleTimer}
-            style={{ cursor: 'pointer' }}
+            style={{ cursor: 'pointer', justifyContent: 'center' }}
             title={isActive ? "Pausa timer" : "Starta timer"}
           >
-            <span>{formatTime(timeLeft)}</span>
-            <span className={`room-status-pill ${isActive ? 'room-status-pill-study' : 'room-status-pill-break'}`} />
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{formatTime(timeLeft)}</span>
+            <span className={`room-status-pill ${isActive ? 'room-status-pill-study' : 'room-status-pill-break'}`} style={{ marginLeft: '12px' }} />
           </div>
           
-          <button className="room-add-button" type="button" onClick={addTime}>
-            +
-          </button>
+          {/* Knapparna under timern */}
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              className="room-break-button" 
+              type="button" 
+              onClick={setStudyTime}
+              style={{ flex: 1, padding: '8px', margin: 0, fontSize: '0.85rem' }}
+            >
+              🍅 25 min
+            </button>
+            <button 
+              className="room-break-button" 
+              type="button" 
+              onClick={setBreakTime}
+              style={{ flex: 1, padding: '8px', margin: 0, fontSize: '0.85rem', background: '#d6a848', color: '#111' }}
+            >
+              ☕ 5 min
+            </button>
+          </div>
+
         </div>
       </section>
 
-      <button className="room-switch-button" type="button" onClick={onLeaveRoom}>
+      <button className="room-switch-button" style={{ marginTop: 'auto' }} type="button" onClick={onLeaveRoom}>
         Choose another room
       </button>
     </aside>

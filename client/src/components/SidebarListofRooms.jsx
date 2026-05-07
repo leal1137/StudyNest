@@ -2,13 +2,10 @@ import { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import RoomButton from './RoomButton';
 import { useNavigate } from 'react-router-dom';
-export default function SidebarListofRooms() {
+export default function SidebarListofRooms({ rooms }) {
     const navigate = useNavigate()
 
-    const [rooms, setRooms] = useState([
-        { id: "room-1", name: "Ångan", subject: "Everything", size: 30, lat: 59.3141, lng: 30.41 },
-        { id: "room2", name: "Carro", subject: "Everything", size: 20, lat: 59.3142, lng: 30.41 }
-    ]);
+
 
     const expandsubjectlist = () => { }
 
@@ -36,7 +33,7 @@ export default function SidebarListofRooms() {
                 <button className="choose-type-button" onClick={expandsubjectlist}>
                     Choose room type <span className="plus-icon">+</span>
                 </button>
-                <button className="create-room-green-button" onClick={() => navigate('/createroom')}>
+                <button className="create-room-green-button" onClick={() => navigate('/create-virtual-room')}>
                     Create room
                 </button>
             </div>

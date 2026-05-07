@@ -1,10 +1,11 @@
-import { useState } from 'react'
-import '../App.css'
+import { useState } from 'react';
+import '../App.css';
 import { SubjectSelector } from './SubjectSelector';
-import { CustomButton } from './customButton';
+import { CustomButton } from './CustomButton';
 import { useNavigate } from 'react-router-dom';
-export default function CreateRoomSettings() {
-    const navigate = useNavigate()
+
+export default function CreateRoomSettings({ pinPosition }) {
+    const navigate = useNavigate();
     const [roomName, setRoomName] = useState('');
     const [roomSize, setRoomSize] = useState(15);
     const [jointWorkspace, setJointWorkspace] = useState(false);
@@ -12,32 +13,31 @@ export default function CreateRoomSettings() {
     const CreateNewRoom = async (e) => {
         e.preventDefault();
 
+        if (!pinPosition) {
+            alert("Please click on the map to choose a location first!");
+            return;
+        }
+
         const newRoomData = {
             name: roomName,
             max_capacity: parseInt(roomSize),
-            is_silent: !jointWorkspace
-            //created_by: localStorage.getItem('token')
+            x: pinPosition.x, 
+            y: pinPosition.y
         };
 
         try {
-            const response = await fetch('http://localhost:3000/api/rooms', {
+            const response = await fetch('/api/rooms', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newRoomData)
             });
 
             if (response.ok) {
-                const savedRoom = await response.json();
-                alert(`Succé! Rummet "${savedRoom.name}" har skapats.`);
-            } else {
-                const errorData = await response.json();
-                alert(`Kunde inte skapa rummet: ${errorData.error}`);
+                alert(`Succé! Rummet "${roomName}" har skapats.`);
+                navigate('/join-virtual-room');
             }
         } catch (error) {
-            console.error("Nätverksfel:", error);
-            alert("Kunde inte nå servern");
+            alert("Kunde inte nå servern.");
         }
     };
 
@@ -48,7 +48,9 @@ export default function CreateRoomSettings() {
                 <input className='Input'
                     type="text"
                     value={roomName}
-                    onChange={(e) => setRoomName(e.target.value)} />
+                    onChange={(e) => setRoomName(e.target.value)}
+                    required
+                />
             </div>
             <div className="input-room-size">
                 <h4>Room size</h4>
@@ -56,6 +58,7 @@ export default function CreateRoomSettings() {
                     type="Number"
                     value={roomSize}
                     onChange={(e) => setRoomSize(e.target.value)}
+                    max="50" min="1"
                 />
                 <span>max 50</span>
             </div>
@@ -73,12 +76,8 @@ export default function CreateRoomSettings() {
                     Clicking this box enables: <br />
                     Chat box, Voice chat, Whiteboard
                 </p>
-            </div> 
-            <CustomButton
-                className='Create-room-button'
-                text="CreateRoom"
-                onClick={() => navigate('/joinvirtualroom')}
-            />
+            </div>
+            <CustomButton className='Create-room-button' text="CreateRoom" />
         </form>
-    )
+    );
 }

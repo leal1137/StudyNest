@@ -2,6 +2,7 @@ require('socket.io');
 //set of all users in rooms
 let List_of_rooms = {};
 let RoomTimers = {};
+let RoomWhiteboards = {};
 
 
 /**
@@ -46,21 +47,44 @@ function joinRoom(room, socket, listActiveUsers, io) {
             isActive: RoomTimers[room].isActive 
         });
     }
+
+    sendWhiteboardToUser(room, socket);
 } 
 
 function leaveRoom(room, socket, listActiveUsers, io) {
     const user = listActiveUsers[socket.id];
-    if (user && List_of_rooms[room]) {
-        List_of_rooms[room] = List_of_rooms[room].filter(u => u.getUsername() !== user.getUsername());
-        const displayName = user.getUsername();
-        console.log(`User ${displayName} left room: ${room}`);
-        io.to(room).emit('user_left_room', { participants_List: List_of_rooms[room], name: displayName });
-    }
-    socket.leave(room);
 
-    if (List_of_rooms[room] && List_of_rooms[room].length === 0 && RoomTimers[room]) {
-        clearInterval(RoomTimers[room].intervalId);
-        delete RoomTimers[room];
+    if (!user || !List_of_rooms[room]) {
+        socket.leave(room);
+        socket.room = null;
+        return;
+    }
+
+    const displayName = user.getUsername();
+
+    List_of_rooms[room] = List_of_rooms[room].filter(
+        u => u.getUsername() !== displayName
+    );
+
+    console.log(`User ${displayName} left room: ${room}`);
+
+    io.to(room).emit('user_left_room', {
+        participants_List: List_of_rooms[room],
+        name: displayName
+    });
+
+    socket.leave(room);
+    socket.room = null;
+    user.room = null;
+
+    if (List_of_rooms[room].length === 0) {
+        delete List_of_rooms[room];
+
+        if (RoomTimers[room]) {
+            clearInterval(RoomTimers[room].intervalId);
+            delete RoomTimers[room];
+        }
+
     }
 }
 
@@ -75,16 +99,15 @@ function sendMessageToRoom(room, socket, message, listActiveUsers, io) {
 }
 
 function handleTimerAction(room, action, io) {
-    // Skapa en timer för rummet om den inte finns
+    // Ändrar standardtiden till 25 minuter (1500 sek) om rummet är helt nytt
     if (!RoomTimers[room]) {
-        RoomTimers[room] = { timeLeft: 10 * 60, isActive: false, intervalId: null };
+        RoomTimers[room] = { timeLeft: 25 * 60, isActive: false, intervalId: null };
     }
     
     let timer = RoomTimers[room];
 
     if (action === 'start' && !timer.isActive) {
         timer.isActive = true;
-        // Skicka uppdatering direkt
         io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: true });
         
         timer.intervalId = setInterval(() => {
@@ -95,7 +118,6 @@ function handleTimerAction(room, action, io) {
                 timer.isActive = false;
                 clearInterval(timer.intervalId);
                 io.to(room).emit('timer_update', { timeLeft: 0, isActive: false });
-
                 io.to(room).emit('timer_ended');
             }
         }, 1000);
@@ -103,9 +125,20 @@ function handleTimerAction(room, action, io) {
         timer.isActive = false;
         clearInterval(timer.intervalId);
         io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: false });
-    } else if (action === 'add') {
-        timer.timeLeft += 60;
-        io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: timer.isActive });
+        
+    // NYTT: Sätt timern på 25 minuter och pausa
+    } else if (action === 'pomodoro_study') {
+        timer.isActive = false;
+        clearInterval(timer.intervalId);
+        timer.timeLeft = 25 * 60;
+        io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: false });
+        
+    // NYTT: Sätt timern på 5 minuter och pausa
+    } else if (action === 'pomodoro_break') {
+        timer.isActive = false;
+        clearInterval(timer.intervalId);
+        timer.timeLeft = 5 * 60;
+        io.to(room).emit('timer_update', { timeLeft: timer.timeLeft, isActive: false });
     }
 }
 
@@ -120,5 +153,31 @@ function changeUserStatus(room, socket, newStatus, listActiveUsers, io) {
     }
 }
 
-module.exports = { joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus };
+function sendWhiteboardToUser(room, socket) {
+    if (room && RoomWhiteboards[room]) {
+        socket.emit('whiteboard_update', { board: RoomWhiteboards[room] });
+    }
+}
+
+function handleWhiteboardRequest(room, socket) {
+    sendWhiteboardToUser(room, socket);
+    return RoomWhiteboards[room] || null;
+}
+
+function handleWhiteboardUpdate(room, socket, board, io) {
+    if (!room || !board) return;
+
+    RoomWhiteboards[room] = board;
+    io.to(room).emit('whiteboard_update', { board });
+}
+
+module.exports = {
+    joinRoom,
+    leaveRoom,
+    sendMessageToRoom,
+    handleTimerAction,
+    changeUserStatus,
+    handleWhiteboardRequest,
+    handleWhiteboardUpdate
+};
 
