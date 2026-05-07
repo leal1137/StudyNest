@@ -8,9 +8,11 @@ export default function CreateRoomSettings({ pinPosition }) {
     const navigate = useNavigate();
     const [roomName, setRoomName] = useState('');
     const [roomSize, setRoomSize] = useState(15);
-    const [jointWorkspace, setJointWorkspace] = useState(false);
     const [isPrivate, setIsPrivate] = useState(false);
     const [roomPassword, setRoomPassword] = useState('');
+    const [chatEnabled, setChatEnabled] = useState(true);
+    const [voiceEnabled, setVoiceEnabled] = useState(true);
+    const [whiteboardEnabled, setWhiteboardEnabled] = useState(true);
 
     const CreateNewRoom = async (e) => {
         e.preventDefault();
@@ -22,23 +24,34 @@ export default function CreateRoomSettings({ pinPosition }) {
 
         const newRoomData = {
             name: roomName,
-            max_capacity: parseInt(roomSize),
+            size: parseInt(roomSize),
             x: pinPosition.x,
             y: pinPosition.y,
             isPrivate,
-            password: isPrivate ? roomPassword : ''
+            password: isPrivate ? roomPassword : '',
+            chatEnabled,
+            voiceEnabled,
+            whiteboardEnabled
         };
 
         try {
-            const response = await fetch('/api/rooms', {
+            const response = await fetch('/api/virtual-rooms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newRoomData)
             });
 
             if (response.ok) {
-                alert(`Success! The room "${roomName}" has been created.`);
-                navigate('/join-virtual-room');
+                const createdRoom = await response.json();
+                alert(`Success! The room "${createdRoom.name}" has been created.`);
+                navigate(`/virtual-room/${encodeURIComponent(createdRoom.name)}`, {
+                    state: {
+                        roomName: createdRoom.name,
+                        chatEnabled: createdRoom.chatEnabled,
+                        voiceEnabled: createdRoom.voiceEnabled,
+                        whiteboardEnabled: createdRoom.whiteboardEnabled
+                    }
+                });
             } else {
                 const error = await response.json();
                 alert(error.error || "Could not create the room.");
@@ -90,19 +103,32 @@ export default function CreateRoomSettings({ pinPosition }) {
                     />
                 )}
             </div>
-            <div className="workspace-checkbox">
+            <div className="workspace-checkbox workspace-feature-settings">
+                <h4>Room tools</h4>
                 <label>
                     <input
                         type="checkbox"
-                        checked={jointWorkspace}
-                        onChange={(e) => setJointWorkspace(e.target.checked)}
+                        checked={chatEnabled}
+                        onChange={(e) => setChatEnabled(e.target.checked)}
                     />
-                    Joint workspace
+                    Chat box
                 </label>
-                <p className="hint-text">
-                    Clicking this box enables: <br />
-                    Chat box, Voice chat, Whiteboard
-                </p>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={voiceEnabled}
+                        onChange={(e) => setVoiceEnabled(e.target.checked)}
+                    />
+                    Voice chat
+                </label>
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={whiteboardEnabled}
+                        onChange={(e) => setWhiteboardEnabled(e.target.checked)}
+                    />
+                    Whiteboard
+                </label>
             </div>
             <CustomButton className='Create-room-button' text="CreateRoom" />
         </form>

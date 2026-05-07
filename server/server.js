@@ -16,6 +16,7 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
+const virtualRoomRoutes = require('./routes/virtualRooms');
 const {
   joinRoom,
   leaveRoom,
@@ -44,6 +45,7 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(cors());
 app.use('/api/rooms', roomRoutes);
+app.use('/api/virtual-rooms', virtualRoomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 

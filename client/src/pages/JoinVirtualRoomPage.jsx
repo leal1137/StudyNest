@@ -9,7 +9,7 @@ export default function JoinVirtualRoom({ socket }) {
 
     useEffect(() => {
         // Hämtar arrayen från servern
-        fetch('/api/rooms')
+        fetch('/api/virtual-rooms')
             .then(res => res.json())
             .then(data => setRooms(data))
             .catch(err => console.error("Kunde inte hämta rum:", err));
