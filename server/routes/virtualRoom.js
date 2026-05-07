@@ -2,6 +2,7 @@ require('socket.io');
 //set of all users in rooms
 let List_of_rooms = {};
 let RoomTimers = {};
+let RoomWhiteboards = {};
 
 
 /**
@@ -46,6 +47,8 @@ function joinRoom(room, socket, listActiveUsers, io) {
             isActive: RoomTimers[room].isActive 
         });
     }
+
+    sendWhiteboardToUser(room, socket);
 } 
 
 function leaveRoom(room, socket, listActiveUsers, io) {
@@ -81,6 +84,7 @@ function leaveRoom(room, socket, listActiveUsers, io) {
             clearInterval(RoomTimers[room].intervalId);
             delete RoomTimers[room];
         }
+
     }
 }
 
@@ -149,5 +153,31 @@ function changeUserStatus(room, socket, newStatus, listActiveUsers, io) {
     }
 }
 
-module.exports = { joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus };
+function sendWhiteboardToUser(room, socket) {
+    if (room && RoomWhiteboards[room]) {
+        socket.emit('whiteboard_update', { board: RoomWhiteboards[room] });
+    }
+}
+
+function handleWhiteboardRequest(room, socket) {
+    sendWhiteboardToUser(room, socket);
+    return RoomWhiteboards[room] || null;
+}
+
+function handleWhiteboardUpdate(room, socket, board, io) {
+    if (!room || !board) return;
+
+    RoomWhiteboards[room] = board;
+    io.to(room).emit('whiteboard_update', { board });
+}
+
+module.exports = {
+    joinRoom,
+    leaveRoom,
+    sendMessageToRoom,
+    handleTimerAction,
+    changeUserStatus,
+    handleWhiteboardRequest,
+    handleWhiteboardUpdate
+};
 
