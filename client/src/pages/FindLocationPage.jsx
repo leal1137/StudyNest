@@ -7,8 +7,7 @@ import { useEffect } from 'react';
 //let inRoom = false;
 
 export default function FindLocationPage({ socket }) {
-  //const [location, setLocation] = useState('empty string');
-  const location = outerLocation.state.locationName;
+  const [location, setLocation] = useState('');
   const [socketReady, setSocketReady] = useState(false);
   const [rooms, setRooms]       = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -18,7 +17,7 @@ export default function FindLocationPage({ socket }) {
 
   function selectRoom(room) {
     if (!selectedRoom){
-      socket.emit('join_physical_room', room.name, null, location);
+      socket.emit('join_physical_room', room.name, null);
     }else{
       socket.emit('join_physical_room', room.name, selectedRoom.name, location);
 
@@ -30,11 +29,11 @@ export default function FindLocationPage({ socket }) {
     }
   }
 
-  // useEffect(() => {
-  //   if (routerLocation.state?.locationName) {
-  //     setLocation(routerLocation.state.locationName);
-  //   }
-  // }, [routerLocation.state]);
+  useEffect(() => {
+    if (routerLocation.state?.locationName) {
+      setLocation(routerLocation.state.locationName);
+    }
+  }, [routerLocation.state]);
 
 //fetch rooms from backend
   useEffect(() =>  {
