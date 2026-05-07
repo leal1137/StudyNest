@@ -7,6 +7,7 @@ import { RoomSidebar } from '../components/RoomSidebar'
 import { RoomTools } from '../components/RoomTools'
 import { VirtualRoomHeader } from '../components/VirtualRoomHeader'
 import { joinVirtualRoom, leaveVirtualRoom } from '../script/virtualRoomConnection';
+import Whiteboard from "../components/Whiteboard";
 
 const initialParticipants = [
   { userId: 1, username: 'Olle', status: 'studying', micMuted: false, speaking: true },
@@ -35,8 +36,8 @@ export default function VirtualRoom({ socket }) {
   const navigate = useNavigate()
   const currentUsername = localStorage.getItem('username') || ''
   const socketRoom = useMemo(
-    () => location.state?.roomName || `room-${location.state?.roomId || 'general'}`,
-    [location.state]
+    () => location.state?.roomName || roomName || `room-${location.state?.roomId || 'general'}`,
+    [location.state, roomName]
   )
   const [participants, setParticipants] = useState(initialParticipants)
   const [messages, setMessages] = useState([
@@ -44,7 +45,10 @@ export default function VirtualRoom({ socket }) {
   ])
   const [messageInput, setMessageInput] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('Checking login...')
-  const [isChatVisible, setIsChatVisible] = useState(true)
+  const [visibleTools, setVisibleTools] = useState({
+    Chatroom: true,
+    Whiteboard: true,
+  })
 
   function handleToggleMute(participantId) {
     setParticipants((currentParticipants) =>
@@ -157,9 +161,10 @@ export default function VirtualRoom({ socket }) {
   }
 
   function handleToolToggle(tool) {
-    if (tool === 'Chatroom') {
-      setIsChatVisible((currentValue) => !currentValue)
-    }
+    setVisibleTools((currentTools) => ({
+      ...currentTools,
+      [tool]: !currentTools[tool],
+    }))
   }
 
   return (
@@ -185,19 +190,24 @@ export default function VirtualRoom({ socket }) {
         </section>
 
         <section className="virtual-room-lower">
-          {isChatVisible ? (
-            <RoomChatPanel
-              messages={messages}
-              messageInput={messageInput}
-              connectionStatus={connectionStatus}
-              onMessageInputChange={setMessageInput}
-              onSendMessage={handleSendMessage}
-              isConnected={Boolean(socket?.connected)}
-            />
-          ) : null}
+          <div className="room-panel-area">
+            {visibleTools.Chatroom && (
+              <RoomChatPanel
+                messages={messages}
+                messageInput={messageInput}
+                connectionStatus={connectionStatus}
+                onMessageInputChange={setMessageInput}
+                onSendMessage={handleSendMessage}
+                isConnected={Boolean(socket?.connected)}
+              />
+            )}
+            {visibleTools.Whiteboard && (
+              <Whiteboard socket={socket} room={socketRoom} />
+            )}
+          </div>
           <RoomTools
             tools={roomTools}
-            activeTool={isChatVisible ? 'Chatroom' : ''}
+            activeTools={roomTools.filter((tool) => visibleTools[tool])}
             onToolToggle={handleToolToggle}
           />
         </section>
