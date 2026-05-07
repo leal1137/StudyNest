@@ -4,6 +4,19 @@ let List_of_rooms = {};
 let RoomTimers = {};
 let RoomWhiteboards = {};
 
+function getRoomCounts() {
+    return Object.fromEntries(
+        Object.entries(List_of_rooms).map(([room, participants]) => [
+            room,
+            participants.length
+        ])
+    );
+}
+
+function emitRoomCounts(io) {
+    io.emit('room_counts_updated', getRoomCounts());
+}
+
 
 /**
  * Hanterar logiken när en användare går med i ett rum.
@@ -40,6 +53,7 @@ function joinRoom(room, socket, listActiveUsers, io) {
 
     io.to(room).emit('user_joined_room', displayName);
     io.to(room).emit('list_participants_in_room', { participants_List: List_of_rooms[room] });
+    emitRoomCounts(io);
 
     if (RoomTimers[room]) {
         socket.emit('timer_update', { 
@@ -72,6 +86,7 @@ function leaveRoom(room, socket, listActiveUsers, io) {
         participants_List: List_of_rooms[room],
         name: displayName
     });
+    emitRoomCounts(io);
 
     socket.leave(room);
     socket.room = null;
@@ -179,6 +194,7 @@ module.exports = {
     changeUserStatus,
     handleWhiteboardRequest,
     handleWhiteboardUpdate,
+    getRoomCounts,
     List_of_rooms
 };
 
