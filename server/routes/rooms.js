@@ -3,9 +3,9 @@ const router = express.Router();
 
 // Din önskade array sparad i serverns minne
 let rooms = [
-    { id: 1, name: "Ekonomikum", subject: "Economics", size: 50, x: 200.8594, y: 700.6200, inRoom: 0 },
-    { id: 2, name: "Ångström", subject: "Math", size: 50, x: 500.8397, y: 200.6468, inRoom: 0 },
-    { id: 3, name: "Carolina Rediviva", subject: "English", size: 50, x: 600.8550, y: 700.6310, inRoom: 0 }
+    { id: 1, name: "Winter Wonderland", subject: "Economics", size: 50, x: 200.8594, y: 100.6200, inRoom: 0 },
+    { id: 2, name: "Sunny Beach", subject: "Math", size: 50, x: 900.8397, y: 200.6468, inRoom: 0 },
+    { id: 3, name: "Tilted Towers", subject: "Everything", size: 50, x: 370.8550, y: 385.6310, inRoom: 0 }
 ];
 
 let nextId = 4;

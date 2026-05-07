@@ -10,11 +10,16 @@
 .LoginPage,
 .SignUpPage,
 .FindLocationPage,
-.FindLocationMapPage,
+.FindLocationMapPage {
+  display: flex;
+  height: 100vh; 
+  font-family: sans-serif;
+}
 .CreateRoomPage {
   display: flex;
   height: 100vh; 
   font-family: sans-serif;
+  padding-left: 70px;
 }
 
 .virtual-room-page {

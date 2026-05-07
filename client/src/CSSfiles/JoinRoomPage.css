@@ -14,15 +14,16 @@
 }
 
 .sidebar-listofrooms {
-  width: 280px; 
-  background-color: #5a5f7e;
+  width: 380px; 
+  background-color: #eeddbb;
   color: white;
   display: flex;
   flex-direction: column;
   height: 100vh; 
   padding: 20px 0;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
   z-index:10;
+  padding-left: 70px;
+
 }
 
 .sidebar-header {
@@ -74,7 +75,7 @@
   transition: transform 0.1s;
 }
 .room-button-on-map {
-  background-color: #000000;
+  background-color: #000000e1;
   color: #ffffff;           
   border: 1px solid #ffffff;         
   border-radius: 12px;

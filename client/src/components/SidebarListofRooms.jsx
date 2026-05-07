@@ -12,7 +12,6 @@ export default function SidebarListofRooms({ rooms }) {
     return (
         <div className='sidebar-listofrooms'>
             <div className="sidebar-header">
-                <span className="menu-icon">≡</span>
                 <h2>StudyNest</h2>
             </div>
             <h1 className="sidebar-title">List of rooms</h1>
