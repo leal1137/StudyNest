@@ -4,8 +4,12 @@ import UserDisplay from '../components/UserDisplay';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
-export default function FindLocationPage() {
-  const [location, setLocation] = useState('');
+//let inRoom = false;
+
+export default function FindLocationPage({ socket }) {
+  //const [location, setLocation] = useState('empty string');
+  const location = outerLocation.state.locationName;
+  const [socketReady, setSocketReady] = useState(false);
   const [rooms, setRooms]       = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
@@ -13,30 +17,47 @@ export default function FindLocationPage() {
   const routerLocation = useLocation();
 
   function selectRoom(room) {
-    setSelectedRoom(room);
-  }
-  useEffect(() => {
-    if (routerLocation.state?.locationName) {
-      setLocation(routerLocation.state.locationName);
+    if (!selectedRoom){
+      socket.emit('join_physical_room', room.name, null, location);
+    }else{
+      socket.emit('join_physical_room', room.name, selectedRoom.name, location);
+
     }
-  }, [routerLocation.state]);
+    if(selectedRoom && room.name === selectedRoom.name){
+      setSelectedRoom(null);
+    }else{
+      setSelectedRoom(room);
+    }
+  }
+
+  // useEffect(() => {
+  //   if (routerLocation.state?.locationName) {
+  //     setLocation(routerLocation.state.locationName);
+  //   }
+  // }, [routerLocation.state]);
 
 //fetch rooms from backend
   useEffect(() =>  {
-    async function fetchRooms() {
-      try {
-        const res = await fetch('/api/rooms');
-        if (!res.ok) throw new Error('Failed to fetch rooms');
-        const data = await res.json();
-        setRooms(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+    console.log("SOCKET IN LOCATIONPAGE:", socket ? socket.id : 'null');
+    const uppdateRooms = (updatedRooms) => {
+      setLoading(true);
+      setRooms(updatedRooms);
+      setLoading(false);
     }
-    fetchRooms();
-  }, []);
+    const handleError = (err) => {
+      setError(err.message);
+      setLoading(false);
+      console.error('Error fetching rooms:', err.details);
+    }
+    socket?.on('update_persistent_rooms', uppdateRooms);
+    socket?.on('error', handleError);
+
+    socket?.emit('get_persistent_rooms', location);
+    return () => {
+      socket?.off('update_persistent_rooms', uppdateRooms);
+      socket?.off('error', handleError);
+    }
+  }, [socket]);
 
   return (
     <div className="FindLocationPage">

@@ -16,6 +16,7 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
+const { getPersistentRooms, updateUserToRoom} = require('./routes/physicalRoom');
 const {joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus } = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 const { send } = require('process');
@@ -123,6 +124,15 @@ io.on('connection', (socket) => {
         changeUserStatus(data.room, socket, data.status, listActiveUsers, io);
     });
 
+
+    socket.on('get_persistent_rooms', (location) => {
+        getPersistentRooms(location, socket, io);
+    });
+
+    socket.on('join_physical_room', (newRoomName, oldRoomName, location) => {
+        updateUserToRoom(newRoomName, oldRoomName, location, socket, io);
+    });
+        
     /**
      * Hanterar uppstädning när en klient förlorar anslutningen eller stänger webbläsaren. 
      * Raderar användaren från serverns minne och informerar det aktiva rummet om att 
