@@ -33,54 +33,48 @@ export default function LogInPage({ socket, setSocket }) {
     <div className="LoginPage">
       <Sidebar />
       <main className="main-content">
-        <form className="Login-box" onSubmit={handleLogin}>
+        <form className="auth-box" onSubmit={handleLogin}>
           <h2>Sign in</h2>
 
           <div className="input-group">
-            <label>Email:</label>
+            <label htmlFor="login-email">
+              Email
+              <span className="email-tooltip" tabIndex="0" aria-label="Only student emails are allowed">?</span>
+            </label>
             <input
-              id='email'
-              type="text"
+              id="login-email"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
           <div className="input-group">
-            <label>Password:</label>
+            <label htmlFor="login-password">Password</label>
             <input
-              id='password'
+              id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <button
-              type="submit"
-              style={{
-                padding: '10px 20px',
-                fontSize: '18px',
-                cursor: 'pointer',
-              }}
-            >
+          <div className="auth-actions">
+            <button className="auth-button auth-button-primary" type="submit">
               Login
             </button>
 
             <button
+              className="auth-button"
               type="button"
-              style={{
-                padding: '10px 20px',
-                fontSize: '18px',
-                cursor: 'pointer',
-              }}
               onClick={() => navigate('/sign-up')}
             >
               Sign Up
             </button>
           </div>
-          {error ? <p style={{ color: '#9f3d31', marginTop: '16px' }}>{error}</p> : null}
+          {error ? <p className="auth-error">{error}</p> : null}
 
         </form>
       </main>
