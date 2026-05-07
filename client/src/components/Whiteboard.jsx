@@ -537,6 +537,7 @@ export default function Whiteboard({ socket, room }) {
       shapeStartRef.current = getCanvasCoordinates(event);
       shapeBaseRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
       isDrawingRef.current = true;
+      event.currentTarget.setPointerCapture?.(event.pointerId);
       return;
     }
 
@@ -554,6 +555,7 @@ export default function Whiteboard({ socket, room }) {
           y: point.y - pendingImage.y,
         };
         isDrawingRef.current = true;
+        event.currentTarget.setPointerCapture?.(event.pointerId);
       }
       return;
     }
@@ -572,6 +574,7 @@ export default function Whiteboard({ socket, room }) {
 
     const { x, y } = getCanvasCoordinates(event);
     isDrawingRef.current = true;
+    event.currentTarget.setPointerCapture?.(event.pointerId);
     ctx.beginPath();
     ctx.moveTo(x, y);
   };
@@ -607,6 +610,10 @@ export default function Whiteboard({ socket, room }) {
   };
 
   const handlePointerUp = (event) => {
+    if (event.currentTarget.hasPointerCapture?.(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
     if (toolMode === "shape" && isBoardReady && isDrawingRef.current) {
       restoreShapeBase();
       drawShape(shapeStartRef.current, getShapeEndCoordinates(event));
@@ -897,10 +904,10 @@ export default function Whiteboard({ socket, room }) {
       <canvas
         ref={canvasRef}
         className={`whiteboard-canvas-wrapper whiteboard-canvas-${toolMode}`}
-        onMouseDown={handlePointerDown}
-        onMouseMove={handlePointerMove}
-        onMouseUp={handlePointerUp}
-        onMouseLeave={handlePointerUp}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
         onDragOver={handleCanvasDragOver}
         onDrop={handleCanvasDrop}
       />
