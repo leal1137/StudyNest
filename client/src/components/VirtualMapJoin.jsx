@@ -41,6 +41,7 @@ export function VirtualMapJoin({ rooms }) {
                 subject={room.subject}
                 inRoom={room.inRoom}
                 size={room.size}
+                isPrivate={room.isPrivate}
               />
             </Tooltip>
           </Marker>

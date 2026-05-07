@@ -21,10 +21,12 @@ export default function SidebarListofRooms({ rooms }) {
                 {rooms.map((room) => (
                     <RoomButton
                         key={room.id}
+                        id={room.id}
                         name={room.name}
                         subject={room.subject}
                         inRoom={room.inRoom}
                         size={room.size}
+                        isPrivate={room.isPrivate}
                     />
                 ))}
             </div>
