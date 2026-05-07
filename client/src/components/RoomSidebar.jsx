@@ -6,7 +6,7 @@ const statusOptions = [
   { label: 'Taking a break', modifier: 'break' },
 ]
 
-export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
+export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
   // Sätter initialt state till 25 minuter (1500 sekunder)
   const [timeLeft, setTimeLeft] = useState(25 * 60);
   const [isActive, setIsActive] = useState(false);
@@ -57,6 +57,10 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
   const handleStatusChange = (modifier) => {
     const newStatus = modifier === 'study' ? 'studying' : 'break';
     setMyStatus(newStatus); 
+
+    if (onStatusChange) {
+      onStatusChange(newStatus);
+    }
     
     if (socket && roomName) {
       socket.emit('change_status', { room: roomName, status: newStatus });
@@ -105,7 +109,10 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName }) {
             title={isActive ? "Pausa timer" : "Starta timer"}
           >
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{formatTime(timeLeft)}</span>
-            <span className={`room-status-pill ${isActive ? 'room-status-pill-study' : 'room-status-pill-break'}`} style={{ marginLeft: '12px' }} />
+            <span
+              className={`room-status-pill ${isActive ? 'room-status-pill-study' : 'room-status-pill-pomodoro'}`}
+              style={{ marginLeft: '12px' }}
+            />
           </div>
           
           {/* Knapparna under timern */}

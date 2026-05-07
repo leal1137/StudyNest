@@ -23,9 +23,14 @@ export default function App() {
       setSocket(soc);
     }
     soc.on('connect', handleConnect);
-    // return () => { //test for connect first time
-    //   soc.off('connect', handleConnect);
-    // };
+
+    if (soc.connected) {
+      handleConnect();
+    }
+
+    return () => {
+      soc.off('connect', handleConnect);
+    };
   }, []);
 
   return (
@@ -102,7 +107,7 @@ export default function App() {
           path="/join-virtual-room"
           element={
             <ProtectedRoute>
-              <JoinVirtualRoomPage/>
+              <JoinVirtualRoomPage socket={socket}/>
             </ProtectedRoute>
           }
         />

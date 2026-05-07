@@ -41,6 +41,10 @@ export function VirtualMapJoin({ rooms }) {
                 subject={room.subject}
                 inRoom={room.inRoom}
                 size={room.size}
+                isPrivate={room.isPrivate}
+                chatEnabled={room.chatEnabled}
+                voiceEnabled={room.voiceEnabled}
+                whiteboardEnabled={room.whiteboardEnabled}
               />
             </Tooltip>
           </Marker>

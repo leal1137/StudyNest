@@ -7,6 +7,7 @@ import { RoomSidebar } from '../components/RoomSidebar'
 import { RoomTools } from '../components/RoomTools'
 import { VirtualRoomHeader } from '../components/VirtualRoomHeader'
 import { joinVirtualRoom, leaveVirtualRoom } from '../script/virtualRoomConnection';
+import Whiteboard from "../components/Whiteboard";
 
 const initialParticipants = [
   { userId: 1, username: 'Olle', status: 'studying', micMuted: false, speaking: true },
@@ -18,8 +19,6 @@ const initialParticipants = [
   { userId: 7, username: 'Edvard', status: 'studying', micMuted: false, speaking: true },
 ]
 
-const roomTools = ['Chatroom', 'Whiteboard']
-
 function createMessage(author, text, type = 'chat') {
   return {
     id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -29,14 +28,43 @@ function createMessage(author, text, type = 'chat') {
   }
 }
 
+function mergeParticipantsWithLocalState(incomingParticipants, currentParticipants) {
+  return incomingParticipants.map((participant) => {
+    const existingParticipant = currentParticipants.find(
+      (currentParticipant) => currentParticipant.username === participant.username
+    )
+
+    return {
+      ...participant,
+      micMuted: existingParticipant?.micMuted ?? false,
+      speaking: existingParticipant?.speaking ?? false,
+    }
+  })
+}
+
 export default function VirtualRoom({ socket }) {
   const { roomName } = useParams();
   const location = useLocation()
   const navigate = useNavigate()
   const currentUsername = localStorage.getItem('username') || ''
   const socketRoom = useMemo(
-    () => location.state?.roomName || `room-${location.state?.roomId || 'general'}`,
+    () => location.state?.roomName || roomName || `room-${location.state?.roomId || 'general'}`,
+    [location.state, roomName]
+  )
+  const roomFeatures = useMemo(
+    () => ({
+      chatEnabled: location.state?.chatEnabled ?? true,
+      voiceEnabled: location.state?.voiceEnabled ?? true,
+      whiteboardEnabled: location.state?.whiteboardEnabled ?? true,
+    }),
     [location.state]
+  )
+  const roomTools = useMemo(
+    () => [
+      roomFeatures.chatEnabled ? 'Chatroom' : null,
+      roomFeatures.whiteboardEnabled ? 'Whiteboard' : null,
+    ].filter(Boolean),
+    [roomFeatures]
   )
   const [participants, setParticipants] = useState(initialParticipants)
   const [messages, setMessages] = useState([
@@ -44,7 +72,17 @@ export default function VirtualRoom({ socket }) {
   ])
   const [messageInput, setMessageInput] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('Checking login...')
-  const [isChatVisible, setIsChatVisible] = useState(true)
+  const [visibleTools, setVisibleTools] = useState({
+    Chatroom: roomFeatures.chatEnabled,
+    Whiteboard: roomFeatures.whiteboardEnabled,
+  })
+
+  useEffect(() => {
+    setVisibleTools({
+      Chatroom: roomFeatures.chatEnabled,
+      Whiteboard: roomFeatures.whiteboardEnabled,
+    })
+  }, [roomFeatures])
 
   function handleToggleMute(participantId) {
     setParticipants((currentParticipants) =>
@@ -60,11 +98,15 @@ export default function VirtualRoom({ socket }) {
     setMessages((currentMessages) => [...currentMessages, createMessage(author, text, type)])
   }
 
+  function isCurrentParticipant(participant) {
+    return participant.username === currentUsername
+  }
+
     
   function handleLocalStatusChange(newStatus) {
     setParticipants((currentParticipants) =>
       currentParticipants.map((participant) =>
-        participant.username === currentUsername
+        isCurrentParticipant(participant)
           ? { ...participant, status: newStatus }
           : participant
       )
@@ -94,11 +136,15 @@ export default function VirtualRoom({ socket }) {
     }
 
     const handleParticipantList = (list) => {
-      setParticipants(list.participants_List)
+      setParticipants((currentParticipants) =>
+        mergeParticipantsWithLocalState(list.participants_List, currentParticipants)
+      )
     }
 
     const handleUserLeftRoom = (data) => {
-      setParticipants(data.participants_List)
+      setParticipants((currentParticipants) =>
+        mergeParticipantsWithLocalState(data.participants_List, currentParticipants)
+      )
       appendMessage('System', `${data.name} left the room.`, 'system')
     }
 
@@ -157,9 +203,10 @@ export default function VirtualRoom({ socket }) {
   }
 
   function handleToolToggle(tool) {
-    if (tool === 'Chatroom') {
-      setIsChatVisible((currentValue) => !currentValue)
-    }
+    setVisibleTools((currentTools) => ({
+      ...currentTools,
+      [tool]: !currentTools[tool],
+    }))
   }
 
   return (
@@ -179,27 +226,40 @@ export default function VirtualRoom({ socket }) {
             <ParticipantCard
               key={participant.userId}
               {...participant}
-              onToggleMute={() => handleToggleMute(participant.userId)}
+              isCurrentUser={isCurrentParticipant(participant)}
+              onToggleMute={
+                roomFeatures.voiceEnabled && isCurrentParticipant(participant)
+                  ? () => handleToggleMute(participant.userId)
+                  : undefined
+              }
+              voiceEnabled={roomFeatures.voiceEnabled}
             />
           ))}
         </section>
 
         <section className="virtual-room-lower">
-          {isChatVisible ? (
-            <RoomChatPanel
-              messages={messages}
-              messageInput={messageInput}
-              connectionStatus={connectionStatus}
-              onMessageInputChange={setMessageInput}
-              onSendMessage={handleSendMessage}
-              isConnected={Boolean(socket?.connected)}
+          <div className="room-panel-area">
+            {roomFeatures.chatEnabled && visibleTools.Chatroom && (
+              <RoomChatPanel
+                messages={messages}
+                messageInput={messageInput}
+                connectionStatus={connectionStatus}
+                onMessageInputChange={setMessageInput}
+                onSendMessage={handleSendMessage}
+                isConnected={Boolean(socket?.connected)}
+              />
+            )}
+            {roomFeatures.whiteboardEnabled && visibleTools.Whiteboard && (
+              <Whiteboard socket={socket} room={socketRoom} />
+            )}
+          </div>
+          {roomTools.length > 0 && (
+            <RoomTools
+              tools={roomTools}
+              activeTools={roomTools.filter((tool) => visibleTools[tool])}
+              onToolToggle={handleToolToggle}
             />
-          ) : null}
-          <RoomTools
-            tools={roomTools}
-            activeTool={isChatVisible ? 'Chatroom' : ''}
-            onToolToggle={handleToolToggle}
-          />
+          )}
         </section>
       </main>
     </div>

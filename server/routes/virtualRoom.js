@@ -2,6 +2,20 @@ require('socket.io');
 //set of all users in rooms
 let List_of_rooms = {};
 let RoomTimers = {};
+let RoomWhiteboards = {};
+
+function getRoomCounts() {
+    return Object.fromEntries(
+        Object.entries(List_of_rooms).map(([room, participants]) => [
+            room,
+            participants.length
+        ])
+    );
+}
+
+function emitRoomCounts(io) {
+    io.emit('room_counts_updated', getRoomCounts());
+}
 
 
 /**
@@ -39,6 +53,7 @@ function joinRoom(room, socket, listActiveUsers, io) {
 
     io.to(room).emit('user_joined_room', displayName);
     io.to(room).emit('list_participants_in_room', { participants_List: List_of_rooms[room] });
+    emitRoomCounts(io);
 
     if (RoomTimers[room]) {
         socket.emit('timer_update', { 
@@ -46,21 +61,45 @@ function joinRoom(room, socket, listActiveUsers, io) {
             isActive: RoomTimers[room].isActive 
         });
     }
+
+    sendWhiteboardToUser(room, socket);
 } 
 
 function leaveRoom(room, socket, listActiveUsers, io) {
     const user = listActiveUsers[socket.id];
-    if (user && List_of_rooms[room]) {
-        List_of_rooms[room] = List_of_rooms[room].filter(u => u.getUsername() !== user.getUsername());
-        const displayName = user.getUsername();
-        console.log(`User ${displayName} left room: ${room}`);
-        io.to(room).emit('user_left_room', { participants_List: List_of_rooms[room], name: displayName });
-    }
-    socket.leave(room);
 
-    if (List_of_rooms[room] && List_of_rooms[room].length === 0 && RoomTimers[room]) {
-        clearInterval(RoomTimers[room].intervalId);
-        delete RoomTimers[room];
+    if (!user || !List_of_rooms[room]) {
+        socket.leave(room);
+        socket.room = null;
+        return;
+    }
+
+    const displayName = user.getUsername();
+
+    List_of_rooms[room] = List_of_rooms[room].filter(
+        u => u.getUsername() !== displayName
+    );
+
+    console.log(`User ${displayName} left room: ${room}`);
+
+    io.to(room).emit('user_left_room', {
+        participants_List: List_of_rooms[room],
+        name: displayName
+    });
+    emitRoomCounts(io);
+
+    socket.leave(room);
+    socket.room = null;
+    user.room = null;
+
+    if (List_of_rooms[room].length === 0) {
+        delete List_of_rooms[room];
+
+        if (RoomTimers[room]) {
+            clearInterval(RoomTimers[room].intervalId);
+            delete RoomTimers[room];
+        }
+
     }
 }
 
@@ -129,5 +168,33 @@ function changeUserStatus(room, socket, newStatus, listActiveUsers, io) {
     }
 }
 
-module.exports = { joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus };
+function sendWhiteboardToUser(room, socket) {
+    if (room && RoomWhiteboards[room]) {
+        socket.emit('whiteboard_update', { board: RoomWhiteboards[room] });
+    }
+}
+
+function handleWhiteboardRequest(room, socket) {
+    sendWhiteboardToUser(room, socket);
+    return RoomWhiteboards[room] || null;
+}
+
+function handleWhiteboardUpdate(room, socket, board, io) {
+    if (!room || !board) return;
+
+    RoomWhiteboards[room] = board;
+    io.to(room).emit('whiteboard_update', { board });
+}
+
+module.exports = {
+    joinRoom,
+    leaveRoom,
+    sendMessageToRoom,
+    handleTimerAction,
+    changeUserStatus,
+    handleWhiteboardRequest,
+    handleWhiteboardUpdate,
+    getRoomCounts,
+    List_of_rooms
+};
 

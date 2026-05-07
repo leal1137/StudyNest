@@ -17,7 +17,17 @@ const User = require('./user');
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
 const { getPersistentRooms, updateUserToRoom} = require('./routes/physicalRoom');
-const {joinRoom, leaveRoom, sendMessageToRoom, handleTimerAction, changeUserStatus } = require('./routes/virtualRoom');
+const virtualRoomRoutes = require('./routes/virtualRooms');
+const {
+  joinRoom,
+  leaveRoom,
+  sendMessageToRoom,
+  handleTimerAction,
+  changeUserStatus,
+  handleWhiteboardRequest,
+  handleWhiteboardUpdate,
+  getRoomCounts
+} = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 const { send } = require('process');
 
@@ -36,6 +46,7 @@ const io = new Server(server, {
 app.use(express.json());
 app.use(cors());
 app.use('/api/rooms', roomRoutes);
+app.use('/api/virtual-rooms', virtualRoomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 
@@ -103,6 +114,10 @@ io.on('connection', (socket) => {
       leaveRoom(room, socket, listActiveUsers, io);
     });
 
+    socket.on('get_room_counts', () => {
+      socket.emit('room_counts_updated', getRoomCounts());
+    });
+
     /**
      * Tar emot ett textmeddelande från klienten och skickar det vidare till 
      * alla andra användare som befinner sig i samma chattrum.
@@ -133,24 +148,41 @@ io.on('connection', (socket) => {
         updateUserToRoom(newRoomName, oldRoomName, location, socket, io);
     });
         
+    socket.on('whiteboard_request', ({ room }, callback) => {
+      const board = handleWhiteboardRequest(room, socket);
+      if (typeof callback === 'function') {
+        callback({ board });
+      }
+    });
+
+    socket.on('whiteboard_update', ({ room, board }) => {
+      handleWhiteboardUpdate(room, socket, board, io);
+    });
+
     /**
      * Hanterar uppstädning när en klient förlorar anslutningen eller stänger webbläsaren. 
      * Raderar användaren från serverns minne och informerar det aktiva rummet om att 
      * personen har lämnat.
      *
-     * @name socketOnDisconnect
+     * @name socketOnDisconnecting
      * @function
      */
-    socket.on('disconnect', () => {
-        const user = listActiveUsers[socket.id];
-        if (user) {
-            if (user.room) {
-                leaveRoom(user.room, socket, listActiveUsers, io);
-            }
-            delete listActiveUsers[socket.id];
-            console.log('User disconnected:', user.getUsername());
-          console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
-        }
+    socket.on('disconnecting', () => {
+      const user = listActiveUsers[socket.id];
+
+      if (!user) return;
+
+      if (socket.room) {
+        leaveRoom(socket.room, socket, listActiveUsers, io);
+      }
+
+      delete listActiveUsers[socket.id];
+
+      console.log('User disconnecting:', user.getUsername());
+      console.log(
+        'Current active users:',
+        Object.values(listActiveUsers).map(u => u.getUsername())
+      );
     });
 });
 

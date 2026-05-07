@@ -12,7 +12,6 @@ export default function SidebarListofRooms({ rooms }) {
     return (
         <div className='sidebar-listofrooms'>
             <div className="sidebar-header">
-                <span className="menu-icon">≡</span>
                 <h2>StudyNest</h2>
             </div>
             <h1 className="sidebar-title">List of rooms</h1>
@@ -21,10 +20,15 @@ export default function SidebarListofRooms({ rooms }) {
                 {rooms.map((room) => (
                     <RoomButton
                         key={room.id}
+                        id={room.id}
                         name={room.name}
                         subject={room.subject}
                         inRoom={room.inRoom}
                         size={room.size}
+                        isPrivate={room.isPrivate}
+                        chatEnabled={room.chatEnabled}
+                        voiceEnabled={room.voiceEnabled}
+                        whiteboardEnabled={room.whiteboardEnabled}
                     />
                 ))}
             </div>
