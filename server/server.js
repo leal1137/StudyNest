@@ -23,7 +23,8 @@ const {
   handleTimerAction,
   changeUserStatus,
   handleWhiteboardRequest,
-  handleWhiteboardUpdate
+  handleWhiteboardUpdate,
+  getRoomCounts
 } = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
 const { send } = require('process');
@@ -108,6 +109,10 @@ io.on('connection', (socket) => {
 
     socket.on('leave_room', (room) => {
       leaveRoom(room, socket, listActiveUsers, io);
+    });
+
+    socket.on('get_room_counts', () => {
+      socket.emit('room_counts_updated', getRoomCounts());
     });
 
     /**
