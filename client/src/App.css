@@ -86,6 +86,7 @@
   background-color: white;
   border: 1px solid #000000;
   border-radius: 8px;
+  cursor: pointer;
 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 
@@ -408,48 +409,127 @@
 
 
 
-/* 5. The Login Box Styling */
-.login-box {
-  color: white; 
-  font-size: 28px;
+/* 5. Auth pages */
+.auth-box {
+  width: min(430px, calc(100vw - 120px));
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 36px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
-.login-box h2 {
+.auth-box h2 {
   text-align: center;
-  font-weight: normal;
-  margin-bottom: 40px;
-  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  letter-spacing: 0;
   color: black;
 }
 
 .input-group {
-  display: flex;
+  display: grid;
+  grid-template-columns: 120px 1fr;
   align-items: center;
-  margin-bottom: 30px;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .input-group label {
-  width: 150px; 
+  color: black;
+  font-size: 18px;
+  font-weight: 600;
   text-align: right;
-  margin-right: 15px;
-  color: black; 
 }
 
 .input-group input {
-  height: 40px;
-  width: 250px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 20px;
-  padding: 16 10px;
+  height: 42px;
+  width: 100%;
+  border: 1px solid #b8b8b8;
+  border-radius: 6px;
+  font-size: 18px;
+  padding: 8px 10px;
   outline: none;
+  background: white;
 }
 
+.input-group input:focus {
+  border-color: #66678e;
+  box-shadow: 0 0 0 3px rgba(102, 103, 142, 0.18);
+}
 
+.auth-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 26px;
+}
 
-.login-box {
-  color: white; 
-  font-size: 28px;
+.auth-button {
+  border: 1px solid #4a4c70;
+  background: white;
+  color: #222;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.auth-button-primary {
+  background: #4a6750;
+  border-color: #4a6750;
+  color: white;
+}
+
+.auth-button:hover {
+  transform: translateY(-1px);
+}
+
+.auth-error {
+  color: #9f3d31;
+  margin-top: 16px;
+  text-align: right;
+}
+
+.email-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: #66678e;
+  color: white;
+  font-size: 12px;
+  cursor: help;
+}
+
+.email-tooltip::after {
+  content: "Only student emails are allowed";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  width: 190px;
+  background: #222;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+.email-tooltip:hover::after,
+.email-tooltip:focus::after {
+  opacity: 1;
 }
 
 
