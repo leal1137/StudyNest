@@ -306,6 +306,12 @@
   outline: none;
 }
 
+.workspace-feature-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 
 /* Map specifics for Create room page*/
 .map-component {

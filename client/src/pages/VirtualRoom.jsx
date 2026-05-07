@@ -19,8 +19,6 @@ const initialParticipants = [
   { userId: 7, username: 'Edvard', status: 'studying', micMuted: false, speaking: true },
 ]
 
-const roomTools = ['Chatroom', 'Whiteboard']
-
 function createMessage(author, text, type = 'chat') {
   return {
     id: `${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
@@ -53,6 +51,21 @@ export default function VirtualRoom({ socket }) {
     () => location.state?.roomName || roomName || `room-${location.state?.roomId || 'general'}`,
     [location.state, roomName]
   )
+  const roomFeatures = useMemo(
+    () => ({
+      chatEnabled: location.state?.chatEnabled ?? true,
+      voiceEnabled: location.state?.voiceEnabled ?? true,
+      whiteboardEnabled: location.state?.whiteboardEnabled ?? true,
+    }),
+    [location.state]
+  )
+  const roomTools = useMemo(
+    () => [
+      roomFeatures.chatEnabled ? 'Chatroom' : null,
+      roomFeatures.whiteboardEnabled ? 'Whiteboard' : null,
+    ].filter(Boolean),
+    [roomFeatures]
+  )
   const [participants, setParticipants] = useState(initialParticipants)
   const [messages, setMessages] = useState([
     createMessage('System', 'Log in and join the room to start chatting.', 'system'),
@@ -60,9 +73,16 @@ export default function VirtualRoom({ socket }) {
   const [messageInput, setMessageInput] = useState('')
   const [connectionStatus, setConnectionStatus] = useState('Checking login...')
   const [visibleTools, setVisibleTools] = useState({
-    Chatroom: true,
-    Whiteboard: true,
+    Chatroom: roomFeatures.chatEnabled,
+    Whiteboard: roomFeatures.whiteboardEnabled,
   })
+
+  useEffect(() => {
+    setVisibleTools({
+      Chatroom: roomFeatures.chatEnabled,
+      Whiteboard: roomFeatures.whiteboardEnabled,
+    })
+  }, [roomFeatures])
 
   function handleToggleMute(participantId) {
     setParticipants((currentParticipants) =>
@@ -208,17 +228,18 @@ export default function VirtualRoom({ socket }) {
               {...participant}
               isCurrentUser={isCurrentParticipant(participant)}
               onToggleMute={
-                isCurrentParticipant(participant)
+                roomFeatures.voiceEnabled && isCurrentParticipant(participant)
                   ? () => handleToggleMute(participant.userId)
                   : undefined
               }
+              voiceEnabled={roomFeatures.voiceEnabled}
             />
           ))}
         </section>
 
         <section className="virtual-room-lower">
           <div className="room-panel-area">
-            {visibleTools.Chatroom && (
+            {roomFeatures.chatEnabled && visibleTools.Chatroom && (
               <RoomChatPanel
                 messages={messages}
                 messageInput={messageInput}
@@ -228,15 +249,17 @@ export default function VirtualRoom({ socket }) {
                 isConnected={Boolean(socket?.connected)}
               />
             )}
-            {visibleTools.Whiteboard && (
+            {roomFeatures.whiteboardEnabled && visibleTools.Whiteboard && (
               <Whiteboard socket={socket} room={socketRoom} />
             )}
           </div>
-          <RoomTools
-            tools={roomTools}
-            activeTools={roomTools.filter((tool) => visibleTools[tool])}
-            onToolToggle={handleToolToggle}
-          />
+          {roomTools.length > 0 && (
+            <RoomTools
+              tools={roomTools}
+              activeTools={roomTools.filter((tool) => visibleTools[tool])}
+              onToolToggle={handleToolToggle}
+            />
+          )}
         </section>
       </main>
     </div>

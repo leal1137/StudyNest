@@ -1,7 +1,19 @@
 import { useNavigate } from 'react-router-dom';
 import '../CSSfiles/JoinRoomPage.css';
 
-export default function RoomButtonOnMap({ id, name, subject, size, x, y, inRoom, isPrivate }) {
+export default function RoomButtonOnMap({
+    id,
+    name,
+    subject,
+    size,
+    x,
+    y,
+    inRoom,
+    isPrivate,
+    chatEnabled = true,
+    voiceEnabled = true,
+    whiteboardEnabled = true
+}) {
     const navigate = useNavigate();
 
     const handleJoinClick = async () => {
@@ -10,7 +22,7 @@ export default function RoomButtonOnMap({ id, name, subject, size, x, y, inRoom,
 
             if (password === null) return;
 
-            const response = await fetch(`/api/rooms/${id}/verify-password`, {
+            const response = await fetch(`/api/virtual-rooms/${id}/verify-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ password })
@@ -23,7 +35,14 @@ export default function RoomButtonOnMap({ id, name, subject, size, x, y, inRoom,
             }
         }
 
-        navigate(`/virtual-room/${name}`, { state: { roomName: name } });
+        navigate(`/virtual-room/${name}`, {
+            state: {
+                roomName: name,
+                chatEnabled,
+                voiceEnabled,
+                whiteboardEnabled
+            }
+        });
     };
 
     return (

@@ -58,8 +58,7 @@ export default function FindLocationPage() {
                 >
                   <h3>{room.name}</h3>
                   <h4>People count:</h4>
-                  <p>{room.is_silent ? 'Silent room' : 'Group room'}</p>
-                  <p>Capacity: {room.max_capacity}</p>
+                  <p>Physical room</p>
                 </div>
                 
               ))}
