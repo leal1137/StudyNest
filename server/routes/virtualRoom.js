@@ -178,6 +178,7 @@ module.exports = {
     handleTimerAction,
     changeUserStatus,
     handleWhiteboardRequest,
-    handleWhiteboardUpdate
+    handleWhiteboardUpdate,
+    List_of_rooms
 };
 

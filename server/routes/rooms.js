@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
+const { List_of_rooms } = require('./virtualRoom');
 
-// Din önskade array sparad i serverns minne
+// Din array sparad i serverns minne
 let rooms = [
     { id: 1, name: "Ekonomikum", subject: "Economics", size: 50, x: 200.8594, y: 700.6200, inRoom: 0 },
     { id: 2, name: "Ångström", subject: "Math", size: 50, x: 500.8397, y: 200.6468, inRoom: 0 },
@@ -10,9 +11,20 @@ let rooms = [
 
 let nextId = 4;
 
-// GET /api/rooms - Skickar arrayen till frontenden
+// GET /api/rooms - Uppdaterar antalet användare och skickar till frontenden
 router.get('/', (req, res) => {
-    res.json(rooms);
+    const updatedRooms = rooms.map(room => {
+        // Kolla hur många som är i rummet via Socket.IO
+        const participants = List_of_rooms[room.name];
+        
+        return {
+            ...room, // Kopierar över id, name, subject, x, y etc.
+            // Om listan finns, sätt antalet deltagare, annars 0
+            inRoom: participants ? participants.length : 0 
+        };
+    });
+
+    res.json(updatedRooms);
 });
 
 // POST /api/rooms - Lägger till ett nytt rum i arrayen
