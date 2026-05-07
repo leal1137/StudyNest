@@ -50,8 +50,8 @@ app.use('/api/virtual-rooms', virtualRoomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 
+const runAlter = require('./db/runAlter');
 const seedRooms = require('./db/seedRooms');
-seedRooms();
 
 // --- 2. AUTHENTICATION FOR ENTRY ---
 //behövs denna function
@@ -201,12 +201,24 @@ process.on('SIGINT', () => {
 
 
 // --- 5. START SERVER ---
-// Only start listening if we are NOT running tests
-if (process.env.NODE_ENV !== 'test') {
-  server.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-  });
+async function startServer() {
+  try {
+    await runAlter();
+    await seedRooms();
+
+    // Only start listening if we are NOT running tests
+    if (process.env.NODE_ENV !== 'test') {
+      server.listen(3000, () => {
+        console.log('Server running on http://localhost:3000');
+      });
+    }
+  } catch (err) {
+    console.error('Failed to initialize database:', err.message);
+    process.exit(1);
+  }
 }
+
+startServer();
 // --- 6. EXPORTS FOR TESTING ---
 // Export the instances so our test files can use them
 module.exports = { app, server, io };
