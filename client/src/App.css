@@ -522,6 +522,10 @@
   background: #fff27a;
 }
 
+.room-status-pill-pomodoro {
+  background: #d64b43;
+}
+
 .room-status-option {
   display: flex;
   justify-content: space-between;

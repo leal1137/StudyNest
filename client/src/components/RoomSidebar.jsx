@@ -109,7 +109,10 @@ export function RoomSidebar({ onLeaveRoom, socket, roomName, onStatusChange }) {
             title={isActive ? "Pausa timer" : "Starta timer"}
           >
             <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{formatTime(timeLeft)}</span>
-            <span className={`room-status-pill ${isActive ? 'room-status-pill-study' : 'room-status-pill-break'}`} style={{ marginLeft: '12px' }} />
+            <span
+              className={`room-status-pill ${isActive ? 'room-status-pill-study' : 'room-status-pill-pomodoro'}`}
+              style={{ marginLeft: '12px' }}
+            />
           </div>
           
           {/* Knapparna under timern */}
