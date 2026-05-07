@@ -37,8 +37,11 @@ export default function CreateRoomSettings({ pinPosition }) {
             });
 
             if (response.ok) {
-                alert(`Success! The room "${roomName}" has been created.`);
-                navigate('/join-virtual-room');
+                const createdRoom = await response.json();
+                alert(`Success! The room "${createdRoom.name}" has been created.`);
+                navigate(`/virtual-room/${encodeURIComponent(createdRoom.name)}`, {
+                    state: { roomName: createdRoom.name }
+                });
             } else {
                 const error = await response.json();
                 alert(error.error || "Could not create the room.");
