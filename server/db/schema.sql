@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS rooms (
     name VARCHAR(100) UNIQUE NOT NULL,
     max_capacity INTEGER DEFAULT 10,
     is_silent BOOLEAN DEFAULT FALSE,
+    is_private BOOLEAN DEFAULT FALSE,
+    room_password VARCHAR(255),
     created_by INTEGER REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW()
 );
