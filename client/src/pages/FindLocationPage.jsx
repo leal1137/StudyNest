@@ -81,8 +81,6 @@ export default function FindLocationPage({ socket }) {
                 >
                   <h3>{room.name}</h3>
                   <h4>People count: {room.user_count}</h4>
-                  <p>{room.is_silent ? 'Silent room' : 'Group room'}</p>
-                  <p>Capacity: {room.max_capacity}</p>
                 </div>
                 
               ))}
