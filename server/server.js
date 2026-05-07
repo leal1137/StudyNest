@@ -140,8 +140,8 @@ io.on('connection', (socket) => {
     });
 
 
-    socket.on('get_persistent_rooms', () => {
-        getPersistentRooms(socket, io);
+    socket.on('get_persistent_rooms', (location) => {
+        getPersistentRooms(location, socket, io);
     });
 
     socket.on('join_physical_room', (newRoomName, oldRoomName, location) => {

@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 
 export default function FindLocationPage({ socket }) {
   const [location, setLocation] = useState('');
+  const [ready, setReady] = useState(false);
   const [socketReady, setSocketReady] = useState(false);
   const [rooms, setRooms]       = useState([]);
   const [loading, setLoading]   = useState(true);
@@ -17,7 +18,7 @@ export default function FindLocationPage({ socket }) {
 
   function selectRoom(room) {
     if (!selectedRoom){
-      socket.emit('join_physical_room', room.name, null);
+      socket.emit('join_physical_room', room.name, null, location);
     }else{
       socket.emit('join_physical_room', room.name, selectedRoom.name, location);
 
@@ -32,6 +33,7 @@ export default function FindLocationPage({ socket }) {
   useEffect(() => {
     if (routerLocation.state?.locationName) {
       setLocation(routerLocation.state.locationName);
+      setReady(true);
     }
   }, [routerLocation.state]);
 
@@ -39,7 +41,6 @@ export default function FindLocationPage({ socket }) {
   useEffect(() =>  {
     console.log("SOCKET IN LOCATIONPAGE:", socket ? socket.id : 'null');
     const uppdateRooms = (updatedRooms) => {
-      setLoading(true);
       setRooms(updatedRooms);
       setLoading(false);
     }
@@ -51,12 +52,14 @@ export default function FindLocationPage({ socket }) {
     socket?.on('update_persistent_rooms', uppdateRooms);
     socket?.on('error', handleError);
 
-    socket?.emit('get_persistent_rooms', location);
+    if(ready){
+      socket?.emit('get_persistent_rooms', location);
+    }
     return () => {
       socket?.off('update_persistent_rooms', uppdateRooms);
       socket?.off('error', handleError);
     }
-  }, [socket]);
+  }, [socket, ready]);
 
   return (
     <div className="FindLocationPage">
