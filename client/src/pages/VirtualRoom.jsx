@@ -30,6 +30,20 @@ function createMessage(author, text, type = 'chat') {
   }
 }
 
+function mergeParticipantsWithLocalState(incomingParticipants, currentParticipants) {
+  return incomingParticipants.map((participant) => {
+    const existingParticipant = currentParticipants.find(
+      (currentParticipant) => currentParticipant.username === participant.username
+    )
+
+    return {
+      ...participant,
+      micMuted: existingParticipant?.micMuted ?? false,
+      speaking: existingParticipant?.speaking ?? false,
+    }
+  })
+}
+
 export default function VirtualRoom({ socket }) {
   const { roomName } = useParams();
   const location = useLocation()
@@ -64,11 +78,15 @@ export default function VirtualRoom({ socket }) {
     setMessages((currentMessages) => [...currentMessages, createMessage(author, text, type)])
   }
 
+  function isCurrentParticipant(participant) {
+    return participant.username === currentUsername
+  }
+
     
   function handleLocalStatusChange(newStatus) {
     setParticipants((currentParticipants) =>
       currentParticipants.map((participant) =>
-        participant.username === currentUsername
+        isCurrentParticipant(participant)
           ? { ...participant, status: newStatus }
           : participant
       )
@@ -98,11 +116,15 @@ export default function VirtualRoom({ socket }) {
     }
 
     const handleParticipantList = (list) => {
-      setParticipants(list.participants_List)
+      setParticipants((currentParticipants) =>
+        mergeParticipantsWithLocalState(list.participants_List, currentParticipants)
+      )
     }
 
     const handleUserLeftRoom = (data) => {
-      setParticipants(data.participants_List)
+      setParticipants((currentParticipants) =>
+        mergeParticipantsWithLocalState(data.participants_List, currentParticipants)
+      )
       appendMessage('System', `${data.name} left the room.`, 'system')
     }
 
@@ -184,9 +206,9 @@ export default function VirtualRoom({ socket }) {
             <ParticipantCard
               key={participant.userId}
               {...participant}
-              isCurrentUser={participant.username === currentUsername}
+              isCurrentUser={isCurrentParticipant(participant)}
               onToggleMute={
-                participant.username === currentUsername
+                isCurrentParticipant(participant)
                   ? () => handleToggleMute(participant.userId)
                   : undefined
               }

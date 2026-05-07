@@ -290,6 +290,22 @@
   gap: 20px;
 }
 
+.private-room-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.private-room-settings input[type="password"] {
+  height: 40px;
+  width: 180px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 8px 10px;
+  outline: none;
+}
+
 
 /* Map specifics for Create room page*/
 .map-component {

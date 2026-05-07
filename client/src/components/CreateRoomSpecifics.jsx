@@ -9,6 +9,8 @@ export default function CreateRoomSettings({ pinPosition }) {
     const [roomName, setRoomName] = useState('');
     const [roomSize, setRoomSize] = useState(15);
     const [jointWorkspace, setJointWorkspace] = useState(false);
+    const [isPrivate, setIsPrivate] = useState(false);
+    const [roomPassword, setRoomPassword] = useState('');
 
     const CreateNewRoom = async (e) => {
         e.preventDefault();
@@ -21,8 +23,10 @@ export default function CreateRoomSettings({ pinPosition }) {
         const newRoomData = {
             name: roomName,
             max_capacity: parseInt(roomSize),
-            x: pinPosition.x, 
-            y: pinPosition.y
+            x: pinPosition.x,
+            y: pinPosition.y,
+            isPrivate,
+            password: isPrivate ? roomPassword : ''
         };
 
         try {
@@ -33,11 +37,14 @@ export default function CreateRoomSettings({ pinPosition }) {
             });
 
             if (response.ok) {
-                alert(`Succé! Rummet "${roomName}" har skapats.`);
+                alert(`Success! The room "${roomName}" has been created.`);
                 navigate('/join-virtual-room');
+            } else {
+                const error = await response.json();
+                alert(error.error || "Could not create the room.");
             }
         } catch (error) {
-            alert("Kunde inte nå servern.");
+            alert("Could not reach the server.");
         }
     };
 
@@ -63,6 +70,26 @@ export default function CreateRoomSettings({ pinPosition }) {
                 <span>max 50</span>
             </div>
             <SubjectSelector />
+            <div className="workspace-checkbox private-room-settings">
+                <label>
+                    <input
+                        type="checkbox"
+                        checked={isPrivate}
+                        onChange={(e) => setIsPrivate(e.target.checked)}
+                    />
+                    Private room
+                </label>
+                {isPrivate && (
+                    <input
+                        className="Input"
+                        type="password"
+                        value={roomPassword}
+                        onChange={(e) => setRoomPassword(e.target.value)}
+                        placeholder="Room password"
+                        required
+                    />
+                )}
+            </div>
             <div className="workspace-checkbox">
                 <label>
                     <input
