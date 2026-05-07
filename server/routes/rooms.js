@@ -5,7 +5,7 @@ const pool = require('../db/pool');
 router.get('/', async (req, res) => {
     try {
         const result = await pool.query(
-            'SELECT id, name, created_by, created_at FROM rooms ORDER BY created_at DESC'
+            'SELECT * FROM rooms ORDER BY created_at DESC'
         );
         res.json(result.rows);
     } catch (err) {
@@ -23,10 +23,14 @@ router.post('/', async (req, res) => {
 
     try {
         const result = await pool.query(
+            `INSERT INTO rooms (name, created_by, user_count, room_location)
+             VALUES ($1, $2, $3 $4)
+             RETURNING *`,
+            [name, created_by || null, 0, room_location || '']
             `INSERT INTO rooms (name, created_by)
              VALUES ($1, $2)
-             RETURNING id, name, created_by, created_at`,
-            [name, created_by || null]
+             RETURNING id, name, created_by, created_at, user_count, room_location`,
+            [name, created_by || null, 0, room_location || '']
         );
         res.status(201).json(result.rows[0]);
     } catch (err) {
