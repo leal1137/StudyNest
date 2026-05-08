@@ -25,9 +25,7 @@ async function getPersistentRooms(location,socket, io) {
 }
 
 function updateUserToRoom(newRoomName, oldRoomName, location, socket, io) {
-    console.log(location);
     let newRoom = persistentRooms[location].find(r => r.name === newRoomName);
-    console.log(newRoom);
     if (!newRoom)return;
 
     if (!oldRoomName){
