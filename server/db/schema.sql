@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     username VARCHAR(50) UNIQUE NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
+    avatar VARCHAR(32) DEFAULT '0.svg',
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -21,6 +22,3 @@ CREATE TABLE IF NOT EXISTS rooms (
     created_at TIMESTAMP DEFAULT NOW(),
     room_location VARCHAR(255) DEFAULT ''
 );
- -- add user_count column to rooms table if it doesn't exist
-ALTER TABLE rooms ADD COLUMN IF NOT EXISTS user_count INTEGER DEFAULT 0;
-ALTER TABLE rooms ADD COLUMN IF NOT EXISTS room_location  VARCHAR(255) DEFAULT '';

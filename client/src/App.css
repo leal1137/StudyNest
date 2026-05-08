@@ -86,6 +86,7 @@
   background-color: white;
   border: 1px solid #000000;
   border-radius: 8px;
+  cursor: pointer;
 
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 
@@ -100,15 +101,20 @@
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 100;
   height: 100%;
   width: 70px;
   background-color: #66678e;
   color: white;
   transition: width 0.3s ease;
-  overflow: hidden;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
-.sidebar:hover {
+.sidebar:hover,
+.sidebar.is-avatar-picker-open {
   width: 200px;
 }
 
@@ -122,6 +128,7 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  flex: 1;
 }
 
 .menu li {
@@ -134,10 +141,125 @@
   color: white;
   text-decoration: none;
   padding: 12px 20px;
+  overflow: hidden;
   transition: background 0.2s;
 }
 
 .menu a:hover {
+  background-color: #33334d;
+}
+
+.sidebar-avatar-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar-account {
+  position: relative;
+  margin-top: auto;
+  padding-bottom: 18px;
+  flex: 0 0 auto;
+}
+
+.sidebar-account-label {
+  color: white;
+  font-size: 1rem;
+  line-height: 1.2;
+  margin: 0;
+  height: 50px;
+  overflow: hidden;
+  padding: 0 12px 8px;
+  text-align: center;
+}
+
+.sidebar-account-text {
+  display: block;
+}
+
+.sidebar-account-username {
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding-top: 4px;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-avatar-item {
+  position: relative;
+}
+
+.sidebar-avatar-button:hover {
+  background-color: #33334d;
+}
+
+.sidebar-avatar-preview {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex: 0 0 40px;
+}
+
+.sidebar-avatar-text {
+  white-space: nowrap;
+  font-size: 1rem;
+}
+
+.sidebar-avatar-picker {
+  position: absolute;
+  left: calc(100% + 12px);
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(6, 90px);
+  gap: 4px;
+  max-height: none;
+  overflow: visible;
+  padding: 4px;
+  background: #fffdf7;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.24);
+  z-index: 200;
+}
+
+.sidebar-avatar-option {
+  width: 90px;
+  height: 90px;
+  border-radius: 6px;
+}
+
+.sidebar-avatar-error {
+  grid-column: 1 / -1;
+  color: #ffe1dc;
+  font-size: 0.78rem;
+  line-height: 1.25;
+}
+
+.sidebar-sign-out-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: white;
+  display: flex;
+  align-items: center;
+  height: 54px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.2s;
+  overflow: hidden;
+  font-size: 1rem;
+}
+
+.sidebar-sign-out-button:hover {
   background-color: #33334d;
 }
 
@@ -147,18 +269,31 @@
   text-align: center;
 }
 
+.sidebar-sign-out-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex: 0 0 32px;
+  filter: brightness(0) invert(1);
+}
+
 .text {
   opacity: 0;
+  visibility: hidden;
   margin-left: 10px;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.15s ease, visibility 0s linear 0.15s;
 }
 
 /* Show text when sidebar expands */
-.sidebar:hover .text {
+.sidebar:hover .text,
+.sidebar.is-avatar-picker-open .text {
   opacity: 1;
+  visibility: visible;
+  transition-delay: 0.16s, 0.16s;
 }
 
-.sidebar:hover .menu-icon {
+.sidebar:hover .menu-icon,
+.sidebar.is-avatar-picker-open .menu-icon {
   opacity: 0;
 
 }
@@ -408,48 +543,224 @@
 
 
 
-/* 5. The Login Box Styling */
-.login-box {
-  color: white; 
-  font-size: 28px;
+/* 5. Auth pages */
+.auth-box {
+  width: min(430px, calc(100vw - 120px));
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 36px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
 }
 
-.login-box h2 {
+.auth-box h2 {
   text-align: center;
-  font-weight: normal;
-  margin-bottom: 40px;
-  letter-spacing: 1px;
+  font-weight: 600;
+  margin-bottom: 28px;
+  letter-spacing: 0;
   color: black;
 }
 
 .input-group {
-  display: flex;
+  display: grid;
+  grid-template-columns: 120px 1fr;
   align-items: center;
-  margin-bottom: 30px;
+  gap: 14px;
+  margin-bottom: 18px;
 }
 
 .input-group label {
-  width: 150px; 
+  color: black;
+  font-size: 18px;
+  font-weight: 600;
   text-align: right;
-  margin-right: 15px;
-  color: black; 
 }
 
 .input-group input {
-  height: 40px;
-  width: 250px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 20px;
-  padding: 16 10px;
+  height: 42px;
+  width: 100%;
+  border: 1px solid #b8b8b8;
+  border-radius: 6px;
+  font-size: 18px;
+  padding: 8px 10px;
   outline: none;
+  background: white;
 }
 
+.input-group input:focus {
+  border-color: #66678e;
+  box-shadow: 0 0 0 3px rgba(102, 103, 142, 0.18);
+}
 
+.auth-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 26px;
+}
 
-.login-box {
-  color: white; 
-  font-size: 28px;
+.auth-button {
+  border: 1px solid #4a4c70;
+  background: white;
+  color: #222;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 17px;
+  cursor: pointer;
+}
+
+.auth-button-primary {
+  background: #4a6750;
+  border-color: #4a6750;
+  color: white;
+}
+
+.auth-button:hover {
+  transform: translateY(-1px);
+}
+
+.auth-error {
+  color: #9f3d31;
+  margin-top: 16px;
+  text-align: right;
+}
+
+.avatar-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.avatar-picker-control {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  width: max-content;
+}
+
+.avatar-picker-label {
+  display: block;
+  color: black;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.avatar-current-button {
+  width: 88px;
+  height: 88px;
+  border: 2px solid #4a6750;
+  border-radius: 10px;
+  background: #fffdf7;
+  cursor: pointer;
+  padding: 6px;
+  display: grid;
+  place-items: center;
+}
+
+.avatar-current-button img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 90px);
+  gap: 4px;
+  max-height: none;
+  overflow: visible;
+  padding: 4px;
+}
+
+.avatar-grid-popup {
+  position: absolute;
+  left: calc(100% + 18px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fffdf7;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  border-radius: 8px;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.18);
+  z-index: 30;
+}
+
+.avatar-option,
+.sidebar-avatar-option {
+  border: 2px solid transparent;
+  background: #fffdf7;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.avatar-option {
+  width: 90px;
+  height: 90px;
+  border-radius: 8px;
+}
+
+.avatar-option img,
+.sidebar-avatar-option img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.avatar-option:hover,
+.sidebar-avatar-option:hover {
+  transform: translateY(-1px);
+}
+
+.avatar-option.is-selected,
+.sidebar-avatar-option.is-selected {
+  box-shadow: 0 0 0 3px rgba(74, 103, 80, 0.18);
+}
+
+.email-tooltip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin-left: 8px;
+  border-radius: 50%;
+  background: #66678e;
+  color: white;
+  font-size: 12px;
+  cursor: help;
+}
+
+.email-tooltip::after {
+  content: "Only student emails are allowed";
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 10px);
+  transform: translateX(-50%);
+  width: 190px;
+  background: #222;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.35;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+}
+
+.email-tooltip:hover::after,
+.email-tooltip:focus::after {
+  opacity: 1;
 }
 
 
@@ -668,23 +979,38 @@
 .participant-card {
   background: #5e82e0;
   border-radius: 18px;
-  min-height: 78px;
+  min-height: 96px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 0 0 0 18px;
+  gap: 16px;
+  padding: 14px 18px;
+  overflow: hidden;
   box-shadow: 0 10px 18px rgba(82, 92, 142, 0.22);
 }
 
 .participant-info {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
   color: #f8fbff;
+  flex: 1;
+  min-width: 0;
+}
+
+.participant-avatar {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  flex: 0 0 64px;
 }
 
 .participant-name {
-  font-size: 1.1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.15;
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .participant-mic {
@@ -703,6 +1029,8 @@
   color: #111;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
   gap: 8px;
   font-size: 1.45rem;
   letter-spacing: 0.06em;
@@ -733,8 +1061,10 @@
 
 .participant-status {
   width: 58px;
-  min-height: 100%;
-  border-radius: 16px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 24px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .participant-status-studying {

@@ -1,17 +1,14 @@
 import '../App.css'
+import { getAvatarSrc } from '../assets/avatars'
 
-export function ParticipantCard({ username, status, micMuted, speaking, onToggleMute, isCurrentUser, voiceEnabled = true }) {
+export function ParticipantCard({ username, status, micMuted, speaking, onToggleMute, isCurrentUser, voiceEnabled = true, avatar }) {
 
-  const dotColorClass = status === 'studying' ? 'study' : 'break';
+  const avatarSrc = getAvatarSrc(avatar)
 
   return (
     <article className="participant-card">
       <div className="participant-info">
-
-        <span
-          className={`room-status-pill room-status-pill-${dotColorClass}`}
-          style={{ width: '18px', height: '18px', borderRadius: '50%', boxShadow: 'none', marginRight: '8px' }}
-        />
+        <img className="participant-avatar" src={avatarSrc} alt={`${username}'s avatar`} />
 
         <span className="participant-name">{username}</span>
         {voiceEnabled && (
