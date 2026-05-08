@@ -6,7 +6,7 @@ import { RoomChatPanel } from '../components/RoomChatPanel'
 import { RoomSidebar } from '../components/RoomSidebar'
 import { RoomTools } from '../components/RoomTools'
 import { VirtualRoomHeader } from '../components/VirtualRoomHeader'
-import { joinVirtualRoom, leaveVirtualRoom } from '../script/virtualRoomConnection';
+import { changeVirtualRoomAvatar, joinVirtualRoom, leaveVirtualRoom } from '../script/virtualRoomConnection';
 import Whiteboard from "../components/Whiteboard";
 
 const initialParticipants = [
@@ -38,6 +38,7 @@ function mergeParticipantsWithLocalState(incomingParticipants, currentParticipan
       ...participant,
       micMuted: existingParticipant?.micMuted ?? false,
       speaking: existingParticipant?.speaking ?? false,
+      avatar: participant.avatar || existingParticipant?.avatar || '0.svg',
     }
   })
 }
@@ -182,6 +183,28 @@ export default function VirtualRoom({ socket }) {
       socket.off('disconnect', handleDisconnect)
     }
   }, [socket, socketRoom]);
+
+  useEffect(() => {
+    const handleAvatarChanged = (event) => {
+      const newAvatar = event.detail?.avatar || localStorage.getItem('avatar') || '0.svg'
+
+      setParticipants((currentParticipants) =>
+        currentParticipants.map((participant) =>
+          isCurrentParticipant(participant)
+            ? { ...participant, avatar: newAvatar }
+            : participant
+        )
+      )
+
+      changeVirtualRoomAvatar(socketRoom, socket, newAvatar)
+    }
+
+    window.addEventListener('avatarChanged', handleAvatarChanged)
+
+    return () => {
+      window.removeEventListener('avatarChanged', handleAvatarChanged)
+    }
+  }, [socket, socketRoom, currentUsername])
 
 
   function handleSendMessage(event) {

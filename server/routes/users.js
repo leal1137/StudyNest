@@ -6,7 +6,40 @@ const pool = require('../db/pool');
 
 // Creates a new user in the database
 // Returns the user (without password) or throws an error
-async function createUser({ username, email, password }) {
+const jwt = require('jsonwebtoken');
+
+const SECRET = process.env.SECRET;
+const validAvatars = new Set(Array.from({ length: 23 }, (_, index) => `${index}.svg`));
+
+function normalizeAvatar(avatar) {
+    return validAvatars.has(avatar) ? avatar : '0.svg';
+}
+
+function authenticateUser(req, res, next) {
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
+
+    if (!token) {
+        return res.status(401).json({ error: 'Missing token' });
+    }
+
+    try {
+        req.user = jwt.verify(token, SECRET);
+        next();
+    } catch {
+        res.status(401).json({ error: 'Invalid token' });
+    }
+}
+
+function signUserToken(user) {
+    return jwt.sign(
+        { userId: user.id, email: user.email, username: user.username, avatar: user.avatar || '0.svg' },
+        SECRET,
+        { expiresIn: '2h' }
+    );
+}
+
+async function createUser({ username, email, password, avatar = '0.svg' }) {
     // Check if email already exists
     const existing = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
     if (existing.rows.length > 0) {
@@ -16,19 +49,19 @@ async function createUser({ username, email, password }) {
     }
 
     const result = await pool.query(
-        'INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id, username, email, created_at',
-        [username, email, password]
+        'INSERT INTO users (username, email, password, avatar) VALUES ($1, $2, $3, $4) RETURNING id, username, email, avatar, created_at',
+        [username, email, password, normalizeAvatar(avatar)]
     );
     return result.rows[0];
 }
 
 // POST /api/users — register a new user
 router.post('/', async (req, res) => {
-    const { username, email, password } = req.body;
+    const { username, email, password, avatar } = req.body;
 
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
-        const user = await createUser({ username, email, hashedPassword });
+        const user = await createUser({ username, email, password: hashedPassword, avatar });
         res.status(201).json(user);
     } catch (err) {
         if (err.code === '23505') {
@@ -36,6 +69,26 @@ router.post('/', async (req, res) => {
         }
         console.error(err);
         res.status(500).json({ error: 'Failed to create user' });
+    }
+});
+
+router.patch('/avatar', authenticateUser, async (req, res) => {
+    const avatar = normalizeAvatar(req.body.avatar);
+
+    try {
+        const result = await pool.query(
+            'UPDATE users SET avatar = $1 WHERE id = $2 RETURNING id, username, email, avatar',
+            [avatar, req.user.userId]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({ avatar: result.rows[0].avatar, token: signUserToken(result.rows[0]) });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Failed to update avatar' });
     }
 });
 
@@ -82,5 +135,7 @@ async function getUserByEmail(email) {
 module.exports = {
     router,
     createUser,
-    getUserByEmail
+    getUserByEmail,
+    normalizeAvatar,
+    signUserToken
 };

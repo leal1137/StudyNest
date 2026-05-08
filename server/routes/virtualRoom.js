@@ -1,4 +1,5 @@
 require('socket.io');
+const { normalizeAvatar } = require('./users');
 //set of all users in rooms
 let List_of_rooms = {};
 let RoomTimers = {};
@@ -27,7 +28,12 @@ function emitRoomCounts(io) {
  * @returns {void}
  * @description Denna funktion hanterar logiken när en användare går med i ett rum. 
  */
-function joinRoom(room, socket, listActiveUsers, io) {
+function joinRoom(room, socket, listActiveUsers, io, avatar) {
+    const user = listActiveUsers[socket.id];
+    if (user && avatar) {
+        user.avatar = normalizeAvatar(avatar);
+    }
+
     if (socket.rooms.has(room)) {
         console.log(`User ${listActiveUsers[socket.id]?.getUsername()} is already in room: ${room}`);
         io.to(room).emit('list_participants_in_room', { participants_List: List_of_rooms[room] });
@@ -37,7 +43,6 @@ function joinRoom(room, socket, listActiveUsers, io) {
     socket.join(room);
     socket.room = room;
 
-    const user = listActiveUsers[socket.id];
     if (!user) return;
     const displayName = user.getUsername();
     
@@ -63,7 +68,19 @@ function joinRoom(room, socket, listActiveUsers, io) {
     }
 
     sendWhiteboardToUser(room, socket);
-} 
+}
+
+function changeUserAvatar(room, socket, avatar, listActiveUsers, io) {
+    const user = listActiveUsers[socket.id];
+
+    if (!user || !avatar) return;
+
+    user.avatar = normalizeAvatar(avatar);
+
+    if (List_of_rooms[room]) {
+        io.to(room).emit('list_participants_in_room', { participants_List: List_of_rooms[room] });
+    }
+}
 
 function leaveRoom(room, socket, listActiveUsers, io) {
     const user = listActiveUsers[socket.id];
@@ -192,6 +209,7 @@ module.exports = {
     sendMessageToRoom,
     handleTimerAction,
     changeUserStatus,
+    changeUserAvatar,
     handleWhiteboardRequest,
     handleWhiteboardUpdate,
     getRoomCounts,
