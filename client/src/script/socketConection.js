@@ -16,6 +16,7 @@ export function connect(){
     if (!socket) {
         socket = io("/", {path: "/socket.io", auth: {token: token}});
     }
+    socket.auth = { token };
     if (!socket.connected) {
         socket.connect();
     }
@@ -31,11 +32,15 @@ export function connect(){
  * kopplar bort Socket.IO-anslutningen och sätter både token och socket till undefined. 
  * Detta säkerställer att användaren är helt utloggad och att ingen anslutning till servern kvarstår.
  */
-export function logoutDisconnect(socket) {
-    if (socket) {
-        socket.disconnect();
-        localStorage.removeItem('token');
-        console.log("User Logged out, socket disconnected");
+export function logoutDisconnect(activeSocket = socket) {
+    if (activeSocket) {
+        activeSocket.disconnect();
     }
+
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('avatar');
+    socket = null;
+    console.log("User Logged out, socket disconnected");
     
 }

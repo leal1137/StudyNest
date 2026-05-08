@@ -26,6 +26,7 @@ export async function login(email, password) {
 
   const payload = JSON.parse(atob(data.token.split('.')[1]))
   localStorage.setItem('username', payload.username)
+  localStorage.setItem('avatar', payload.avatar || '0.svg')
   window.dispatchEvent(new Event('userLoggedIn'))
 
   return { ok: true, username: payload.username }

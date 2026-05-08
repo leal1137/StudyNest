@@ -1,14 +1,14 @@
-export async function signup({ email, username, password }) {
+export async function signup({ email, username, password, avatar }) {
   const apiUrl = import.meta.env.VITE_API_URL || '';
 
   console.log("Sending sign up request to:", `${apiUrl}/auth/signup`);
-  console.log("Data:", { email, username, password });
+  console.log("Data:", { email, username, password, avatar });
 
   try {
     const res = await fetch(`/auth/signup`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, username, password })
+      body: JSON.stringify({ email, username, password, avatar })
     });
 
     const data = await res.json();

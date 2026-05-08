@@ -3,12 +3,10 @@ require('dotenv').config();
 
 const express = require('express');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { createUser, getUserByEmail } = require('./users');
+const { createUser, getUserByEmail, normalizeAvatar, signUserToken } = require('./users');
 
 const router = express.Router();
 
-const SECRET = process.env.SECRET;
 const allowedDomains = ['kth.se', 'su.se', 'student.uu.se'];
 
 function isStudentEmail(email) {
@@ -24,7 +22,8 @@ function isStudentEmail(email) {
     await createUser({
       username: "TestUser",
       email: "test@test.su.se",
-      password: hashed
+      password: hashed,
+      avatar: '0.svg'
     });
 
     console.log("Test user created");
@@ -39,7 +38,7 @@ function isStudentEmail(email) {
 
 // Signup
 router.post('/signup', async (req, res) => {
-  const { email, username, password } = req.body;
+  const { email, username, password, avatar } = req.body;
 
   if (!isStudentEmail(email)) {
     return res.status(403).json({ error: 'Only students allowed' });
@@ -51,7 +50,8 @@ router.post('/signup', async (req, res) => {
     await createUser({
       username: username,
       email: email,
-      password: hashedPassword   // viktigt namn!
+      password: hashedPassword,   // viktigt namn!
+      avatar: normalizeAvatar(avatar)
     });
 
     res.json({ message: 'User created' });
@@ -83,11 +83,7 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Wrong password' });
     }
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email, username: user.username }, // add username
-      SECRET,
-      { expiresIn: '2h' }
-    );
+    const token = signUserToken(user);
 
     res.json({ token });
     console.log(`User logged in: ${user.email} (${user.username})`);

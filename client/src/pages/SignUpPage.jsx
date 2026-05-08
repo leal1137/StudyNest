@@ -4,11 +4,14 @@ import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
 import { signup } from '../script/signup';
 import { } from '../script/socketConection';
+import { avatars, defaultAvatar } from '../assets/avatars';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
+  const [avatar, setAvatar] = useState(defaultAvatar);
+  const [isAvatarPickerOpen, setIsAvatarPickerOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -20,7 +23,7 @@ export default function SignUp() {
       console.log("Username:", username);
       console.log("Password:", password);
     
-      const resultConstanst = await signup({ email, username, password });
+      const resultConstanst = await signup({ email, username, password, avatar });
     
       if (resultConstanst.success) { 
         alert(`Sign up success!`);
@@ -74,6 +77,41 @@ export default function SignUp() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+
+          <div className="avatar-picker avatar-picker-compact">
+            <span className="avatar-picker-label">Choose avatar</span>
+            <div className="avatar-picker-control">
+              <button
+                className="avatar-current-button"
+                type="button"
+                onClick={() => setIsAvatarPickerOpen((isOpen) => !isOpen)}
+                aria-expanded={isAvatarPickerOpen}
+                aria-label="Choose avatar"
+              >
+                <img src={avatars.find((avatarOption) => avatarOption.id === avatar)?.src} alt="" />
+              </button>
+
+              {isAvatarPickerOpen && (
+                <div className="avatar-grid avatar-grid-popup" aria-label="Avatar options">
+                  {avatars.map((avatarOption) => (
+                    <button
+                      className={`avatar-option ${avatar === avatarOption.id ? 'is-selected' : ''}`}
+                      key={avatarOption.id}
+                      type="button"
+                      onClick={() => {
+                        setAvatar(avatarOption.id);
+                        setIsAvatarPickerOpen(false);
+                      }}
+                      aria-label={avatarOption.label}
+                      aria-pressed={avatar === avatarOption.id}
+                    >
+                      <img src={avatarOption.src} alt="" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="auth-actions">

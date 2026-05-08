@@ -10,7 +10,7 @@
  */
 export function joinVirtualRoom(room, socket) {
     if (room && socket) {
-        socket.emit('join_room', room);
+        socket.emit('join_room', room, localStorage.getItem('avatar') || '0.svg');
     }
 }
 
@@ -18,5 +18,11 @@ export function joinVirtualRoom(room, socket) {
 export function leaveVirtualRoom(room, socket) {
     if (room && socket) {
         socket.emit('leave_room', room);
+    }
+}
+
+export function changeVirtualRoomAvatar(room, socket, avatar) {
+    if (room && socket && avatar) {
+        socket.emit('change_avatar', { room, avatar });
     }
 }

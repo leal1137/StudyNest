@@ -24,6 +24,7 @@ const {
   sendMessageToRoom,
   handleTimerAction,
   changeUserStatus,
+  changeUserAvatar,
   handleWhiteboardRequest,
   handleWhiteboardUpdate,
   getRoomCounts
@@ -95,7 +96,7 @@ let listActiveUsers = {};
  * @param {Object} socket - Klientens unika anslutningsobjekt.
  */
 io.on('connection', (socket) => {
-    listActiveUsers[socket.id] = new User(socket.user.userId, socket.user.username, socket.user.email, socket.id);
+    listActiveUsers[socket.id] = new User(socket.user.userId, socket.user.username, socket.user.email, socket.id, socket.user.avatar);
     console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
     /**
      * Placerar klienten i ett specifikt chattrum. Funktionen uppdaterar serverns 
@@ -106,8 +107,8 @@ io.on('connection', (socket) => {
      * @function
      * @param {string} room - Namnet på rummet som klienten vill ansluta till.
      */
-    socket.on('join_room', (room) => {
-      joinRoom(room, socket, listActiveUsers, io);
+    socket.on('join_room', (room, avatar) => {
+      joinRoom(room, socket, listActiveUsers, io, avatar);
     });
 
     socket.on('leave_room', (room) => {
@@ -137,6 +138,10 @@ io.on('connection', (socket) => {
 
     socket.on('change_status', (data) => {
         changeUserStatus(data.room, socket, data.status, listActiveUsers, io);
+    });
+
+    socket.on('change_avatar', (data) => {
+        changeUserAvatar(data.room, socket, data.avatar, listActiveUsers, io);
     });
 
 

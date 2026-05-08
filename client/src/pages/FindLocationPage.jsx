@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
-import UserDisplay from '../components/UserDisplay';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
 
@@ -61,7 +60,6 @@ export default function FindLocationPage({ socket }) {
   return (
     <div className="FindLocationPage">
       <Sidebar />
-      <UserDisplay />
       <main className="main-content">
         <div className="Location-search-box">
           <h2>Locations near</h2>
