@@ -21,10 +21,15 @@ async function getPersistentRooms(location,socket, io) {
         }
         onGoingFetch = false;
     }
-        io.emit('update_persistent_rooms', persistentRooms[location]);
+        io.emit('update_persistent_rooms', persistentRooms[location] || []);
 }
 
 function updateUserToRoom(newRoomName, oldRoomName, location, socket, io) {
+    if (!persistentRooms[location]) {
+        socket.emit('update_persistent_rooms', []);
+        return;
+    }
+
     let newRoom = persistentRooms[location].find(r => r.name === newRoomName);
     if (!newRoom)return;
 
