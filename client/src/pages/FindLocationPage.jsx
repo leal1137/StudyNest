@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -8,14 +8,16 @@ import { useEffect } from 'react';
 export default function FindLocationPage({ socket }) {
   const [location, setLocation] = useState('');
   const [ready, setReady] = useState(false);
-  const [socketReady, setSocketReady] = useState(false);
   const [rooms, setRooms]       = useState([]);
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const selectedRoomRef = useRef(null);
   const routerLocation = useLocation();
 
   function selectRoom(room) {
+    if (!socket) return;
+
     if (!selectedRoom){
       socket.emit('join_physical_room', room.name, null, location);
     }else{
@@ -23,8 +25,10 @@ export default function FindLocationPage({ socket }) {
 
     }
     if(selectedRoom && room.name === selectedRoom.name){
+      selectedRoomRef.current = null;
       setSelectedRoom(null);
     }else{
+      selectedRoomRef.current = room;
       setSelectedRoom(room);
     }
   }
@@ -39,8 +43,8 @@ export default function FindLocationPage({ socket }) {
 //fetch rooms from backend
   useEffect(() =>  {
     console.log("SOCKET IN LOCATIONPAGE:", socket ? socket.id : 'null');
-    const uppdateRooms = (updatedRooms) => {
-      setRooms(updatedRooms);
+    const updateRooms = (updatedRooms) => {
+      setRooms(Array.isArray(updatedRooms) ? updatedRooms : []);
       setLoading(false);
     }
     const handleError = (err) => {
@@ -48,17 +52,26 @@ export default function FindLocationPage({ socket }) {
       setLoading(false);
       console.error('Error fetching rooms:', err.details);
     }
-    socket?.on('update_persistent_rooms', uppdateRooms);
+    socket?.on('update_persistent_rooms', updateRooms);
     socket?.on('error', handleError);
 
     if(ready){
       socket?.emit('get_persistent_rooms', location);
     }
     return () => {
-      socket?.off('update_persistent_rooms', uppdateRooms);
+      socket?.off('update_persistent_rooms', updateRooms);
       socket?.off('error', handleError);
     }
   }, [socket, ready]);
+
+  useEffect(() => {
+    return () => {
+      if (socket && selectedRoomRef.current) {
+        socket.emit('leave_physical_room');
+        selectedRoomRef.current = null;
+      }
+    };
+  }, [socket]);
 
   return (
     <div className="FindLocationPage">

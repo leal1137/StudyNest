@@ -16,7 +16,7 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
-const { getPersistentRooms, updateUserToRoom} = require('./routes/physicalRoom');
+const { getPersistentRooms, updateUserToRoom, leavePhysicalRoom} = require('./routes/physicalRoom');
 const virtualRoomRoutes = require('./routes/virtualRooms');
 const {
   joinRoom,
@@ -152,6 +152,10 @@ io.on('connection', (socket) => {
     socket.on('join_physical_room', (newRoomName, oldRoomName, location) => {
         updateUserToRoom(newRoomName, oldRoomName, location, socket, io);
     });
+
+    socket.on('leave_physical_room', () => {
+        leavePhysicalRoom(socket, io);
+    });
         
     socket.on('whiteboard_request', ({ room }, callback) => {
       const board = handleWhiteboardRequest(room, socket);
@@ -180,6 +184,8 @@ io.on('connection', (socket) => {
       if (socket.room) {
         leaveRoom(socket.room, socket, listActiveUsers, io);
       }
+
+      leavePhysicalRoom(socket, io);
 
       delete listActiveUsers[socket.id];
 
