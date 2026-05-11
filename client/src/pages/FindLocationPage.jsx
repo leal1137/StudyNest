@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { useLocation } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -12,6 +12,7 @@ export default function FindLocationPage({ socket }) {
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState(null);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const selectedRoomRef = useRef(null);
   const routerLocation = useLocation();
 
   function selectRoom(room) {
@@ -24,8 +25,10 @@ export default function FindLocationPage({ socket }) {
 
     }
     if(selectedRoom && room.name === selectedRoom.name){
+      selectedRoomRef.current = null;
       setSelectedRoom(null);
     }else{
+      selectedRoomRef.current = room;
       setSelectedRoom(room);
     }
   }
@@ -60,6 +63,15 @@ export default function FindLocationPage({ socket }) {
       socket?.off('error', handleError);
     }
   }, [socket, ready]);
+
+  useEffect(() => {
+    return () => {
+      if (socket && selectedRoomRef.current) {
+        socket.emit('leave_physical_room');
+        selectedRoomRef.current = null;
+      }
+    };
+  }, [socket]);
 
   return (
     <div className="FindLocationPage">
