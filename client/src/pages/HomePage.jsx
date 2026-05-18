@@ -33,7 +33,7 @@ export default function HomePage({ socket, setSocket}) {
       <main className="main-content">
         <div style={{ padding: '50px', textAlign: 'center' }}>
           <h1 className="home-title">StudyNest</h1>
-          <p>What would you like to do?</p>
+          <p>The place you study the best</p>
           <img src={heroImg} alt="vine" className="vine-img" />
 
             <div className="button-group">

@@ -34,9 +34,6 @@ export default function SidebarListofRooms({ rooms }) {
             </div>
 
             <div className="sidebar-footer">
-                <button className="choose-type-button" onClick={expandsubjectlist}>
-                    Choose room type <span className="plus-icon">+</span>
-                </button>
                 <button className="create-room-green-button" onClick={() => navigate('/create-virtual-room')}>
                     Create room
                 </button>
