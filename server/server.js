@@ -3,6 +3,7 @@
 require('dotenv').config(); 
 
 //server imports
+const cors = require('cors');
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -15,7 +16,21 @@ const User = require('./user');
 //route imports ei. Our local API 
 const authRoutes = require('./routes/auth');
 const roomRoutes = require('./routes/rooms');
+const { getPersistentRooms, updateUserToRoom, leavePhysicalRoom} = require('./routes/physicalRoom');
+const virtualRoomRoutes = require('./routes/virtualRooms');
+const {
+  joinRoom,
+  leaveRoom,
+  sendMessageToRoom,
+  handleTimerAction,
+  changeUserStatus,
+  changeUserAvatar,
+  handleWhiteboardRequest,
+  handleWhiteboardUpdate,
+  getRoomCounts
+} = require('./routes/virtualRoom');
 const { router: userRoutes } = require('./routes/users');
+const { send } = require('process');
 
 // --- 1. EXPRESS MIDDLEWARE & ROUTING ---
 //making server and Sockets.io
@@ -30,12 +45,17 @@ const io = new Server(server, {
 //server setup
 //app.use(express.static('public')); //move to react instead
 app.use(express.json());
+app.use(cors());
 app.use('/api/rooms', roomRoutes);
+app.use('/api/virtual-rooms', virtualRoomRoutes);
 app.use('/api/users', userRoutes);
 app.use('/auth', authRoutes);
 
-// --- 2. AUTHENTICATION FOR ENTRY ---
+const runAlter = require('./db/runAlter');
+const seedRooms = require('./db/seedRooms');
 
+// --- 2. AUTHENTICATION FOR ENTRY ---
+//behövs denna function
 /**
  * Fungerar som en dörrvakt för chatten. Den kollar användarens JWT-token 
  * för att se till att bara inloggade personer får ansluta. Om allt 
@@ -64,8 +84,7 @@ io.use((socket, next) => {
 
 //all logged in users, indexed by socket ID
 let listActiveUsers = {};
-//set of all users in rooms
-let room_participants = {};
+
 
 /**
  * Hanterar en ny anslutning till realtidsservern. 
@@ -77,22 +96,8 @@ let room_participants = {};
  * @param {Object} socket - Klientens unika anslutningsobjekt.
  */
 io.on('connection', (socket) => {
-    console.log('User connected:', socket.user.email, 'Socket ID:', socket.id);
-
-    listActiveUsers[socket.id] = new User(socket.user.username, socket.user.email, socket.id);
-    /**
-     * Registrerar användaren manuellt och skapar ett nytt User-objekt på servern.
-     *
-     * @name socketOnLogin
-     * @function
-     * @param {string} username - Namnet som användaren väljer vid inloggning.
-     */
-    socket.on('login', (username) => {
-        listActiveUsers[socket.id] = new User(username);
-        console.log('User logged in:', username);
-    });
-
-
+    listActiveUsers[socket.id] = new User(socket.user.userId, socket.user.username, socket.user.email, socket.id, socket.user.avatar);
+    console.log('Current active users:', Object.values(listActiveUsers).map(u => u.getUsername()));
     /**
      * Placerar klienten i ett specifikt chattrum. Funktionen uppdaterar serverns 
      * interna listor över vilka som är i rummet och meddelar sedan både den 
@@ -102,37 +107,17 @@ io.on('connection', (socket) => {
      * @function
      * @param {string} room - Namnet på rummet som klienten vill ansluta till.
      */
-    socket.on('join_room', (room) => {
-        socket.join(room);
-        socket.room = room; // Spara rummet på socketen
-
-        // Sätt rummet på User-objektet om det finns
-        if (listActiveUsers[socket.id]) {
-            listActiveUsers[socket.id].room = room;
-        }
-        // if (!room_participants[room]) {
-        //     room_participants[room] = [];
-        // }
-        // const userExists = room_participants[room].some(u => u.id === socket.user.userId);
-        // if (!userExists) {
-        //     room_participants[room].push({ id: socket.user.userId, email: socket.user.email });
-        // }
-
-        // 1. Skicka bekräftelse till den som anslöt
-        socket.emit('joined_room', { room: room });
-
-        // 2. Meddela andra i rummet (Använd namnet från listActiveUsers i första hand, annars e-posten från JWT)
-        const displayName = listActiveUsers[socket.id] 
-          ? listActiveUsers[socket.id].getUsername() 
-          : socket.user.email;
-
-        socket.to(room).emit('user_joined', displayName);
-
-        //io.to(room).emit('room_participants', { participants: room_participants[room] || [] });
-         
-
+    socket.on('join_room', (room, avatar) => {
+      joinRoom(room, socket, listActiveUsers, io, avatar);
     });
 
+    socket.on('leave_room', (room) => {
+      leaveRoom(room, socket, listActiveUsers, io);
+    });
+
+    socket.on('get_room_counts', () => {
+      socket.emit('room_counts_updated', getRoomCounts());
+    });
 
     /**
      * Tar emot ett textmeddelande från klienten och skickar det vidare till 
@@ -141,33 +126,74 @@ io.on('connection', (socket) => {
      * @name socketOnSendMessage
      * @function
      * @param {string} message - Textmeddelandet som klienten vill skicka.
+     * @param {string} room - Namnet på rummet som klienten vill skicka meddelandet till.
      */
-    socket.on('send_message', (message) => {
-        const user = listActiveUsers[socket.id];
-        if (user) {
-            io.to(user.room).emit('receive_message', {
-                username: user.username,
-                message
-            });
-        }
+    socket.on('send_message', (message, room) => {
+        sendMessageToRoom(room, socket, message, listActiveUsers, io);
     });
 
+    socket.on('timer_action', (data) => {
+        handleTimerAction(data.room, data.action, io);
+    });
+
+    socket.on('change_status', (data) => {
+        changeUserStatus(data.room, socket, data.status, listActiveUsers, io);
+    });
+
+    socket.on('change_avatar', (data) => {
+        changeUserAvatar(data.room, socket, data.avatar, listActiveUsers, io);
+    });
+
+
+    socket.on('get_persistent_rooms', (location) => {
+        getPersistentRooms(location, socket, io);
+    });
+
+    socket.on('join_physical_room', (newRoomName, oldRoomName, location) => {
+        updateUserToRoom(newRoomName, oldRoomName, location, socket, io);
+    });
+
+    socket.on('leave_physical_room', () => {
+        leavePhysicalRoom(socket, io);
+    });
+        
+    socket.on('whiteboard_request', ({ room }, callback) => {
+      const board = handleWhiteboardRequest(room, socket);
+      if (typeof callback === 'function') {
+        callback({ board });
+      }
+    });
+
+    socket.on('whiteboard_update', ({ room, board }) => {
+      handleWhiteboardUpdate(room, socket, board, io);
+    });
 
     /**
      * Hanterar uppstädning när en klient förlorar anslutningen eller stänger webbläsaren. 
      * Raderar användaren från serverns minne och informerar det aktiva rummet om att 
      * personen har lämnat.
      *
-     * @name socketOnDisconnect
+     * @name socketOnDisconnecting
      * @function
      */
-    socket.on('disconnect', () => {
-        const user = listActiveUsers[socket.id];
-        if (user) {
-            socket.to(user.room).emit('user_left', user.username);
-            delete listActiveUsers[socket.id];
-        }
-        console.log('User disconnected:', socket.id);
+    socket.on('disconnecting', () => {
+      const user = listActiveUsers[socket.id];
+
+      if (!user) return;
+
+      if (socket.room) {
+        leaveRoom(socket.room, socket, listActiveUsers, io);
+      }
+
+      leavePhysicalRoom(socket, io);
+
+      delete listActiveUsers[socket.id];
+
+      console.log('User disconnecting:', user.getUsername());
+      console.log(
+        'Current active users:',
+        Object.values(listActiveUsers).map(u => u.getUsername())
+      );
     });
 });
 
@@ -186,12 +212,24 @@ process.on('SIGINT', () => {
 
 
 // --- 5. START SERVER ---
-// Only start listening if we are NOT running tests
-if (process.env.NODE_ENV !== 'test') {
-  server.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-  });
+async function startServer() {
+  try {
+    await runAlter();
+    await seedRooms();
+
+    // Only start listening if we are NOT running tests
+    if (process.env.NODE_ENV !== 'test') {
+      server.listen(3000, () => {
+        console.log('Server running on http://localhost:3000');
+      });
+    }
+  } catch (err) {
+    console.error('Failed to initialize database:', err.message);
+    process.exit(1);
+  }
 }
+
+startServer();
 // --- 6. EXPORTS FOR TESTING ---
 // Export the instances so our test files can use them
 module.exports = { app, server, io };

@@ -2,95 +2,79 @@ import { useState } from 'react'
 import '../App.css'
 import { Sidebar } from '../components/Sidebar'
 import { useNavigate } from 'react-router-dom';
-import { login } from '../script/login'
+import { login } from '../script/login';
+import { connect } from '../script/socketConection';
 
-export default function LogInPage() {
-  const [username, setUsername] = useState('test');
-  const [password, setPassword] = useState('abc');
-  const [email, setEmail] = useState('test@test.su.se');
+export default function LogInPage({ socket, setSocket }) {
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  console.log("login clicked");
-  console.log("Email:", email);
-  console.log("Password:", password);
+    e.preventDefault();
 
-  const resultConstanst = await login({ email, password });
+    setError('');
 
-  if (resultConstanst.success && localStorage.getItem('token')) { 
-    alert(`Logging in as ${localStorage.getItem('username')}!`);
+    const result = await login(email, password);
+
+    if (!result.ok) {
+      setError(result.error);
+      return;
+    }
+
+    const soc = connect(); // Test for first time connection
+    setSocket(soc);
     navigate('/home');
-  }
-  
-  else {
-    alert(resultConstanst.message);
-    //alert('Login failed. Please check your credentials and try again.');
-  }
-};
+  };
 
   return (
     <div className="LoginPage">
       <Sidebar />
       <main className="main-content">
-        <form className="Login-box" onSubmit={handleLogin}>
+        <form className="auth-box" onSubmit={handleLogin}>
           <h2>Sign in</h2>
 
           <div className="input-group">
-            <label>Email:</label>
+            <label htmlFor="login-email">
+              Email
+              <span className="email-tooltip" tabIndex="0" aria-label="Only student emails are allowed">?</span>
+            </label>
             <input
-              id='email'
-              type="text"
+              id="login-email"
+              type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
           <div className="input-group">
-            <label>Username:</label>
+            <label htmlFor="login-password">Password</label>
             <input
-              id='username'
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
-
-          <div className="input-group">
-            <label>Password:</label>
-            <input
-              id='password'
+              id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
-            <button
-              type="submit"
-              style={{
-                padding: '10px 20px',
-                fontSize: '18px',
-                cursor: 'pointer',
-              }}
-            >
+          <div className="auth-actions">
+            <button className="auth-button auth-button-primary" type="submit">
               Login
             </button>
 
             <button
+              className="auth-button"
               type="button"
-              style={{
-                padding: '10px 20px',
-                fontSize: '18px',
-                cursor: 'pointer',
-              }}
               onClick={() => navigate('/sign-up')}
             >
               Sign Up
             </button>
           </div>
+          {error ? <p className="auth-error">{error}</p> : null}
 
         </form>
       </main>

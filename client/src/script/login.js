@@ -1,44 +1,33 @@
-export async function login({ email, password }) {
-  const apiUrl = import.meta.env.VITE_API_URL || '';
+/**
+ * Hanterar inloggningsprocessen på klientsidan. Funktionen tar emot
+ * användarens e-post och lösenord, skickar en autentiseringsförfrågan
+ * till servern och sparar JWT-token lokalt vid framgång.
+ *
+ * @name login
+ * @function
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<{ok: boolean, error?: string, username?: string}>}
+ */
+export async function login(email, password) {
+  const res = await fetch('/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  })
 
-  console.log("Sending login request to:", `${apiUrl}/auth/login`);
-  console.log("Data:", { email, password });
+  const data = await res.json()
 
-  try {
-    const res = await fetch(`/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    localStorage.setItem('string-result', JSON.stringify(res));
-    const data = await res.json();
-
-    console.log("Response ok:", res.ok);
-    console.log("Response data:", data);
-
-    if (!res.ok) {
-      return {
-        success: false,
-        message: data.error || 'Invalid email or password'
-      };
-    }
-
-    localStorage.setItem('token', data.token);
-
-    const payload = JSON.parse(atob(data.token.split('.')[1]));
-    localStorage.setItem('username', payload.username);
-
-    // Dispatch custom event to notify components of login
-    window.dispatchEvent(new Event('userLoggedIn'));
-
-    return {
-      success: true
-    };
-
-  } catch (err) {
-    return {
-      success: false,
-      message: 'Network error. Please try again.'
-    };
+  if (!res.ok) {
+    return { ok: false, error: data.error || 'Login failed' }
   }
+
+  localStorage.setItem('token', data.token)
+
+  const payload = JSON.parse(atob(data.token.split('.')[1]))
+  localStorage.setItem('username', payload.username)
+  localStorage.setItem('avatar', payload.avatar || '0.svg')
+  window.dispatchEvent(new Event('userLoggedIn'))
+
+  return { ok: true, username: payload.username }
 }

@@ -12,9 +12,6 @@ export function SubjectSelector() {
                 <option>Economics</option>
                 <option>Misc</option>
             </select>
-            <button type="button" className="add-subject">
-              + Add more subjects
-            </button>
         </div>
     )
 }

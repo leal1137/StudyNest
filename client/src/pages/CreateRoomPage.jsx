@@ -1,17 +1,20 @@
 import { useState } from 'react'
 import { Sidebar } from '../components/Sidebar';
 import CreateRoomSettings from '../components/CreateRoomSpecifics';
-import { SelectPlaceOnMap } from '../components/SelectPlaceOnMap';
+import VirtualMapCreate from '../components/VirtualMapCreate';
+import { } from '../script/socketConection';
+import '../cssfiles/JoinRoomPage.css'
 
-export default function CreateRoomPage() {
 
+export default function CreateRoomPage({ socket }) {
+
+  const [pinPosition, setPinPosition] = useState(null);
 
   return (
     <div className="CreateRoomPage">
       <Sidebar />
-      <CreateRoomSettings/>
-      <SelectPlaceOnMap/>
+      <CreateRoomSettings pinPosition={pinPosition}/>
+      <VirtualMapCreate pinPosition={pinPosition} setPinPosition={setPinPosition} />
     </div>
   )
-
 }
