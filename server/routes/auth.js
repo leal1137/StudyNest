@@ -7,7 +7,8 @@ const { createUser, getUserByEmail, normalizeAvatar, signUserToken } = require('
 
 const router = express.Router();
 
-const allowedDomains = ['kth.se', 'su.se', 'student.uu.se'];
+const allowedDomains = ['kth.se', 'su.se', 'student.uu.se', 'student.lu.se', 'student.umu.se', 
+  'student.uu.se', 'student.gu.se', 'student.ki.se', 'student.liu.se'];
 
 function isStudentEmail(email) {
   const domain = email.split('@')[1];

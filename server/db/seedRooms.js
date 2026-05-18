@@ -5,7 +5,7 @@ const PERSISTENT_ROOMS = [
   { name: 'Silent study room', user_count: 0, room_location: "Ekonomikum"},
   { name: 'Maths ecom',        user_count: 0, room_location: "Ekonomikum"},
   { name: 'Chattier room',     user_count: 0, room_location: "Ekonomikum"},
-  { name: 'Källaren hus 10',  user_count: 0, room_location: "Ångström"},
+  { name: 'Källare hus 10',  user_count: 0, room_location: "Ångström"},
   { name: 'Skrubben',         user_count: 0, room_location: "Ångström"},
   { name: 'Terrassen',    user_count: 0, room_location: "Ångström"},
   { name: 'Silent study',      user_count: 0, room_location: "Carolina Rediviva"},
