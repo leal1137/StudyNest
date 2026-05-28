@@ -55,6 +55,10 @@ export default function FindLocationPage({ socket }) {
       socket?.emit('get_persistent_rooms', location);
     }
     return () => {
+      if(selectedRoom && ready){
+        console.log(selectedRoom.name);
+        selectRoom(selectRoomed.name); //är detta rätt?
+      }
       socket?.off('update_persistent_rooms', uppdateRooms);
       socket?.off('error', handleError);
     }
